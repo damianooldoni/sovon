@@ -10,7 +10,7 @@
 #'
 #' @importFrom DBI dbGetQuery
 #' @importFrom dplyr %>% as_tibble
-#' @example
+#' @examples
 #' \dontrun{
 #' conn <- connect_to_kleurring()
 #'

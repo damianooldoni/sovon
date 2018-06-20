@@ -1,5 +1,5 @@
 Package: sovon
-Title: Access and Process Data from the European Tracking Network
+Title: R code to extract data from INBO's kleurringdatabank and transform it to SOVON standard.
 Version: 0.1.0
 Authors@R:
     person("Damiano", "Oldoni", email = "damiano.oldoni@inbo.be", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3445-7562"))

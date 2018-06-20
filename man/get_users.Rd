@@ -10,8 +10,16 @@ get_users(conn)
 \item{conn}{A valid connection to INBO kleurring database.}
 }
 \value{
-A data.frame.
+A tibble data frame.
 }
 \description{
 Get users data.
+}
+\examples{
+\dontrun{
+conn <- connect_to_kleurring()
+
+# all users
+users <- sovon::get_users(conn)
+}
 }
