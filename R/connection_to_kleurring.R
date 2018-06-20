@@ -1,6 +1,8 @@
-#' @description Provide connection to the INBO kleurringdatabank (the so called
-#'   *meeuwen* database). Valid only if rights are provided by INBO databeheer
-#'   team.
+#' Provide connection to the INBO kleurringdatabank
+#'
+#' @description Connect to the INBO kleurringdatabank (the so called
+#'   *meeuwen* database). Be sure to have the needed rights by INBO databeheer
+#'   team. The driver `SQL Server Native Client 11.0` is used.
 #'
 #' @return conn ODBC connection to kleurring database.
 #'
