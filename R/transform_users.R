@@ -5,7 +5,11 @@
 #'
 #' @param users tibble data frame.
 #'
+#' @export
+#'
 #' @return A tibble data frame.
+#'
+#' @importFrom dplyr %>% rename mutate select one_of
 transform_users <- function(users) {
   users <- users %>%
     rename(user_email = Email,
