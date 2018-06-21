@@ -34,13 +34,15 @@ reference:
     desc: "Get access to data"
     contents:
       - get_users
+      - get_birds
+      - get_observations
   - title: "Main data transformation functionalities"
-    desc: "Transfomr user data"
+    desc: "Transform user data"
     contents:
       - transform_users
-
+      - transform_birds
 articles:
-  - title: "Get and transform INBO user data to SOVON standard"
+  - title: "Get and transform INBO data to SOVON standard"
     contents:
     - transfer-users-data
 
