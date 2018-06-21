@@ -11,6 +11,6 @@ conn ODBC connection to kleurring database.
 }
 \description{
 Connect to the INBO kleurringdatabank (the so called
-  *meeuwen* database). Be sure to have the needed rights by INBO databeheer
+  meeuwen database). Be sure to have the needed rights by INBO databeheer
   team. The driver `SQL Server Native Client 11.0` is used.
 }

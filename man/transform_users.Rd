@@ -2,9 +2,9 @@
 % Please edit documentation in R/transform_users.R
 \name{transform_users}
 \alias{transform_users}
-\title{Transform users information as asked by SOVON}
+\title{Transform users information to SOVON format}
 \usage{
-transform_users(users)
+transform_users(users, sovon_fields)
 }
 \arguments{
 \item{users}{tibble data frame.}
@@ -13,6 +13,6 @@ transform_users(users)
 A tibble data frame.
 }
 \description{
-SOVON requests users data in a specific format. This function tranforms the
-information in INBO kleurring database to such format.
+SOVON requests user data in a specific format. This function tranforms the
+information extracted from INBO kleurring database to such format.
 }

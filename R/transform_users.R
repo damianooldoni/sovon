@@ -1,7 +1,7 @@
-#' Transform users information as asked by SOVON
+#' Transform users information to SOVON format
 #'
-#' SOVON requests users data in a specific format. This function tranforms the
-#' information in INBO kleurring database to such format.
+#' SOVON requests user data in a specific format. This function tranforms the
+#' information extracted from INBO kleurring database to such format.
 #'
 #' @param users tibble data frame.
 #'
@@ -19,12 +19,12 @@ transform_users <- function(users) {
            user_reference = NA,
            user_language = NA,
            user_role = "O") %>%
-    select(one_of(sovon_fields))
+    select(one_of(sovon_user_fields))
   users
 }
 
 #' user fields requested by SOVON
-sovon_fields <- c("user_id",
+sovon_user_fields <- c("user_id",
                   "user_reference",
                   "user_email",
                   "user_first_name",

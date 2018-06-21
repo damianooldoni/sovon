@@ -3,12 +3,12 @@
 \docType{data}
 \name{driver}
 \alias{driver}
-\title{kleurring database informations}
+\title{kleurring database connection info}
 \format{An object of class \code{character} of length 1.}
 \usage{
 driver
 }
 \description{
-kleurring database informations
+kleurring database connection info
 }
 \keyword{datasets}
