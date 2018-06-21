@@ -1,5 +1,5 @@
 ---
-title: "Transfer data about users"
+title: "Transfer users data"
 author: 
 - Damiano Oldoni
 date: "`r Sys.Date()`"
@@ -30,20 +30,20 @@ This pipeline will:
 
 Install `sovon` package:
 
-```{r install_sovon_package}
+```{r install_sovon_package, eval = FALSE}
 devtools::install_github("damianooldoni/sovon")
 ```
 
 Load libraries:
 
-```{r load_libraries}
+```{r load_libraries, eval = FALSE}
 library(sovon)
 library(readr)
 ```
 
 Connect to INBO *kleurring* database:
 
-```{r connect_to_db}
+```{r connect_to_db, eval = FALSE}
 conn <- sovon::connect_to_kleurring()
 ```
 
@@ -51,26 +51,31 @@ conn <- sovon::connect_to_kleurring()
 
 First, we extract data about users from INBO *kleurring* database:
 
-```{r get_user_data}
+```{r get_user_data, eval = FALSE}
 INBO_users <- sovon::get_users(conn)
 ```
+
+For privcay reasons no preview is shown. How many users do we get?
+
+```{r number_users, eval = FALSE}
+nrow(INBO_users)
+```
+
 
 # Transform user data 
 
 Next step is transforming user data to SOVON format. For more info see spreadsheet [here](https://drive.google.com/drive/folders/1GoPXDluxdviHEZIRcInmLwSHDqkTrmsM).
 
-```{r transform_to_SOVON_format}
+```{r transform_to_SOVON_format, eval = FALSE}
 INBO_users <- sovon::transform_users(INBO_users)
 ```
+
+For privcay reasons data are not shown.
 
 # Export data in text file
 
 The user data are ready for being written in a text file (comma separated value)
 
-```{r chgdir, include = FALSE}
-setwd("../data/output/")
-```
-
-```{r write_user_data_txt}
-readr::write_csv(INBO_users, path = "data_users.tsv", na = "")
+```{r write_user_data_txt, eval = FALSE}
+readr::write_csv(INBO_users, path = "../data/output/data_users.tsv", na = "")
 ```

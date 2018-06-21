@@ -30,7 +30,7 @@ This pipeline will:
 
 Install `sovon` package:
 
-```{r install_sovon_package}
+```{r install_sovon_package, eval = FALSE}
 devtools::install_github("damianooldoni/sovon")
 ```
 
@@ -55,6 +55,8 @@ First, we extract data about users from INBO *kleurring* database:
 INBO_users <- sovon::get_users(conn)
 ```
 
+For privcay reasons no preview is shown.
+
 # Transform user data 
 
 Next step is transforming user data to SOVON format. For more info see spreadsheet [here](https://drive.google.com/drive/folders/1GoPXDluxdviHEZIRcInmLwSHDqkTrmsM).
@@ -63,14 +65,12 @@ Next step is transforming user data to SOVON format. For more info see spreadshe
 INBO_users <- sovon::transform_users(INBO_users)
 ```
 
+For privcay reasons data are not shown.
+
 # Export data in text file
 
 The user data are ready for being written in a text file (comma separated value)
 
-```{r chgdir, include = FALSE}
-setwd("../data/output/")
-```
-
 ```{r write_user_data_txt}
-readr::write_csv(INBO_users, path = "data_users.tsv", na = "")
+readr::write_csv(INBO_users, path = "../data/output/data_users.tsv", na = "")
 ```
