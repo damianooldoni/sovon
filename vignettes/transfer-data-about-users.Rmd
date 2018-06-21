@@ -55,6 +55,8 @@ First, we extract data about users from INBO *kleurring* database:
 INBO_users <- sovon::get_users(conn)
 ```
 
+For privcay reasons no preview is shown.
+
 # Transform user data 
 
 Next step is transforming user data to SOVON format. For more info see spreadsheet [here](https://drive.google.com/drive/folders/1GoPXDluxdviHEZIRcInmLwSHDqkTrmsM).
@@ -62,6 +64,8 @@ Next step is transforming user data to SOVON format. For more info see spreadshe
 ```{r transform_to_SOVON_format}
 INBO_users <- sovon::transform_users(INBO_users)
 ```
+
+For privcay reasons data are not shown.
 
 # Export data in text file
 
