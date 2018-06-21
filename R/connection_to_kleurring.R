@@ -1,4 +1,4 @@
-#' Provide connection to the INBO kleurringdatabank
+#' Provide connection to the INBO kleurring database.
 #'
 #' @description Connect to the INBO kleurringdatabank (the so called
 #'   meeuwen database). Be sure to have the needed rights by INBO databeheer

@@ -1,0 +1,49 @@
+navbar:
+  title: ~
+  type: default
+  left:
+  - text: Pipelines
+    href: articles/index.html
+    menu:
+    - text: Prepare user data for submission to SOVON application
+      href: articles/Transfer-data-about-users.html
+  - text: Functions
+    href: reference/index.html
+  - text: Contributing
+    href: contributing.html
+  right:
+  - icon: fa-twitter fa-lg
+    href: https://twitter.com/LifeWatchINBO
+  - icon: fa-github fa-lg
+    href: https://github.com/damianooldoni/sovon
+
+home:
+  links:
+  - text: Get to know our team
+    href: https://lifewatch.inbo.be
+
+authors:
+  Damiano Oldoni:
+    href: https://twitter.com/damianozingaro
+
+reference:
+  - title: "Connect to the database"
+    contents:
+      - connect_to_kleurring
+  - title: "Main data access functionalities"
+    desc: "Get access to data"
+    contents:
+      - get_users
+  - title: "Main data transformation functionalities"
+    desc: "Transfomr user data"
+    contents:
+      - transform_users
+
+articles:
+  - title: "Get and transform INBO user data to SOVON standard"
+    contents:
+    - transfer-data-about-users
+
+template:
+  params:
+    bootswatch: yeti
