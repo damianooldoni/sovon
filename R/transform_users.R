@@ -1,4 +1,4 @@
-#' Transform user information to SOVON format
+#' Transform user data to SOVON format
 #'
 #' SOVON requests user data in a specific format. This function tranforms the
 #' information extracted from INBO kleurring database to such format.
