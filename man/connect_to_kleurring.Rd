@@ -2,7 +2,7 @@
 % Please edit documentation in R/connection_to_kleurring.R
 \name{connect_to_kleurring}
 \alias{connect_to_kleurring}
-\title{Provide connection to the INBO kleurringdatabank}
+\title{Provide connection to the INBO kleurring database.}
 \usage{
 connect_to_kleurring()
 }

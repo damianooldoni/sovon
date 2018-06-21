@@ -6,7 +6,7 @@ navbar:
     href: articles/index.html
     menu:
     - text: Prepare user data for submission to SOVON application
-      href: articles/Transfer-data-about-users.html
+      href: articles/Transfer-users-data.html
   - text: Functions
     href: reference/index.html
   - text: Contributing
@@ -42,7 +42,7 @@ reference:
 articles:
   - title: "Get and transform INBO user data to SOVON standard"
     contents:
-    - transfer-data-about-users
+    - transfer-users-data
 
 template:
   params:

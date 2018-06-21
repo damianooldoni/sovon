@@ -1,5 +1,5 @@
 ---
-title: "Transfer data about users"
+title: "Transfer users data"
 author: 
 - Damiano Oldoni
 date: "`r Sys.Date()`"
@@ -30,8 +30,8 @@ This pipeline will:
 
 Install `sovon` package:
 
-```{r install_sovon_package}
-devtools::install_github("damianooldoni/sovon")
+```{r install_sovon_package, eval = FALSE}
+devtools::install_github("damianooldoni/sovon/tree/finalize_users_export_transform")
 ```
 
 Load libraries:
@@ -55,7 +55,12 @@ First, we extract data about users from INBO *kleurring* database:
 INBO_users <- sovon::get_users(conn)
 ```
 
-For privcay reasons no preview is shown.
+For privcay reasons no preview is shown. How many users do we get?
+
+```{r number_users}
+nrow(INBO_users)
+```
+
 
 # Transform user data 
 
@@ -71,10 +76,6 @@ For privcay reasons data are not shown.
 
 The user data are ready for being written in a text file (comma separated value)
 
-```{r chgdir, include = FALSE}
-setwd("../data/output/")
-```
-
 ```{r write_user_data_txt}
-readr::write_csv(INBO_users, path = "data_users.tsv", na = "")
+readr::write_csv(INBO_users, path = "../data/output/data_users.tsv", na = "")
 ```
