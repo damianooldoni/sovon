@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform_users.R
 \name{transform_users}
 \alias{transform_users}
-\title{Transform user information to SOVON format}
+\title{Transform user data to SOVON format}
 \usage{
 transform_users(users)
 }

@@ -64,7 +64,7 @@ nrow(INBO_users)
 
 # Transform user data 
 
-Next step is transforming user data to SOVON format. For more info see spreadsheet [here](https://drive.google.com/drive/folders/1GoPXDluxdviHEZIRcInmLwSHDqkTrmsM).
+Now we adapt user data to SOVON format. For more info see [spreadsheet](https://docs.google.com/spreadsheets/d/16928bSQzZ0jz0FCf5gXZ4Rg4gf9qYQPO5izLZ5IYSTQ/edit?usp=drive_web&ouid=109004011205942623101) and [document](https://docs.google.com/document/d/1VtwGD4wrwJLnGnvJprtFB3MbbXdirMELYvuCGEhLr3w/edit) as provided by SOVON.
 
 ```{r transform_to_SOVON_format, eval = FALSE}
 INBO_users <- sovon::transform_users(INBO_users)
