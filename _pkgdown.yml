@@ -37,7 +37,7 @@ reference:
       - get_birds
       - get_observations
   - title: "Main data transformation functionalities"
-    desc: "Transform user data"
+    desc: "Transform data"
     contents:
       - transform_users
       - transform_birds
