@@ -2,9 +2,9 @@ name: "Mapping to crbirding (SOVON) format"
 output_dir: "../docs"
 include: ["static/"]
 navbar:
-  title: "Mapping kleurring INBO database to crbirding"
+  title: "Mapping to crbirding (SOVON) format"
   left:
-    - text: "Mapping"
+    - text: "Mapping kleurring database to crbirding"
       href: map_inbo_data_to_sovon.html
   right:
     - icon: fa-github fa-lg
