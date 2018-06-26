@@ -53,12 +53,12 @@ cr_obs <- "../data/processed/data_observations.tsv"
 
 We establish a connection to the database. Sensible data are saved in the `.Renviron` file:
 
-```{r connect_to_db, eval = FALSE}
+```{r connect_to_db}
 conn <- DBI::dbConnect(odbc::odbc(),
                        driver = Sys.getenv("driver"),
                        server = Sys.getenv("driver"),
                        database = Sys.getenv("D0016_00_Meeuwen"),
-                       port = Sys.getenv(1433),
+                       port = Sys.getenv("port"),
                        trusted_connection = Sys.getenv("tc"))
 ```
 
