@@ -57,7 +57,7 @@ We establish a connection to the database. Sensible data are saved in the `.Renv
 conn <- dbConnect(odbc::odbc(),
                   driver = Sys.getenv("driver"),
                   server = Sys.getenv("server"),
-                  database = Sys.getenv("D0016_00_Meeuwen"),
+                  database = Sys.getenv("database"),
                   port = Sys.getenv("port"),
                   trusted_connection = Sys.getenv("tc"))
 ```
@@ -162,6 +162,8 @@ We tranform the information extracted from INBO color ring database to SOVON for
 
 ## Map user data
 
+We start mapping user data.
+
 ### E-mail
 
 ```{r e-mail}
@@ -242,14 +244,14 @@ users <- users %>%
 
 The distinction between ringer and observer is not present in `users`, but can be retrieved by combining `obs`, `obs_actions` and `users`.
 
-We filter the ring actions, `rngkl` and `rngme`, and we retrieve the ringers in `obs` by `raw_WaarnemerNummer`:
+We filter by ring action (`rngkl` and `rngme`) and we retrieve the ringers in `obs` by `raw_WaarnemerNummer`:
 
 ```{r find_ringers}
 ringing_obs_numbers <- obs_actions %>% 
   filter(raw_AktieCode %in% c("rngkl","rngme")) %>%
   pull(raw_WaarnemingNummer)
 ringers_number <- obs %>% 
-  filter(raw_Nummer %in% obs_numbers) %>%
+  filter(raw_Nummer %in% ringing_obs_numbers) %>%
   distinct(raw_WaarnemerNummer) %>% pull()
 ```
 
