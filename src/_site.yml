@@ -1,6 +1,5 @@
 name: "Mapping to crbirding (SOVON) format"
 output_dir: "../docs"
-include: "static/"
 navbar:
   title: "Mapping to crbirding (SOVON) format"
   left:
