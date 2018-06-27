@@ -429,18 +429,20 @@ obs <- obs %>% mutate(
 
 ### Observation location
 
-Aggregate information about observation location:
+Aggregate information about observation location. We follow the following structure, in agreement with SOVON: `raw_PlaatsGemeente` [+ `, in de omgeving van ` + `raw_PlaatsToponym` [+ `: ` + `raw_PlaatsToponymDetail`]]:
 
 ```{r}
 obs <- obs %>% mutate(
-  observation_location = str_c(raw_PlaatsGemeente,
-                               raw_PlaatsToponym, 
-                               sep = ", in de omgeving van "
-)) %>%
-  mutate(observation_location = str_c(observation_location, 
-                                      raw_PlaatsToponymDetail,
-                                      sep = ": "
-))
+  observation_location = ifelse(!is.na(raw_PlaatsToponym),
+                                str_c(raw_PlaatsGemeente,
+                                      raw_PlaatsToponym, 
+                                      sep = ", in de omgeving van "),
+                                paste(raw_PlaatsGemeente))) %>%
+  mutate(observation_location = ifelse(!is.na(raw_PlaatsToponymDetail),
+                                       str_c(observation_location,
+                                             raw_PlaatsToponymDetail,
+                                             sep = ": "),
+                                       paste(observation_location)))
 ```
 
 
