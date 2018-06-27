@@ -1,15 +1,17 @@
 name: "Mapping to crbirding (SOVON) format"
 output_dir: "../docs"
-include: ["static/"]
+include: "static/"
 navbar:
   title: "Mapping to crbirding (SOVON) format"
   left:
-    - text: "Mapping kleurring database to crbirding"
-      href: map_inbo_data_to_sovon.html
+  - text: "Mapping kleurring database to crbirding"
+    href: map_inbo_data_to_sovon.html
   right:
-    - icon: fa-github fa-lg
-      href: https://github.com/damianooldoni/sovon/
+  - icon: fa-github fa-lg
+    href: https://github.com/damianooldoni/sovon/
 output:
   html_document:
     theme: yeti
     df_print: paged
+
+

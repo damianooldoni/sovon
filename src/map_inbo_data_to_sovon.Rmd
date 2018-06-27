@@ -124,7 +124,7 @@ obs_actions <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemingAktie")
 
 ## Pre-processing
 
-Add prefix `raw_` to all column names to avoid any possible name clash with SOVON terms (for more info see [spreadsheet](https://docs.google.com/spreadsheets/d/16928bSQzZ0jz0FCf5gXZ4Rg4gf9qYQPO5izLZ5IYSTQ/edit?usp=drive_web&ouid=109004011205942623101) and [document](https://docs.google.com/document/d/1VtwGD4wrwJLnGnvJprtFB3MbbXdirMELYvuCGEhLr3w/edit)) as provided by SOVON.
+Add prefix `raw_` to all column names to avoid any possible name clash with SOVON terms (for more info see [spreadsheet](https://docs.google.com/spreadsheets/d/16928bSQzZ0jz0FCf5gXZ4Rg4gf9qYQPO5izLZ5IYSTQ/edit?usp=drive_web&ouid=109004011205942623101) and [document](https://docs.google.com/document/d/1VtwGD4wrwJLnGnvJprtFB3MbbXdirMELYvuCGEhLr3w/edit)) as provided by SOVON (access restricted).
 
 ```{r add_raw}
 colnames(users) <- paste0("raw_", colnames(users))

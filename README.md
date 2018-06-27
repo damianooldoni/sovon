@@ -6,7 +6,7 @@ This repository contains the functionality to access and process data from the *
 
 ## Workflow
 
-source data from INBO database →  [mapping script](http:///github.com/damianooldoni/sovon/map_inbo_data_to_sovon.html) → generated [generated files](https://github.com/damianooldoni/sovon/blob/master/data/processed/)
+source data from INBO database →  [mapping script](http://damianooldoni.github.io/sovon/map_inbo_data_to_sovon.html) → generated [generated files](https://github.com/damianooldoni/sovon/blob/master/data/processed/)
 
 ## Repo structure
 
