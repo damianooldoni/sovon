@@ -1,0 +1,528 @@
+---
+title: "Map data from INBO color ring database to crbirding (SOVON)"
+author: 
+- Damiano Oldoni
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: yeti
+    df_print: paged
+knit: (function(input_file, encoding) { rmarkdown::render(input_file, encoding = encoding, output_file = paste0("../docs/",sub(".Rmd", ".html", basename(input_file))))})
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Goal
+
+This pipeline will:
+
+1. extract data from INBO *kleurring* database (official name: `D0016_00_Meeuwen`)
+2. transform data to SOVON format
+3. export data in text files
+
+# Setup
+
+Load libraries:
+
+```{r load_libraries}
+library(DBI) # To connect to database
+library(odbc) # To connect to database
+library(stringr)   # To perform string operations
+library(readr) # To read and write txt files
+library(dplyr) # To transform data
+library(measurements) # To convert units of measurement 
+```
+
+Set output file paths (all paths should be relative to this script):
+
+```{r file_paths}
+cr_users <- "../data/processed/data_users.tsv"
+cr_birds <- "../data/processed/data_birds.tsv"
+cr_obs <- "../data/processed/data_observations.tsv"
+```
+
+# Extract data from INBO kleurring database
+
+## Connection to INBO database
+
+We establish a connection to the database. Sensible data are saved in the `.Renviron` file:
+
+```{r connect_to_db}
+conn <- dbConnect(odbc::odbc(),
+                  driver = Sys.getenv("driver"),
+                  server = Sys.getenv("server"),
+                  database = Sys.getenv("database"),
+                  port = Sys.getenv("port"),
+                  trusted_connection = Sys.getenv("tc"))
+```
+
+## Extract data
+
+### Extract user data
+
+First, we extract data about users from INBO *kleurring* database:
+
+```{r get_user_data}
+users <-  dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemer") %>%
+    as_tibble()
+```
+
+### Extract color ring data
+
+```{r get_birds_data}
+birds <- dbGetQuery(conn, "SELECT * FROM dbo.tblKleurring") %>%
+  as_tibble()
+```
+
+### Extract observation data
+
+INBO's observation data contain a text type field: `Opmerking`. Text type is deprecated and an error will be returned if we perform the standard SQL query `"SELECT * FROM dbo.tblWaarneming"`. So, we need an ad-hoc query:
+
+```{r get_obs_data}
+obs <- dbGetQuery(conn,
+  "SELECT Nummer,
+          Datum,
+          EuringCode,
+          LeeftijdCode,
+          KleurringNummer,
+          KleurringPlaats,
+          MetaalringNummer,
+          MetaalringPlaats,
+          PlaatsGemeente,
+          PlaatsToponym,
+          PlaatsToponymDetail,
+          Convert(nvarchar(4000),Opmerking) as Opmerking,
+          WaarnemerNummer,
+          PlaatsLengtegraadGraden,
+          PlaatsLengtegraadMinuten,
+          PlaatsLengtegraadSeconden,
+          PlaatsBreedtegraadGraden,
+          PlaatsBreedtegraadMinuten,
+          PlaatsBreedtegraadSeconden,
+          PlaatsLengtegraadRichtingCode,
+          PlaatsBreedtegraadRichtingCode,
+          PlaatsLandCode,
+          MetaalringLandCode,
+          BevestigingDatum,
+          PlaatsProvincie,
+          AanmaakDatum,
+          WijzigDatum
+  FROM dbo.tblWaarneming") %>% as_tibble()
+```
+
+There is a second table with important information about observations, called `tboWaarnemingAktie`:
+
+```{r get_waarnemingAktie}
+obs_actions <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemingAktie")
+```
+
+## Pre-processing
+
+Add prefix `raw_` to all column names to avoid any possible name clash with SOVON terms (for more info see [spreadsheet](https://docs.google.com/spreadsheets/d/16928bSQzZ0jz0FCf5gXZ4Rg4gf9qYQPO5izLZ5IYSTQ/edit?usp=drive_web&ouid=109004011205942623101) and [document](https://docs.google.com/document/d/1VtwGD4wrwJLnGnvJprtFB3MbbXdirMELYvuCGEhLr3w/edit)) as provided by SOVON (access restricted).
+
+```{r add_raw}
+colnames(users) <- paste0("raw_", colnames(users))
+colnames(birds) <- paste0("raw_", colnames(birds))
+colnames(obs) <- paste0("raw_", colnames(obs))
+colnames(obs_actions) <- paste0("raw_", colnames(obs_actions))
+```
+
+For privcay reasons users data cannot be shown. Users data refer to the following fields:
+
+```{r prview_users}
+colnames(users)
+```
+
+Preview birds data:
+
+```{r preview_birds}
+birds %>% head()
+```
+
+Preview observations data:
+
+```{r preview_obs}
+obs %>% head()
+```
+
+```{r prview_obs_actions}
+obs_actions %>% head()
+```
+
+
+# Map data
+
+We tranform the information extracted from INBO color ring database to SOVON format.
+
+## Map user data
+
+We start mapping user data.
+
+### E-mail
+
+```{r e-mail}
+users <- users %>%
+  mutate(user_email = raw_Email)
+```
+
+### First name
+
+```{r first_name}
+users <- users %>%
+  mutate(user_first_name = raw_Voornaam)
+```
+
+### Last name
+
+```{r last_name}
+users <- users %>%
+  mutate(user_last_name = raw_Familienaam)
+```
+
+### Address
+
+```{r address}
+users <- users %>%
+  mutate(user_address = raw_Adres)
+```
+
+### Place
+
+```{r place}
+users <- users %>%
+  mutate(user_place = raw_Gemeente)
+```
+
+### Postal code
+
+```{r postal_code}
+users <- users %>%
+  mutate(user_postal_code = raw_Postcode)
+```
+
+### Country
+
+```{r country}
+users <- users %>%
+  mutate(user_country = raw_LandCode)
+```
+
+### User ID
+
+User identifiers are provided by SOVON. `NA` is given.
+
+```{r userID}
+users <- users %>%
+  mutate(user_id  = NA)
+```
+
+### User reference
+
+Field provided by SOVON: `NA` is given
+
+```{r user_ref}
+users <- users %>%
+  mutate(user_reference  = NA)
+```
+
+### User language
+
+This field is not present in `users`: `NA` is given
+
+```{r user_language}
+users <- users %>%
+  mutate(user_language  = NA)
+```
+
+### User role
+
+The distinction between ringer and observer is not present in `users`, but can be retrieved by combining `obs`, `obs_actions` and `users`.
+
+We filter by ring action (`rngkl` and `rngme`) and we retrieve the ringers in `obs` by `raw_WaarnemerNummer`:
+
+```{r find_ringers}
+ringing_obs_numbers <- obs_actions %>% 
+  filter(raw_AktieCode %in% c("rngkl","rngme")) %>%
+  pull(raw_WaarnemingNummer)
+ringers_number <- obs %>% 
+  filter(raw_Nummer %in% ringing_obs_numbers) %>%
+  distinct(raw_WaarnemerNummer) %>% pull()
+```
+
+And we assign a `R` (ringer) to them, `O` (observer) otherwise:
+
+```{r assign_ringer}
+users <- users %>%
+  mutate(user_role = ifelse(raw_Nummer %in% ringers_number,
+                      "R", "O"))
+```
+
+## Map color ring data
+
+### Euring
+
+```{r bird_euring}
+birds <- birds %>%
+  mutate(bird_euring = raw_EuringCode)
+```
+
+### Short hand
+
+```{r shorthand}
+birds <- birds %>%
+  mutate(bird_shorthand = raw_RingKleurCode)
+```
+
+### Ring number
+
+```{r ring_n}
+birds <- birds %>%
+  mutate(bird_ring_number = raw_MetaalringNummer)
+```
+
+### Bird sex
+
+Bird sex is translated to English: `M` (mannetje) will not change so no need to convert it:
+
+```{r sex}
+birds <- birds %>%
+  mutate(bird_sex = recode(raw_GeslachtCode,
+    "V" = "F", # V(rouwtje) ->F(emale)
+    "O" = "U" # O(nbekend) ->  U(nknown)
+))
+```
+
+### Bird age ringing
+
+Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs` when related code action in `obs_actions` is equal to `rngkl` (code action of applying colour ring). Such age can then be added to data frame `birds` by matching the color ring number:
+
+```{r retrieve_age_ringing}
+birds <- left_join(obs_actions %>% 
+                     select(raw_WaarnemingNummer, raw_AktieCode) %>%
+                     filter(raw_AktieCode == "rngkl"), 
+                   obs, 
+                   by = c("raw_WaarnemingNummer" = "raw_Nummer")) %>%
+  select(raw_WaarnemingNummer,
+         raw_KleurringNummer,
+         raw_LeeftijdCode) %>%
+  right_join(birds, 
+             by = c("raw_KleurringNummer" = "raw_Nummer"))
+```
+
+Mapping the age while applying color ring from INBO format to SOVON standard (Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14)
+
+```{r}
+birds <- birds %>%
+  mutate(bird_age_ringing = recode(raw_LeeftijdCode,
+    "PU" = "1",
+    "AD" = "2",
+    "J1" = "3",
+    "I4" = "5",
+    "I3" = "7",
+    "I2" = "9",
+    "I5" = "B",
+    .missing = "O"))
+```
+
+### Bird ID
+
+Bird identifiers will be provided by SOVON. `NA` is given:
+
+```{r birdID}
+birds <- birds %>%
+  mutate(bird_id = NA)
+```
+
+### Bird BTO
+
+Bird BTO will be provided by SOVON.  `NA` is given:
+
+```{r bird_bto}
+birds <- birds %>%
+  mutate(bird_bto = NA)
+```
+
+### Bird name
+
+Bird name will be provided by SOVON.  `NA` is given:
+
+```{r bird_name}
+birds <- birds %>%
+  mutate(bird_name = NA)
+```
+
+### Bird birth year
+
+This field will be filled by SOVON (authomatically by a function, I think). `NA` is given:
+
+```{r bird_birth_year}
+birds <- birds %>%
+  mutate(bird_birth_year = NA)
+```
+
+### Bird date end
+
+This field should be left to SOVON.  `NA` is given:
+
+```{r bird_date_end}
+birds <- birds %>%
+  mutate(bird_date_end = NA)
+```
+
+## Map observation data
+
+### Observation reference
+
+```{r obs_ref}
+obs <- obs %>% mutate(observation_reference = raw_Nummer)
+```
+
+### Observation date
+
+```{r obs_date}
+obs <- obs %>% mutate(observation_date = raw_Datum)
+```
+
+### Observation time
+
+No time is found for observations in `obs`. `NA` is given:
+
+```{r obs_time}
+obs <- obs %>% mutate(observation_time = NA)
+```
+
+### Observation latitude
+
+Observation latitude should be converted to decimal degrees:
+
+```{r obs_latitude}
+obs <- obs %>% mutate(
+  observation_lat = conv_unit(
+    str_c(raw_PlaatsBreedtegraadGraden,
+          raw_PlaatsBreedtegraadMinuten,
+          raw_PlaatsBreedtegraadSeconden, 
+          sep = " "), 
+    from = 'deg_min_sec', to = 'dec_deg'
+))
+```
+
+### Observation longitude
+
+Observation longitude should be converted to decimal degrees:
+
+```{r obs_longitude}
+obs <- obs %>% mutate(
+  observation_long = conv_unit(
+    str_c(raw_PlaatsLengtegraadGraden,
+          raw_PlaatsLengtegraadMinuten,
+          raw_PlaatsLengtegraadSeconden, 
+          sep = " "), 
+    from = 'deg_min_sec', to = 'dec_deg'
+))
+```
+
+### Observation location
+
+Aggregate information about observation location. We follow the following structure, in agreement with SOVON: `raw_PlaatsGemeente` [+ `, in de omgeving van ` + `raw_PlaatsToponym` [+ `: ` + `raw_PlaatsToponymDetail`]]:
+
+```{r}
+obs <- obs %>% mutate(
+  observation_location = ifelse(!is.na(raw_PlaatsToponym),
+                                str_c(raw_PlaatsGemeente,
+                                      raw_PlaatsToponym, 
+                                      sep = ", in de omgeving van "),
+                                paste(raw_PlaatsGemeente))) %>%
+  mutate(observation_location = ifelse(!is.na(raw_PlaatsToponymDetail),
+                                       str_c(observation_location,
+                                             raw_PlaatsToponymDetail,
+                                             sep = ": "),
+                                       paste(observation_location)))
+```
+
+
+### Observation notes
+
+```{r obs_notes}
+obs <- obs %>% mutate(observation_notes = raw_Opmerking)
+```
+
+### MRI: metal ring information
+
+Metal ring information table can be found at page 8 of [this pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf)
+
+A summary of the mapping follows:
+
+1. observations with action code `meweg` should be mapped to 0 (metal ring is not present)
+
+Further mapping steps need the knowledge of an expert.
+
+```{r MRI}
+
+```
+
+# Post-processing
+
+## User data 
+
+Remove the original columns:
+
+```{r user_remove_originals}
+users <- users %>% select(-starts_with("raw_"))
+```
+
+Preview data:
+
+```{r final_preview_users}
+users %>% head()
+```
+
+Save to CSV:
+
+```{r write_user_data_txt}
+readr::write_csv(users, path = cr_users, na = "")
+```
+
+## Bird data
+
+Remove the original columns:
+
+```{r birds_remove_originals}
+birds <- birds %>% select(-starts_with("raw_"))
+```
+
+Preview data:
+
+```{r final_preview_birds}
+birds %>% head()
+```
+
+Save to CSV:
+
+```{r write_bird_data_txt}
+```
+
+## Observation data
+
+
+Remove the original columns:
+
+```{r obs_remove_originals}
+obs <- obs %>% select(-starts_with("raw_"))
+```
+
+Preview data:
+
+```{r final_preview_obs}
+obs %>% head()
+```
+
+Save to CSV:
+
+```{r write_obs_data_txt}
+```

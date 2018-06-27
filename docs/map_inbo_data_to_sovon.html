@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Damiano Oldoni" />
+
+<meta name="date" content="2018-06-27" />
+
+<title>Map data from INBO color ring database to crbirding (SOVON)</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 45px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+
+.section h2 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h3 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h4 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h5 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h6 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Mapping to crbirding (SOVON) format</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="map_inbo_data_to_sovon.html">Mapping kleurring database to crbirding</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/damianooldoni/sovon/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Map data from INBO color ring database to crbirding (SOVON)</h1>
+<h4 class="author"><em>Damiano Oldoni</em></h4>
+<h4 class="date"><em>2018-06-27</em></h4>
+
+</div>
+
+
+<div id="goal" class="section level1">
+<h1><span class="header-section-number">1</span> Goal</h1>
+<p>This pipeline will:</p>
+<ol style="list-style-type: decimal">
+<li>extract data from INBO <em>kleurring</em> database (official name: <code>D0016_00_Meeuwen</code>)</li>
+<li>transform data to SOVON format</li>
+<li>export data in text files</li>
+</ol>
+</div>
+<div id="setup" class="section level1">
+<h1><span class="header-section-number">2</span> Setup</h1>
+<p>Load libraries:</p>
+<pre class="r"><code>library(DBI) # To connect to database
+library(odbc) # To connect to database
+library(stringr)   # To perform string operations
+library(readr) # To read and write txt files
+library(dplyr) # To transform data
+library(measurements) # To convert units of measurement </code></pre>
+<p>Set output file paths (all paths should be relative to this script):</p>
+<pre class="r"><code>cr_users &lt;- &quot;../data/processed/data_users.tsv&quot;
+cr_birds &lt;- &quot;../data/processed/data_birds.tsv&quot;
+cr_obs &lt;- &quot;../data/processed/data_observations.tsv&quot;</code></pre>
+</div>
+<div id="extract-data-from-inbo-kleurring-database" class="section level1">
+<h1><span class="header-section-number">3</span> Extract data from INBO kleurring database</h1>
+<div id="connection-to-inbo-database" class="section level2">
+<h2><span class="header-section-number">3.1</span> Connection to INBO database</h2>
+<p>We establish a connection to the database. Sensible data are saved in the <code>.Renviron</code> file:</p>
+<pre class="r"><code>conn &lt;- dbConnect(odbc::odbc(),
+                  driver = Sys.getenv(&quot;driver&quot;),
+                  server = Sys.getenv(&quot;server&quot;),
+                  database = Sys.getenv(&quot;database&quot;),
+                  port = Sys.getenv(&quot;port&quot;),
+                  trusted_connection = Sys.getenv(&quot;tc&quot;))</code></pre>
+</div>
+<div id="extract-data" class="section level2">
+<h2><span class="header-section-number">3.2</span> Extract data</h2>
+<div id="extract-user-data" class="section level3">
+<h3><span class="header-section-number">3.2.1</span> Extract user data</h3>
+<p>First, we extract data about users from INBO <em>kleurring</em> database:</p>
+<pre class="r"><code>users &lt;-  dbGetQuery(conn, &quot;SELECT * FROM dbo.tblWaarnemer&quot;) %&gt;%
+    as_tibble()</code></pre>
+</div>
+<div id="extract-color-ring-data" class="section level3">
+<h3><span class="header-section-number">3.2.2</span> Extract color ring data</h3>
+<pre class="r"><code>birds &lt;- dbGetQuery(conn, &quot;SELECT * FROM dbo.tblKleurring&quot;) %&gt;%
+  as_tibble()</code></pre>
+</div>
+<div id="extract-observation-data" class="section level3">
+<h3><span class="header-section-number">3.2.3</span> Extract observation data</h3>
+<p>INBO’s observation data contain a text type field: <code>Opmerking</code>. Text type is deprecated and an error will be returned if we perform the standard SQL query <code>&quot;SELECT * FROM dbo.tblWaarneming&quot;</code>. So, we need an ad-hoc query:</p>
+<pre class="r"><code>obs &lt;- dbGetQuery(conn,
+  &quot;SELECT Nummer,
+          Datum,
+          EuringCode,
+          LeeftijdCode,
+          KleurringNummer,
+          KleurringPlaats,
+          MetaalringNummer,
+          MetaalringPlaats,
+          PlaatsGemeente,
+          PlaatsToponym,
+          PlaatsToponymDetail,
+          Convert(nvarchar(4000),Opmerking) as Opmerking,
+          WaarnemerNummer,
+          PlaatsLengtegraadGraden,
+          PlaatsLengtegraadMinuten,
+          PlaatsLengtegraadSeconden,
+          PlaatsBreedtegraadGraden,
+          PlaatsBreedtegraadMinuten,
+          PlaatsBreedtegraadSeconden,
+          PlaatsLengtegraadRichtingCode,
+          PlaatsBreedtegraadRichtingCode,
+          PlaatsLandCode,
+          MetaalringLandCode,
+          BevestigingDatum,
+          PlaatsProvincie,
+          AanmaakDatum,
+          WijzigDatum
+  FROM dbo.tblWaarneming&quot;) %&gt;% as_tibble()</code></pre>
+<p>There is a second table with important information about observations, called <code>tboWaarnemingAktie</code>:</p>
+<pre class="r"><code>obs_actions &lt;- dbGetQuery(conn, &quot;SELECT * FROM dbo.tblWaarnemingAktie&quot;)</code></pre>
+</div>
+</div>
+<div id="pre-processing" class="section level2">
+<h2><span class="header-section-number">3.3</span> Pre-processing</h2>
+<p>Add prefix <code>raw_</code> to all column names to avoid any possible name clash with SOVON terms (for more info see <a href="https://docs.google.com/spreadsheets/d/16928bSQzZ0jz0FCf5gXZ4Rg4gf9qYQPO5izLZ5IYSTQ/edit?usp=drive_web&amp;ouid=109004011205942623101">spreadsheet</a> and <a href="https://docs.google.com/document/d/1VtwGD4wrwJLnGnvJprtFB3MbbXdirMELYvuCGEhLr3w/edit">document</a>) as provided by SOVON (access restricted).</p>
+<pre class="r"><code>colnames(users) &lt;- paste0(&quot;raw_&quot;, colnames(users))
+colnames(birds) &lt;- paste0(&quot;raw_&quot;, colnames(birds))
+colnames(obs) &lt;- paste0(&quot;raw_&quot;, colnames(obs))
+colnames(obs_actions) &lt;- paste0(&quot;raw_&quot;, colnames(obs_actions))</code></pre>
+<p>For privcay reasons users data cannot be shown. Users data refer to the following fields:</p>
+<pre class="r"><code>colnames(users)</code></pre>
+<pre><code>##  [1] &quot;raw_Nummer&quot;         &quot;raw_Familienaam&quot;    &quot;raw_Voornaam&quot;      
+##  [4] &quot;raw_Adres&quot;          &quot;raw_Postcode&quot;       &quot;raw_Gemeente&quot;      
+##  [7] &quot;raw_Email&quot;          &quot;raw_Telefoon&quot;       &quot;raw_Wachtwoord&quot;    
+## [10] &quot;raw_Gebruikersnaam&quot; &quot;raw_LandCode&quot;       &quot;raw_TelefoonMobiel&quot;
+## [13] &quot;raw_TelefoonWerk&quot;</code></pre>
+<p>Preview birds data:</p>
+<pre class="r"><code>birds %&gt;% head()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["raw_Nummer"],"name":[1],"type":["chr"],"align":["left"]},{"label":["raw_NummerNieuw"],"name":[2],"type":["chr"],"align":["left"]},{"label":["raw_NummerDesc"],"name":[3],"type":["chr"],"align":["left"]},{"label":["raw_Plaats"],"name":[4],"type":["chr"],"align":["left"]},{"label":["raw_RingKleurCode"],"name":[5],"type":["chr"],"align":["left"]},{"label":["raw_InscriptieKleurCode"],"name":[6],"type":["chr"],"align":["left"]},{"label":["raw_EuringCode"],"name":[7],"type":["chr"],"align":["left"]},{"label":["raw_GeslachtCode"],"name":[8],"type":["chr"],"align":["left"]},{"label":["raw_MetaalringNummer"],"name":[9],"type":["chr"],"align":["left"]},{"label":["raw_MetaalringPlaats"],"name":[10],"type":["chr"],"align":["left"]},{"label":["raw_MetaalringLandCode"],"name":[11],"type":["chr"],"align":["left"]}],"data":[{"1":"BBAJ","2":"BBAJ","3":"BBAJ","4":"NA","5":"B","6":"W","7":"05910","8":"O","9":"L89194","10":"NA","11":"BE"},{"1":"BAAV","2":"BAAV","3":"BAAV","4":"NA","5":"B","6":"W","7":"05910","8":"O","9":"L89321","10":"NA","11":"BE"},{"1":"BAAW","2":"BAAW","3":"BAAW","4":"NA","5":"B","6":"W","7":"05910","8":"O","9":"L89322","10":"NA","11":"BE"},{"1":"BAAX","2":"BAAX","3":"BAAX","4":"NA","5":"B","6":"W","7":"05910","8":"O","9":"L89323","10":"NA","11":"BE"},{"1":"BAAY","2":"BAAY","3":"BAAY","4":"RU","5":"B","6":"W","7":"05910","8":"O","9":"L89324","10":"LL","11":"BE"},{"1":"BCAA","2":"BCAA","3":"BCAA","4":"RU","5":"B","6":"W","7":"05910","8":"O","9":"L89325","10":"LL","11":"BE"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Preview observations data:</p>
+<pre class="r"><code>obs %&gt;% head()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["raw_Nummer"],"name":[1],"type":["int"],"align":["right"]},{"label":["raw_Datum"],"name":[2],"type":["S3: POSIXct"],"align":["right"]},{"label":["raw_EuringCode"],"name":[3],"type":["chr"],"align":["left"]},{"label":["raw_LeeftijdCode"],"name":[4],"type":["chr"],"align":["left"]},{"label":["raw_KleurringNummer"],"name":[5],"type":["chr"],"align":["left"]},{"label":["raw_KleurringPlaats"],"name":[6],"type":["chr"],"align":["left"]},{"label":["raw_MetaalringNummer"],"name":[7],"type":["chr"],"align":["left"]},{"label":["raw_MetaalringPlaats"],"name":[8],"type":["chr"],"align":["left"]},{"label":["raw_PlaatsGemeente"],"name":[9],"type":["chr"],"align":["left"]},{"label":["raw_PlaatsToponym"],"name":[10],"type":["chr"],"align":["left"]},{"label":["raw_PlaatsToponymDetail"],"name":[11],"type":["chr"],"align":["left"]},{"label":["raw_Opmerking"],"name":[12],"type":["chr"],"align":["left"]},{"label":["raw_WaarnemerNummer"],"name":[13],"type":["int"],"align":["right"]},{"label":["raw_PlaatsLengtegraadGraden"],"name":[14],"type":["int"],"align":["right"]},{"label":["raw_PlaatsLengtegraadMinuten"],"name":[15],"type":["int"],"align":["right"]},{"label":["raw_PlaatsLengtegraadSeconden"],"name":[16],"type":["int"],"align":["right"]},{"label":["raw_PlaatsBreedtegraadGraden"],"name":[17],"type":["int"],"align":["right"]},{"label":["raw_PlaatsBreedtegraadMinuten"],"name":[18],"type":["int"],"align":["right"]},{"label":["raw_PlaatsBreedtegraadSeconden"],"name":[19],"type":["int"],"align":["right"]},{"label":["raw_PlaatsLengtegraadRichtingCode"],"name":[20],"type":["chr"],"align":["left"]},{"label":["raw_PlaatsBreedtegraadRichtingCode"],"name":[21],"type":["chr"],"align":["left"]},{"label":["raw_PlaatsLandCode"],"name":[22],"type":["chr"],"align":["left"]},{"label":["raw_MetaalringLandCode"],"name":[23],"type":["chr"],"align":["left"]},{"label":["raw_BevestigingDatum"],"name":[24],"type":["S3: POSIXct"],"align":["right"]},{"label":["raw_PlaatsProvincie"],"name":[25],"type":["chr"],"align":["left"]},{"label":["raw_AanmaakDatum"],"name":[26],"type":["S3: POSIXct"],"align":["right"]},{"label":["raw_WijzigDatum"],"name":[27],"type":["S3: POSIXct"],"align":["right"]}],"data":[{"1":"126208","2":"2017-10-24","3":"NA","4":"AD","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"NA","22":"NA","23":"NA","24":"<NA>","25":"NA","26":"2017-10-30 16:54:00","27":"2017-10-30 16:54:00"},{"1":"67256","2":"2011-05-24","3":"05910","4":"AD","5":"294N","6":"NA","7":"NA","8":"NA","9":"Zeebrugge","10":"Voorhaven","11":"APM","12":"294N > NGAN","13":"7","14":"3","15":"11","16":"0","17":"51","18":"21","19":"0","20":"E","21":"N","22":"BE","23":"NA","24":"<NA>","25":"West-Vlaanderen","26":"2011-08-10 16:14:00","27":"2011-08-10 16:16:00"},{"1":"71192","2":"2011-05-25","3":"05910","4":"AD","5":"294N","6":"NA","7":"NA","8":"NA","9":"Zeebrugge","10":"Voorhaven","11":"NA","12":"NA","13":"106","14":"3","15":"11","16":"0","17":"51","18":"21","19":"0","20":"E","21":"N","22":"BE","23":"NA","24":"<NA>","25":"West-Vlaanderen","26":"2011-10-16 11:12:00","27":"2011-10-16 11:16:00"},{"1":"71193","2":"2011-06-22","3":"05910","4":"AD","5":"294N","6":"NA","7":"NA","8":"NA","9":"Zeebrugge","10":"Voorhaven","11":"NA","12":"NA","13":"106","14":"3","15":"11","16":"0","17":"51","18":"21","19":"0","20":"E","21":"N","22":"BE","23":"NA","24":"<NA>","25":"West-Vlaanderen","26":"2011-10-16 11:17:00","27":"2011-10-16 11:17:00"},{"1":"71194","2":"2011-07-08","3":"05910","4":"AD","5":"294N","6":"NA","7":"NA","8":"NA","9":"Zeebrugge","10":"Voorhaven","11":"NA","12":"NA","13":"106","14":"3","15":"11","16":"0","17":"51","18":"21","19":"0","20":"E","21":"N","22":"BE","23":"NA","24":"<NA>","25":"West-Vlaanderen","26":"2011-10-16 11:17:00","27":"2011-10-16 11:17:00"},{"1":"72062","2":"2011-10-31","3":"05910","4":"AD","5":"294N","6":"NA","7":"NA","8":"NA","9":"Matosinhos","10":"Strand","11":"NA","12":"N.GAN","13":"951","14":"8","15":"42","16":"0","17":"41","18":"11","19":"0","20":"W","21":"N","22":"PT","23":"NA","24":"<NA>","25":"Douro Litoral","26":"2011-11-01 08:59:00","27":"2011-11-01 09:00:00"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>obs_actions %&gt;% head()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["raw_WaarnemingNummer"],"name":[1],"type":["int"],"align":["right"]},{"label":["raw_Nummer"],"name":[2],"type":["int"],"align":["right"]},{"label":["raw_AktieCode"],"name":[3],"type":["chr"],"align":["left"]},{"label":["raw_AanmaakDatum"],"name":[4],"type":["S3: POSIXct"],"align":["right"]},{"label":["raw_WijzigDatum"],"name":[5],"type":["S3: POSIXct"],"align":["right"]}],"data":[{"1":"2","2":"780","3":"rngme","4":"<NA>","5":"<NA>","_rn_":"1"},{"1":"3","2":"781","3":"rngme","4":"<NA>","5":"<NA>","_rn_":"2"},{"1":"4","2":"13","3":"rngkl","4":"<NA>","5":"<NA>","_rn_":"3"},{"1":"5","2":"14","3":"rngkl","4":"<NA>","5":"<NA>","_rn_":"4"},{"1":"6","2":"15","3":"rngkl","4":"<NA>","5":"<NA>","_rn_":"5"},{"1":"8","2":"17","3":"rngkl","4":"<NA>","5":"<NA>","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div id="map-data" class="section level1">
+<h1><span class="header-section-number">4</span> Map data</h1>
+<p>We tranform the information extracted from INBO color ring database to SOVON format.</p>
+<div id="map-user-data" class="section level2">
+<h2><span class="header-section-number">4.1</span> Map user data</h2>
+<p>We start mapping user data.</p>
+<div id="e-mail" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> E-mail</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_email = raw_Email)</code></pre>
+</div>
+<div id="first-name" class="section level3">
+<h3><span class="header-section-number">4.1.2</span> First name</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_first_name = raw_Voornaam)</code></pre>
+</div>
+<div id="last-name" class="section level3">
+<h3><span class="header-section-number">4.1.3</span> Last name</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_last_name = raw_Familienaam)</code></pre>
+</div>
+<div id="address" class="section level3">
+<h3><span class="header-section-number">4.1.4</span> Address</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_address = raw_Adres)</code></pre>
+</div>
+<div id="place" class="section level3">
+<h3><span class="header-section-number">4.1.5</span> Place</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_place = raw_Gemeente)</code></pre>
+</div>
+<div id="postal-code" class="section level3">
+<h3><span class="header-section-number">4.1.6</span> Postal code</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_postal_code = raw_Postcode)</code></pre>
+</div>
+<div id="country" class="section level3">
+<h3><span class="header-section-number">4.1.7</span> Country</h3>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_country = raw_LandCode)</code></pre>
+</div>
+<div id="user-id" class="section level3">
+<h3><span class="header-section-number">4.1.8</span> User ID</h3>
+<p>User identifiers are provided by SOVON. <code>NA</code> is given.</p>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_id  = NA)</code></pre>
+</div>
+<div id="user-reference" class="section level3">
+<h3><span class="header-section-number">4.1.9</span> User reference</h3>
+<p>Field provided by SOVON: <code>NA</code> is given</p>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_reference  = NA)</code></pre>
+</div>
+<div id="user-language" class="section level3">
+<h3><span class="header-section-number">4.1.10</span> User language</h3>
+<p>This field is not present in <code>users</code>: <code>NA</code> is given</p>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_language  = NA)</code></pre>
+</div>
+<div id="user-role" class="section level3">
+<h3><span class="header-section-number">4.1.11</span> User role</h3>
+<p>The distinction between ringer and observer is not present in <code>users</code>, but can be retrieved by combining <code>obs</code>, <code>obs_actions</code> and <code>users</code>.</p>
+<p>We filter by ring action (<code>rngkl</code> and <code>rngme</code>) and we retrieve the ringers in <code>obs</code> by <code>raw_WaarnemerNummer</code>:</p>
+<pre class="r"><code>ringing_obs_numbers &lt;- obs_actions %&gt;% 
+  filter(raw_AktieCode %in% c(&quot;rngkl&quot;,&quot;rngme&quot;)) %&gt;%
+  pull(raw_WaarnemingNummer)
+ringers_number &lt;- obs %&gt;% 
+  filter(raw_Nummer %in% ringing_obs_numbers) %&gt;%
+  distinct(raw_WaarnemerNummer) %&gt;% pull()</code></pre>
+<p>And we assign a <code>R</code> (ringer) to them, <code>O</code> (observer) otherwise:</p>
+<pre class="r"><code>users &lt;- users %&gt;%
+  mutate(user_role = ifelse(raw_Nummer %in% ringers_number,
+                      &quot;R&quot;, &quot;O&quot;))</code></pre>
+</div>
+</div>
+<div id="map-color-ring-data" class="section level2">
+<h2><span class="header-section-number">4.2</span> Map color ring data</h2>
+<div id="euring" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Euring</h3>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_euring = raw_EuringCode)</code></pre>
+</div>
+<div id="short-hand" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Short hand</h3>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_shorthand = raw_RingKleurCode)</code></pre>
+</div>
+<div id="ring-number" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Ring number</h3>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_ring_number = raw_MetaalringNummer)</code></pre>
+</div>
+<div id="bird-sex" class="section level3">
+<h3><span class="header-section-number">4.2.4</span> Bird sex</h3>
+<p>Bird sex is translated to English: <code>M</code> (mannetje) will not change so no need to convert it:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_sex = recode(raw_GeslachtCode,
+    &quot;V&quot; = &quot;F&quot;, # V(rouwtje) -&gt;F(emale)
+    &quot;O&quot; = &quot;U&quot; # O(nbekend) -&gt;  U(nknown)
+))</code></pre>
+</div>
+<div id="bird-age-ringing" class="section level3">
+<h3><span class="header-section-number">4.2.5</span> Bird age ringing</h3>
+<p>Map the age of the bird while ringing. This information can be found in column <code>raw_LeeftijdCode</code> of data frame <code>obs</code> when related code action in <code>obs_actions</code> is equal to <code>rngkl</code> (code action of applying colour ring). Such age can then be added to data frame <code>birds</code> by matching the color ring number:</p>
+<pre class="r"><code>birds &lt;- left_join(obs_actions %&gt;% 
+                     select(raw_WaarnemingNummer, raw_AktieCode) %&gt;%
+                     filter(raw_AktieCode == &quot;rngkl&quot;), 
+                   obs, 
+                   by = c(&quot;raw_WaarnemingNummer&quot; = &quot;raw_Nummer&quot;)) %&gt;%
+  select(raw_WaarnemingNummer,
+         raw_KleurringNummer,
+         raw_LeeftijdCode) %&gt;%
+  right_join(birds, 
+             by = c(&quot;raw_KleurringNummer&quot; = &quot;raw_Nummer&quot;))</code></pre>
+<p>Mapping the age while applying color ring from INBO format to SOVON standard (Euring standard: see <a href="https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf">online pdf document</a> at page 14)</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_age_ringing = recode(raw_LeeftijdCode,
+    &quot;PU&quot; = &quot;1&quot;,
+    &quot;AD&quot; = &quot;2&quot;,
+    &quot;J1&quot; = &quot;3&quot;,
+    &quot;I4&quot; = &quot;5&quot;,
+    &quot;I3&quot; = &quot;7&quot;,
+    &quot;I2&quot; = &quot;9&quot;,
+    &quot;I5&quot; = &quot;B&quot;,
+    .missing = &quot;O&quot;))</code></pre>
+</div>
+<div id="bird-id" class="section level3">
+<h3><span class="header-section-number">4.2.6</span> Bird ID</h3>
+<p>Bird identifiers will be provided by SOVON. <code>NA</code> is given:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_id = NA)</code></pre>
+</div>
+<div id="bird-bto" class="section level3">
+<h3><span class="header-section-number">4.2.7</span> Bird BTO</h3>
+<p>Bird BTO will be provided by SOVON. <code>NA</code> is given:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_bto = NA)</code></pre>
+</div>
+<div id="bird-name" class="section level3">
+<h3><span class="header-section-number">4.2.8</span> Bird name</h3>
+<p>Bird name will be provided by SOVON. <code>NA</code> is given:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_name = NA)</code></pre>
+</div>
+<div id="bird-birth-year" class="section level3">
+<h3><span class="header-section-number">4.2.9</span> Bird birth year</h3>
+<p>This field will be filled by SOVON (authomatically by a function, I think). <code>NA</code> is given:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_birth_year = NA)</code></pre>
+</div>
+<div id="bird-date-end" class="section level3">
+<h3><span class="header-section-number">4.2.10</span> Bird date end</h3>
+<p>This field should be left to SOVON. <code>NA</code> is given:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;%
+  mutate(bird_date_end = NA)</code></pre>
+</div>
+</div>
+<div id="map-observation-data" class="section level2">
+<h2><span class="header-section-number">4.3</span> Map observation data</h2>
+<div id="observation-reference" class="section level3">
+<h3><span class="header-section-number">4.3.1</span> Observation reference</h3>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(observation_reference = raw_Nummer)</code></pre>
+</div>
+<div id="observation-date" class="section level3">
+<h3><span class="header-section-number">4.3.2</span> Observation date</h3>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(observation_date = raw_Datum)</code></pre>
+</div>
+<div id="observation-time" class="section level3">
+<h3><span class="header-section-number">4.3.3</span> Observation time</h3>
+<p>No time is found for observations in <code>obs</code>. <code>NA</code> is given:</p>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(observation_time = NA)</code></pre>
+</div>
+<div id="observation-latitude" class="section level3">
+<h3><span class="header-section-number">4.3.4</span> Observation latitude</h3>
+<p>Observation latitude should be converted to decimal degrees:</p>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(
+  observation_lat = conv_unit(
+    str_c(raw_PlaatsBreedtegraadGraden,
+          raw_PlaatsBreedtegraadMinuten,
+          raw_PlaatsBreedtegraadSeconden, 
+          sep = &quot; &quot;), 
+    from = &#39;deg_min_sec&#39;, to = &#39;dec_deg&#39;
+))</code></pre>
+</div>
+<div id="observation-longitude" class="section level3">
+<h3><span class="header-section-number">4.3.5</span> Observation longitude</h3>
+<p>Observation longitude should be converted to decimal degrees:</p>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(
+  observation_long = conv_unit(
+    str_c(raw_PlaatsLengtegraadGraden,
+          raw_PlaatsLengtegraadMinuten,
+          raw_PlaatsLengtegraadSeconden, 
+          sep = &quot; &quot;), 
+    from = &#39;deg_min_sec&#39;, to = &#39;dec_deg&#39;
+))</code></pre>
+</div>
+<div id="observation-location" class="section level3">
+<h3><span class="header-section-number">4.3.6</span> Observation location</h3>
+<p>Aggregate information about observation location. We follow the following structure, in agreement with SOVON: <code>raw_PlaatsGemeente</code> [+ <code>, in de omgeving van</code> + <code>raw_PlaatsToponym</code> [+ <code>:</code> + <code>raw_PlaatsToponymDetail</code>]]:</p>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(
+  observation_location = ifelse(!is.na(raw_PlaatsToponym),
+                                str_c(raw_PlaatsGemeente,
+                                      raw_PlaatsToponym, 
+                                      sep = &quot;, in de omgeving van &quot;),
+                                paste(raw_PlaatsGemeente))) %&gt;%
+  mutate(observation_location = ifelse(!is.na(raw_PlaatsToponymDetail),
+                                       str_c(observation_location,
+                                             raw_PlaatsToponymDetail,
+                                             sep = &quot;: &quot;),
+                                       paste(observation_location)))</code></pre>
+</div>
+<div id="observation-notes" class="section level3">
+<h3><span class="header-section-number">4.3.7</span> Observation notes</h3>
+<pre class="r"><code>obs &lt;- obs %&gt;% mutate(observation_notes = raw_Opmerking)</code></pre>
+</div>
+<div id="mri-metal-ring-information" class="section level3">
+<h3><span class="header-section-number">4.3.8</span> MRI: metal ring information</h3>
+<p>Metal ring information table can be found at page 8 of <a href="https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf">this pdf document</a></p>
+<p>A summary of the mapping follows:</p>
+<ol style="list-style-type: decimal">
+<li>observations with action code <code>meweg</code> should be mapped to 0 (metal ring is not present)</li>
+</ol>
+<p>Further mapping steps need the knowledge of an expert.</p>
+</div>
+</div>
+</div>
+<div id="post-processing" class="section level1">
+<h1><span class="header-section-number">5</span> Post-processing</h1>
+<div id="user-data" class="section level2">
+<h2><span class="header-section-number">5.1</span> User data</h2>
+<p>Remove the original columns:</p>
+<pre class="r"><code>users &lt;- users %&gt;% select(-starts_with(&quot;raw_&quot;))</code></pre>
+<p>Preview data:</p>
+<pre class="r"><code>users %&gt;% head()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["user_email"],"name":[1],"type":["chr"],"align":["left"]},{"label":["user_first_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["user_last_name"],"name":[3],"type":["chr"],"align":["left"]},{"label":["user_address"],"name":[4],"type":["chr"],"align":["left"]},{"label":["user_place"],"name":[5],"type":["chr"],"align":["left"]},{"label":["user_postal_code"],"name":[6],"type":["chr"],"align":["left"]},{"label":["user_country"],"name":[7],"type":["chr"],"align":["left"]},{"label":["user_id"],"name":[8],"type":["lgl"],"align":["right"]},{"label":["user_reference"],"name":[9],"type":["lgl"],"align":["right"]},{"label":["user_language"],"name":[10],"type":["lgl"],"align":["right"]},{"label":["user_role"],"name":[11],"type":["chr"],"align":["left"]}],"data":[{"1":"alcotan76@yahoo.es","2":"Antonio","3":"Acedo","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"O"},{"1":"villem@adojaan.net","2":"Art Villem","3":"Adojaan","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"O"},{"1":"peter.adriaens@inbo.be","2":"Peter","3":"Adriaens","4":"NA","5":"NA","6":"NA","7":"BE","8":"NA","9":"NA","10":"NA","11":"O"},{"1":"willy.aelvoet@telenet.be","2":"Willy","3":"Aelvoet","4":"NA","5":"NA","6":"NA","7":"BE","8":"NA","9":"NA","10":"NA","11":"O"},{"1":"NA","2":"Antonio","3":"Aguilera Nieves","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"O"},{"1":"NA","2":"Manuel","3":"Agulla","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"O"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Save to CSV:</p>
+<pre class="r"><code>readr::write_csv(users, path = cr_users, na = &quot;&quot;)</code></pre>
+</div>
+<div id="bird-data" class="section level2">
+<h2><span class="header-section-number">5.2</span> Bird data</h2>
+<p>Remove the original columns:</p>
+<pre class="r"><code>birds &lt;- birds %&gt;% select(-starts_with(&quot;raw_&quot;))</code></pre>
+<p>Preview data:</p>
+<pre class="r"><code>birds %&gt;% head()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["bird_euring"],"name":[1],"type":["chr"],"align":["left"]},{"label":["bird_shorthand"],"name":[2],"type":["chr"],"align":["left"]},{"label":["bird_ring_number"],"name":[3],"type":["chr"],"align":["left"]},{"label":["bird_sex"],"name":[4],"type":["chr"],"align":["left"]},{"label":["bird_age_ringing"],"name":[5],"type":["chr"],"align":["left"]},{"label":["bird_id"],"name":[6],"type":["lgl"],"align":["right"]},{"label":["bird_bto"],"name":[7],"type":["lgl"],"align":["right"]},{"label":["bird_name"],"name":[8],"type":["lgl"],"align":["right"]},{"label":["bird_birth_year"],"name":[9],"type":["lgl"],"align":["right"]},{"label":["bird_date_end"],"name":[10],"type":["lgl"],"align":["right"]}],"data":[{"1":"05910","2":"B","3":"L89194","4":"U","5":"1","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","_rn_":"1"},{"1":"05910","2":"B","3":"L89321","4":"U","5":"1","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","_rn_":"2"},{"1":"05910","2":"B","3":"L89322","4":"U","5":"1","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","_rn_":"3"},{"1":"05910","2":"B","3":"L89323","4":"U","5":"1","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","_rn_":"4"},{"1":"05910","2":"B","3":"L89324","4":"U","5":"1","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","_rn_":"5"},{"1":"05910","2":"B","3":"L89325","4":"U","5":"1","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Save to CSV:</p>
+</div>
+<div id="observation-data" class="section level2">
+<h2><span class="header-section-number">5.3</span> Observation data</h2>
+<p>Remove the original columns:</p>
+<pre class="r"><code>obs &lt;- obs %&gt;% select(-starts_with(&quot;raw_&quot;))</code></pre>
+<p>Preview data:</p>
+<pre class="r"><code>obs %&gt;% head()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["observation_reference"],"name":[1],"type":["int"],"align":["right"]},{"label":["observation_date"],"name":[2],"type":["S3: POSIXct"],"align":["right"]},{"label":["observation_time"],"name":[3],"type":["lgl"],"align":["right"]},{"label":["observation_lat"],"name":[4],"type":["chr"],"align":["left"]},{"label":["observation_long"],"name":[5],"type":["chr"],"align":["left"]},{"label":["observation_location"],"name":[6],"type":["chr"],"align":["left"]},{"label":["observation_notes"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"126208","2":"2017-10-24","3":"NA","4":"NA","5":"NA","6":"__NA__","7":"NA"},{"1":"67256","2":"2011-05-24","3":"NA","4":"51.35","5":"3.18333333333333","6":"Zeebrugge, in de omgeving van Voorhaven: APM","7":"294N > NGAN"},{"1":"71192","2":"2011-05-25","3":"NA","4":"51.35","5":"3.18333333333333","6":"Zeebrugge, in de omgeving van Voorhaven","7":"NA"},{"1":"71193","2":"2011-06-22","3":"NA","4":"51.35","5":"3.18333333333333","6":"Zeebrugge, in de omgeving van Voorhaven","7":"NA"},{"1":"71194","2":"2011-07-08","3":"NA","4":"51.35","5":"3.18333333333333","6":"Zeebrugge, in de omgeving van Voorhaven","7":"NA"},{"1":"72062","2":"2011-10-31","3":"NA","4":"41.1833333333333","5":"8.7","6":"Matosinhos, in de omgeving van Strand","7":"N.GAN"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Save to CSV:</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
