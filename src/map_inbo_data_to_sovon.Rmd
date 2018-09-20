@@ -300,6 +300,26 @@ birds <- birds %>%
   mutate(bird_shorthand = raw_RingKleurCode)
 ```
 
+### Scheme
+
+Actual values:
+
+```{r scheme}
+birds %>% distinct(raw_MetaalringLandCode)
+```
+
+We apply the following mapping:
+
+```{r scheme_mapping}
+birds <- birds %>%
+  mutate(bird_scheme = recode(raw_MetaalringLandCode,
+                              "BE " = "BLB",
+                              "FR" = "FRP",
+                              "NL" = "NLA",
+                              "PT" = "POL",
+                              "UK" = "GBT"))
+```
+
 ### Ring number
 
 ```{r ring_n}
