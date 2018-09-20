@@ -11,7 +11,7 @@ output:
     number_sections: true
     theme: yeti
     df_print: paged
-knit: (function(input_file, encoding) { rmarkdown::render(input_file, encoding = encoding, output_file = paste0("../docs/",sub(".Rmd", ".html", basename(input_file))))})
+knit: (function(input_file, encoding) { rmarkdown::render(input_file, encoding = encoding, output_file = paste0("./docs/",sub(".Rmd", ".html", basename(input_file))))})
 ---
 
 ```{r setup, include=FALSE}
@@ -37,14 +37,15 @@ library(stringr)   # To perform string operations
 library(readr) # To read and write txt files
 library(dplyr) # To transform data
 library(measurements) # To convert units of measurement 
+library(here) # To find files
 ```
 
-Set output file paths (all paths should be relative to this script):
+Set output file paths:
 
 ```{r file_paths}
-cr_users <- "../data/processed/data_users.tsv"
-cr_birds <- "../data/processed/data_birds.tsv"
-cr_obs <- "../data/processed/data_observations.tsv"
+cr_users_file <- here("data", "processed", "data_users.tsv")
+cr_birds_file <- here("data", "processed", "data_birds.tsv")
+cr_obs_file <- here("data", "processed", "data_observations.tsv")
 ```
 
 # Extract data from INBO kleurring database
@@ -505,6 +506,7 @@ birds %>% head()
 Save to CSV:
 
 ```{r write_bird_data_txt}
+readr::write_csv(birds, path = cr_birds, na = "")
 ```
 
 ## Observation data
@@ -525,4 +527,5 @@ obs %>% head()
 Save to CSV:
 
 ```{r write_obs_data_txt}
+readr::write_csv(obs, path = cr_obs, na = "")
 ```
