@@ -268,6 +268,12 @@ users <- users %>%
 
 ### Euring
 
+Present values:
+
+```{r euring_in_db}
+birds %>% distinct(raw_EuringCode)
+```
+
 ```{r bird_euring}
 birds <- birds %>%
   mutate(bird_euring = raw_EuringCode)
