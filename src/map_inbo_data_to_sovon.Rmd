@@ -274,9 +274,19 @@ Present values:
 birds %>% distinct(raw_EuringCode)
 ```
 
+We apply the following mapping:
+
 ```{r bird_euring}
 birds <- birds %>%
-  mutate(bird_euring = raw_EuringCode)
+  mutate(bird_euring = recode(raw_EuringCode,
+                              "5920" = "05920",
+                              "5910" = "05910",
+                              "5926" = "05926",
+                              "5922" = "05922",
+                              "zz" = NA_character_,
+                              "zzz" = NA_character_))
+```
+
 ```
 
 ### Short hand
