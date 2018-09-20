@@ -234,11 +234,11 @@ users <- users %>%
 
 ### User language
 
-This field is not present in `users`: `NA` is given
+This field is not present in `users`. However, all accounts have been made by INBO in Dutch:
 
 ```{r user_language}
 users <- users %>%
-  mutate(user_language  = NA)
+  mutate(user_language  = "Dutch")
 ```
 
 ### User role
