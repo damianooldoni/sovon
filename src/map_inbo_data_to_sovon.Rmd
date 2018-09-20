@@ -320,6 +320,12 @@ birds <- birds %>%
                               "UK" = "GBT"))
 ```
 
+Effects of mapping:
+
+```{r comparison_scheme}
+birds %>% distinct(raw_MetaalringLandCode, bird_scheme)
+```
+
 ### Ring number
 
 ```{r ring_n}
