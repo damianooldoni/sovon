@@ -287,6 +287,10 @@ birds <- birds %>%
                               "zzz" = NA_character_))
 ```
 
+Effects of mapping:
+
+```{r comparison_euring}
+birds %>% distinct(raw_EuringCode, bird_euring)
 ```
 
 ### Short hand
