@@ -117,7 +117,7 @@ obs <- dbGetQuery(conn,
   FROM dbo.tblWaarneming") %>% as_tibble()
 ```
 
-There is a second table with important information about observations, called `tboWaarnemingAktie`:
+There is a second table with important information about observations, called `tblWaarnemingAktie`:
 
 ```{r get_waarnemingAktie}
 obs_actions <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemingAktie")
