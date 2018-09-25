@@ -162,6 +162,53 @@ obs %>% head()
 obs_actions %>% head()
 ```
 
+```{r to_be_removed_after}
+# to be removed after cleaning by Marc!!!
+obs_actions <- obs_actions %>% 
+  distinct(raw_WaarnemingNummer, 
+           raw_AktieCode, .keep_all = TRUE)
+```
+
+We check there are no duplicates in `obs_actions`, that means no multiple lines for each distinct couple `raw_WaarnemingNummer` - `raw_AktieCode`:
+
+```{r show_duplicates_obs_actions}
+obs_actions %>% filter(raw_WaarnemingNummer %in% 
+                         (obs_actions %>% 
+                         group_by(raw_WaarnemingNummer, 
+                                  raw_AktieCode) %>% 
+                         count() %>%
+                         filter(n > 1) %>%
+                         pull(raw_WaarnemingNummer)))
+```
+
+The action acronym is contained in column  `raw_AktieCode`. Observations and their action are linked via columns `raw_WaarnemingNummer` (in `obs_actions`) and `raw_Nummer` (in `obs`). 
+
+Observations without action code:
+
+```{r observations_without_action}
+obs %>% 
+  filter(!raw_Nummer %in% 
+           (obs_actions %>% pull(raw_WaarnemingNummer)))
+```
+
+We remove them:
+
+```{r remove_observations_without_action}
+obs <- obs %>% 
+  filter(raw_Nummer %in% 
+           (obs_actions %>% pull(raw_WaarnemingNummer)))
+```
+
+In order to ease the mapping of birds and observations, we add action to observations in order to have a unique **tidy** data frame:
+
+```{r}
+obs_and_acts <- obs %>% 
+  left_join(obs_actions %>% 
+              select(-c(raw_Nummer, 
+                        raw_AanmaakDatum, 
+                        raw_WijzigDatum)),
+            by = c("raw_Nummer" = "raw_WaarnemingNummer"))
+```
 
 # Map data
 
