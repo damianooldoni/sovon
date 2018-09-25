@@ -117,10 +117,16 @@ obs <- dbGetQuery(conn,
   FROM dbo.tblWaarneming") %>% as_tibble()
 ```
 
-There is a second table with important information about observations, called `tblWaarnemingAktie`:
+Table `tblWaarnemingAktie` is also important because contains informations about the actions the observations refer to:
 
 ```{r get_waarnemingAktie}
 obs_actions <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemingAktie")
+```
+
+The action codes are described in table `dbo.cdeAktie`:
+```{r get_}
+actions_meaning <- dbGetQuery(conn, "SELECT * FROM dbo.cdeAktie")
+actions_meaning
 ```
 
 ## Pre-processing
