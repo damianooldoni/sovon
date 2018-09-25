@@ -296,17 +296,16 @@ users <- users %>%
 
 ### User role
 
-The distinction between ringer and observer is not present in `users`, but can be retrieved by combining `obs`, `obs_actions` and `users`.
+The distinction between ringer and observer is not present in `users`, but can be retrieved by combining it with `obs_and_acts`.
 
-We filter by ring action (`rngkl` and `rngme`) and we retrieve the ringers in `obs` by `raw_WaarnemerNummer`:
+We filter by ring actions (`rngkl` or `rngme`) and we retrieve the ringers by `raw_WaarnemerNummer`:
 
 ```{r find_ringers}
-ringing_obs_numbers <- obs_actions %>% 
+ringers_number <- obs_and_acts %>% 
   filter(raw_AktieCode %in% c("rngkl","rngme")) %>%
-  pull(raw_WaarnemingNummer)
-ringers_number <- obs %>% 
-  filter(raw_Nummer %in% ringing_obs_numbers) %>%
   distinct(raw_WaarnemerNummer) %>% pull()
+print(paste("Number of ringers:", 
+            length(ringers_number)))
 ```
 
 And we assign a `R` (ringer) to them, `O` (observer) otherwise:
