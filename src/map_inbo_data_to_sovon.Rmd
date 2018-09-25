@@ -381,9 +381,29 @@ birds %>% distinct(raw_MetaalringLandCode, bird_scheme)
 
 ### Ring number
 
-```{r ring_n}
+The ring number can be found in field `raw_MetaalringNummer`. Ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
+
+> Where the ring number consist of fewer than ten numbers/letters, the number is padded with dots. These dots are always inserted to the left of the rightmost
+row of numbers.
+
+Filtering metal rings without any number results in detecting anomalies:
+
+```{r anomalies_ring_number}
+birds %>%
+  filter(!str_detect(raw_MetaalringNummer, pattern = regex("\\d+"))) %>%
+  group_by(raw_MetaalringNummer) %>%
+  count()
+```
+
+Value `none` means _not metal-ringed bird_. From the EUring documentation:
+
+> If a bird is not metal-ringed on first capture but is identified in another way (primary identification method not A0), a unique number relating to that bird must be entered in this field. That unique number will represent a not-present-metal-ring-number. It must be a unique number because this identification number is unique for database reasons. That unique number must be allocated by the national scheme. It is recommended to start that unique number with the characters “NMR” (meaning “not metal ring”) and then followed by seven numbers. For example: NMR0000001. It is recommended that the Scheme and ringer agree this unique number that will be used to identify the bird throughout its life. 
+
+Ring number should also not contain any `*`. We remove all asteriks:
+
+```{r remove_*_in_ring_number}
 birds <- birds %>%
-  mutate(bird_ring_number = raw_MetaalringNummer)
+  mutate(bird_ring_number = gsub("\\*", "", raw_MetaalringNummer))
 ```
 
 ### Bird sex
