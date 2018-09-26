@@ -159,18 +159,15 @@ Preview observations data:
 obs %>% head()
 ```
 
+Preview observation actions data:
+
 ```{r prview_obs_actions}
 obs_actions %>% head()
 ```
 
-```{r to_be_removed_after}
-# to be removed after cleaning by Marc!!!
-obs_actions <- obs_actions %>% 
-  distinct(raw_WaarnemingNummer, 
-           raw_AktieCode, .keep_all = TRUE)
-```
+The action acronym is contained in column  `raw_AktieCode`. Observations and their action are linked via columns `raw_WaarnemingNummer` (in `obs_actions`) and `raw_Nummer` (in `obs`).
 
-We check there are no duplicates in `obs_actions`, that means no multiple lines for each distinct couple `raw_WaarnemingNummer` - `raw_AktieCode`:
+No duplicates `raw_WaarnemingNummer`-`raw_AktieCode` should exist:
 
 ```{r show_duplicates_obs_actions}
 obs_actions %>% filter(raw_WaarnemingNummer %in% 
@@ -182,9 +179,16 @@ obs_actions %>% filter(raw_WaarnemingNummer %in%
                          pull(raw_WaarnemingNummer)))
 ```
 
-The action acronym is contained in column  `raw_AktieCode`. Observations and their action are linked via columns `raw_WaarnemingNummer` (in `obs_actions`) and `raw_Nummer` (in `obs`). 
+Otherwise they should be removed:
 
-Observations without action code:
+```{r to_be_removed_after}
+# to be removed after cleaning by Marc!!!
+obs_actions <- obs_actions %>% 
+  distinct(raw_WaarnemingNummer, 
+           raw_AktieCode, .keep_all = TRUE)
+```
+
+All observations should also have an action code:
 
 ```{r observations_without_action}
 obs %>% 
@@ -192,7 +196,7 @@ obs %>%
            (obs_actions %>% pull(raw_WaarnemingNummer)))
 ```
 
-We remove them:
+Observation without it will be removed:
 
 ```{r remove_observations_without_action}
 obs <- obs %>% 
@@ -200,7 +204,7 @@ obs <- obs %>%
            (obs_actions %>% pull(raw_WaarnemingNummer)))
 ```
 
-In order to ease the mapping of birds and observations, we add action to observations in order to have a unique **tidy** data frame:
+In order to ease the mapping of birds and observations, we add action codes to observations in order to have a unique **tidy** data frame:
 
 ```{r}
 obs_and_acts <- obs %>% 
@@ -386,7 +390,7 @@ The ring number can be found in field `raw_MetaalringNummer`. Ring number should
 > Where the ring number consist of fewer than ten numbers/letters, the number is padded with dots. These dots are always inserted to the left of the rightmost
 row of numbers.
 
-Filtering metal rings without any number results in detecting anomalies:
+Ring number anomalies:
 
 ```{r anomalies_ring_number}
 birds %>%
@@ -395,15 +399,77 @@ birds %>%
   count()
 ```
 
-Value `none` means _not metal-ringed bird_. From the EUring documentation:
+Value `none` means _not metal-ringed bird_, while `onbekend` means that information is no more available. SOVON chooses to leave column `bird_ring_number` empty for both cases and adding a note in `bird_notes` column. Value `?` is equivalent to `onbekend` while `H????????` and `Lxxxxxx` are mapped as `H--------` and `L------` respectively.
 
-> If a bird is not metal-ringed on first capture but is identified in another way (primary identification method not A0), a unique number relating to that bird must be entered in this field. That unique number will represent a not-present-metal-ring-number. It must be a unique number because this identification number is unique for database reasons. That unique number must be allocated by the national scheme. It is recommended to start that unique number with the characters “NMR” (meaning “not metal ring”) and then followed by seven numbers. For example: NMR0000001. It is recommended that the Scheme and ringer agree this unique number that will be used to identify the bird throughout its life. 
+```{r solve_anomalies_bird_ring_number}
+birds <- birds %>%
+  mutate(bird_ring_number = recode(raw_MetaalringNummer,
+                              "?" = NA_character_,
+                              "onbekend" = NA_character_,
+                              "none" = NA_character_,
+                              "H????????" = "H--------",
+                              "Lxxxxxx" = "L------")) %>%
+  mutate(bird_notes = case_when(
+    raw_MetaalringNummer %in% c("?", "onbekend") ~ "bird_ring_number not anymore available.",
+    raw_MetaalringNummer == "none" ~ "bird_ring_number not present."))
+```
 
-Ring number should also not contain any `*`. We remove all asteriks:
+We separate the birds with special mapping values by all the others:
+
+```{r hold_special_values}
+special_values <- c("H--------", "L------")
+birds_special_values <- birds %>%
+  filter(bird_ring_number %in% special_values)
+birds_others <- birds %>%
+  filter(!bird_ring_number %in% special_values)
+```
+
+Some ring numbers contain asterisks:
+
+```{r show_asterisks}
+birds_others %>% 
+  filter(str_detect(bird_ring_number, "\\*")) %>%
+  select(bird_ring_number)
+```
+
+We remove all of them:
 
 ```{r remove_*_in_ring_number}
-birds <- birds %>%
-  mutate(bird_ring_number = gsub("\\*", "", raw_MetaalringNummer))
+birds_others <- birds_others %>%
+  mutate(bird_ring_number = gsub("\\*", "", bird_ring_number))
+```
+
+Add points `.` where needed:
+
+```{r add_._in_ring_number}
+birds_others <- birds_others %>%
+  mutate(reversed = stri_reverse(str = bird_ring_number))
+idx <- as.data.frame(str_locate(birds_others$reversed, pattern = regex("\\d+")))$end
+idx <- replace_na(idx, 0)
+birds_others <- birds_others %>%
+  mutate(bird_ring_number = stri_reverse(str_c(
+    str_sub(reversed, 
+          end = idx),
+  map_chr(nchar(reversed), function(x) {
+    ifelse(x < 10,
+           str_c(rep(".", 10 - x), collapse = ""),
+           "")
+  }),
+  str_sub(reversed, 
+          start = idx+1)))) %>%
+  select(-reversed)
+```
+
+Merge the two data frames together:
+
+```{r}
+birds <- bind_rows(birds_others, birds_special_values)
+```
+
+Effects of mapping (part of it):
+
+```{r}
+birds %>% distinct(raw_MetaalringNummer, bird_ring_number)
 ```
 
 ### Bird sex
