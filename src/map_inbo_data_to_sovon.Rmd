@@ -33,7 +33,8 @@ Load libraries:
 ```{r load_libraries}
 library(DBI) # To connect to database
 library(odbc) # To connect to database
-library(stringr)   # To perform string operations
+library(stringr) # To perform string operations
+library(stringi) # To perform string operations
 library(readr) # To read and write txt files
 library(dplyr) # To transform data
 library(measurements) # To convert units of measurement 
