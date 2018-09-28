@@ -222,6 +222,27 @@ obs_and_acts <- obs_and_acts %>% filter(raw_KleurringNummer != "FOUT")
 birds <- birds %>% filter(raw_Nummer != "FOUT")
 ```
 
+Typically bird color rings codes are uppercase:
+
+```{r show_example_Nummer_uppercase}
+all(toupper(birds$raw_Nummer) == birds$raw_Nummer)
+```
+
+And so should be for `raw_KleurringNummer` in `obs_and_acts`. Exceptions:
+
+```{r lowercase_raw_kleurringNummer}
+obs_and_acts %>% 
+  filter(raw_KleurringNummer != toupper(raw_KleurringNummer)) %>% 
+  distinct(raw_KleurringNummer)
+```
+
+We transform all of them to uppercase:
+
+```{r raw_KleurringNummer_to_upper}
+obs_and_acts <- obs_and_acts %>% 
+  mutate(raw_KleurringNummer = toupper(raw_KleurringNummer))
+```
+
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format.
