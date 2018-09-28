@@ -264,6 +264,19 @@ birds <- birds %>%
   filter(!raw_Nummer %in% raw_KleurringNummer_remove)
 ```
 
+Finally, we search for birds (`raw_Nummer` in  `birds`) which are not present in any observation (`raw_KleurringNummer` in `obs_and_acts`):
+
+```{r birds_not_in_obs}
+birds %>% filter(!raw_Nummer %in% obs_and_acts$raw_KleurringNummer)
+```
+
+We remove them:
+
+```{r remove_birds_not_in_obs}
+birds <- birds %>% 
+  filter(raw_Nummer %in% obs_and_acts$raw_KleurringNummer)
+```
+
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format.
