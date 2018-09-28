@@ -215,6 +215,13 @@ obs_and_acts <- obs %>%
             by = c("raw_Nummer" = "raw_WaarnemingNummer"))
 ```
 
+There are observations judged as error. They are marked by`raw_KleurringNummmer` equal to `FOUT`, which is also in `birds`. We remove both:
+
+```{r remove_FOUT}
+obs_and_acts <- obs_and_acts %>% filter(raw_KleurringNummer != "FOUT")
+birds <- birds %>% filter(raw_Nummer != "FOUT")
+```
+
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format.
