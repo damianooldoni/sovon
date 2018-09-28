@@ -243,6 +243,27 @@ obs_and_acts <- obs_and_acts %>%
   mutate(raw_KleurringNummer = toupper(raw_KleurringNummer))
 ```
 
+All values in `raw_KleurringNummer` should be present in `birds$raw_Nummer`. Exceptions:
+
+```{r raw_KleurringNummer_not_in_birds_raw_Nummer}
+obs_and_acts %>%
+  filter(!raw_KleurringNummer %in% birds$raw_Nummer) %>% 
+  distinct(raw_KleurringNummer)
+```
+
+We remove them:
+
+```{r}
+raw_KleurringNummer_remove <- obs_and_acts %>%
+  filter(!raw_KleurringNummer %in% birds$raw_Nummer) %>% 
+  distinct(raw_KleurringNummer) %>%
+  pull()
+obs_and_acts <- obs_and_acts %>% 
+  filter(!raw_KleurringNummer %in% raw_KleurringNummer_remove)
+birds <- birds %>%
+  filter(!raw_Nummer %in% raw_KleurringNummer_remove)
+```
+
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format.
