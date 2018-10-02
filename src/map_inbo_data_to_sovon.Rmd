@@ -252,7 +252,7 @@ obs_and_acts %>%
   distinct(raw_KleurringNummer)
 ```
 
-We transform all of them to uppercase:
+are transformed to uppercase:
 
 ```{r raw_KleurringNummer_to_upper}
 obs_and_acts <- obs_and_acts %>% 
