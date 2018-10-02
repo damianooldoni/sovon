@@ -154,6 +154,20 @@ Preview birds data:
 birds %>% head()
 ```
 
+No spaces should be present in any column of `birds`:
+
+```{r check_spaces}
+map_dfr(birds, ~ mutate(birds, space_detect = str_detect(., pattern = " "))) %>%
+  filter(space_detect == TRUE)
+```
+
+Remove all spaces:
+
+```{r remove_spaces}
+birds <- birds %>% 
+  mutate_all(funs(str_replace(., " ", "")))
+```
+
 Preview observations data:
 
 ```{r preview_obs}
