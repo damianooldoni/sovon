@@ -330,19 +330,23 @@ birds <- birds %>%
   filter(raw_Nummer %in% obs_and_acts$raw_KleurringNummer)
 ```
 
+We control the presence of duplicates in datum of applying color or metal rings (action code `rngkl` or `rngme`):
+
+```{r duplicates_apply_color_rings}
+duplicates_ringing <- obs_and_acts %>%
+  filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
+  filter(raw_KleurringNummer %in% (
+    obs_and_acts %>% 
+      filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
+      group_by(raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
+      count() %>%
+      filter(n > 1) %>%
+      pull(raw_KleurringNummer))) %>%
+  arrange(raw_KleurringNummer)
+duplicates_ringing
 ```
 
-We change `PSA-T1` to `Kleine Vlakte`:
-
-```{r}
-obs_and_acts <- obs_and_acts %>%
-  mutate(raw_PlaatsToponymDetail = if_else((raw_KleurringNummer == "AVOH" & 
-                                raw_Nummer == "114756"),
-                                "Kleine Vlakte",
-                                raw_PlaatsToponymDetail))
-```
-
-Now we can remove duplicates in applying color and metal rings:
+If no inconsistencies are detected in other columns (e.g. bird age or place while ringing), duplicates can be removed:
 
 ```{r remove_duplicates_ringing}
 obs_and_acts <- bind_rows(obs_and_acts %>% 
@@ -351,6 +355,23 @@ obs_and_acts <- bind_rows(obs_and_acts %>%
                      .keep_all = TRUE),
           obs_and_acts %>%
             filter(!raw_AktieCode %in% c("rngkl", "rngme")))
+```
+
+```{r duplicates_apply_color_rings}
+duplicates_ringing_bird_age <- obs_and_acts %>%
+  filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
+  filter(raw_KleurringNummer %in% (
+    obs_and_acts %>% 
+      filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
+      group_by(raw_KleurringNummer, raw_LeeftijdCode, raw_Datum, raw_AktieCode) %>%
+      count() %>%
+      filter(n > 1) %>%
+      pull(raw_KleurringNummer))) %>%
+  arrange(raw_KleurringNummer)
+duplicates_ringing_bird_age
+```
+
+
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format.
