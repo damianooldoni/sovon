@@ -229,6 +229,26 @@ obs_and_acts <- obs %>%
             by = c("raw_Nummer" = "raw_WaarnemingNummer"))
 ```
 
+No spaces should be present in `obs_and_acts` except for columns related to place description (`raw_Plaats*`), datums (`*Datum`) and notes (`raw_Opmerking`):
+
+```{r show_spaces_obs_and_acts}
+map_dfr(obs_and_acts %>%
+          select(-c(starts_with("raw_Plaats"), 
+                    raw_Opmerking, 
+                    ends_with("Datum"))), ~ 
+          mutate(obs_and_acts, space_detect = str_detect(., pattern = " "))) %>%
+  filter(space_detect == TRUE) %>%
+  arrange(raw_Nummer)
+```
+
+Remove spaces:
+
+```{r remove_spaces_from_obs_and_acts}
+ obs_and_acts <- obs_and_acts %>% 
+  mutate_at(vars(-c(starts_with("raw_Plaats"), ends_with("Datum"), matches("raw_Opmerking"))), 
+            funs(str_replace(., " ", "")))
+```
+
 There are observations judged as error. They are marked by`raw_KleurringNummmer` equal to `FOUT`:
 
 ```{r show_FOUT_obs}
