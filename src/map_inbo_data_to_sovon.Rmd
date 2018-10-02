@@ -675,7 +675,7 @@ Mapping the age while applying color ring from INBO format to SOVON standard (Eu
 birds <- birds %>%
   mutate(bird_age_ringing = recode(raw_LeeftijdCode,
     "PU" = "1",
-    "AD" = "2",
+    "AD" = "A",
     "J1" = "3",
     "I4" = "5",
     "I3" = "7",
