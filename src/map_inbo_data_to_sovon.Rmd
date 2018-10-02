@@ -648,6 +648,10 @@ The date of ringing (to be mapped as `bird_date_begin`) can be found in data fra
 ```{r}
 obs_and_acts %>% 
   filter(raw_AktieCode == "rngkl") %>%
+  select(raw_KleurringNummer, raw_Datum) %>%
+  head(n = 10)
+```
+
 ### Bird age ringing
 
 Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs` when related code action in `obs_actions` is equal to `rngkl` (code action of applying colour ring). Such age can then be added to data frame `birds` by matching the color ring number:
