@@ -214,7 +214,24 @@ obs_and_acts <- obs %>%
             by = c("raw_Nummer" = "raw_WaarnemingNummer"))
 ```
 
-There are observations judged as error. They are marked by`raw_KleurringNummmer` equal to `FOUT`, which is also in `birds`. We remove both:
+There are observations judged as error. They are marked by`raw_KleurringNummmer` equal to `FOUT`:
+
+```{r show_FOUT_obs}
+obs_and_acts %>% 
+  filter(raw_KleurringNummer == "FOUT") %>%
+  head(n = 10)
+```
+
+The value `FOUT` is also present in `birds`:
+
+```{r show_FOUT_birds}
+birds %>% 
+  filter(raw_Nummer == "FOUT")
+```
+
+These data are related to observations judged not correct (`FOUT`: _error_) by the INBO experts and administrator of the database.
+
+Thus, at the moment, we remove these data (discussion about this issue [here](https://github.com/inbo/sovon/issues/9)):
 
 ```{r remove_FOUT}
 obs_and_acts <- obs_and_acts %>% filter(raw_KleurringNummer != "FOUT")
