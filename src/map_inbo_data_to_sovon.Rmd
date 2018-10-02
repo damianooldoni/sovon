@@ -37,6 +37,7 @@ library(stringr) # To perform string operations
 library(stringi) # To perform string operations
 library(readr) # To read and write txt files
 library(dplyr) # To transform data
+library(tidyr) # To transform data
 library(purrr) # To transform data via loops
 library(measurements) # To convert units of measurement 
 library(here) # To find files
