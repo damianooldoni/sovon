@@ -182,7 +182,6 @@ obs_actions %>% filter(raw_WaarnemingNummer %in%
 Otherwise they should be removed:
 
 ```{r to_be_removed_after}
-# to be removed after cleaning by Marc!!!
 obs_actions <- obs_actions %>% 
   distinct(raw_WaarnemingNummer, 
            raw_AktieCode, .keep_all = TRUE)
