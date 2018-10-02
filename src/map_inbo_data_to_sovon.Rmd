@@ -713,7 +713,7 @@ birds <- birds %>%
 
 ### Bird birth year
 
-This field will be filled by SOVON (authomatically by a function, I think). `NA` is given:
+This field will be filled by SOVON. `NA` is given:
 
 ```{r bird_birth_year}
 birds <- birds %>%
