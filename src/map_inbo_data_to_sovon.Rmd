@@ -510,8 +510,7 @@ birds %>% distinct(raw_EuringCode, bird_euring)
 ### Short hand
 
 ```{r shorthand}
-birds <- birds %>%
-  mutate(bird_shorthand = raw_RingKleurCode)
+
 ```
 
 ### Scheme
