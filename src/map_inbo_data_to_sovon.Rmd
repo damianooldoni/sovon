@@ -37,6 +37,7 @@ library(stringr) # To perform string operations
 library(stringi) # To perform string operations
 library(readr) # To read and write txt files
 library(dplyr) # To transform data
+library(purrr) # To transform data via loops
 library(measurements) # To convert units of measurement 
 library(here) # To find files
 ```
@@ -293,6 +294,27 @@ birds <- birds %>%
   filter(raw_Nummer %in% obs_and_acts$raw_KleurringNummer)
 ```
 
+```
+
+We change `PSA-T1` to `Kleine Vlakte`:
+
+```{r}
+obs_and_acts <- obs_and_acts %>%
+  mutate(raw_PlaatsToponymDetail = if_else((raw_KleurringNummer == "AVOH" & 
+                                raw_Nummer == "114756"),
+                                "Kleine Vlakte",
+                                raw_PlaatsToponymDetail))
+```
+
+Now we can remove duplicates in applying color and metal rings:
+
+```{r remove_duplicates_ringing}
+obs_and_acts <- bind_rows(obs_and_acts %>% 
+            filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
+            distinct(raw_Datum, raw_KleurringNummer, raw_AktieCode, 
+                     .keep_all = TRUE),
+          obs_and_acts %>%
+            filter(!raw_AktieCode %in% c("rngkl", "rngme")))
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format.
@@ -489,6 +511,7 @@ birds <- birds %>%
                               "Lxxxxxx" = "L------")) %>%
   mutate(bird_notes = case_when(
     raw_MetaalringNummer %in% c("?", "onbekend") ~ "bird_ring_number not anymore available.",
+    is.na(raw_MetaalringNummer) ~ "bird_ring_number not available.",
     raw_MetaalringNummer == "none" ~ "bird_ring_number not present."))
 ```
 
@@ -562,6 +585,13 @@ birds <- birds %>%
 ))
 ```
 
+### Bird ringing date
+
+The date of ringing (to be mapped as `bird_date_begin`) can be found in data frame `obs_and_acts` in the column `raw_Datum` relatively to code action `rngkl` (code action of applying colour ring).
+
+```{r}
+obs_and_acts %>% 
+  filter(raw_AktieCode == "rngkl") %>%
 ### Bird age ringing
 
 Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs` when related code action in `obs_actions` is equal to `rngkl` (code action of applying colour ring). Such age can then be added to data frame `birds` by matching the color ring number:
