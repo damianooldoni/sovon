@@ -182,7 +182,7 @@ Preview observation actions data:
 obs_actions %>% head()
 ```
 
-The action acronym is contained in column  `raw_AktieCode`. Observations and their action are linked via columns `raw_WaarnemingNummer` (in `obs_actions`) and `raw_Nummer` (in `obs`).
+The action acronym is contained in column `raw_AktieCode`. Observations and their action are linked via columns `raw_WaarnemingNummer` (in `obs_actions`) and `raw_Nummer` (in `obs`).
 
 No duplicates `raw_WaarnemingNummer`-`raw_AktieCode` should exist:
 
