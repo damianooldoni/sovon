@@ -231,7 +231,7 @@ obs_and_acts <- obs %>%
             by = c("raw_Nummer" = "raw_WaarnemingNummer"))
 ```
 
-No spaces should be present in `obs_and_acts` except for columns related to place description (`raw_Plaats*`), datums (`*Datum`) and notes (`raw_Opmerking`):
+No spaces should be present in character columns of `obs_and_acts` except for columns related to place description (`raw_Plaats*`), datums (`*Datum`) and notes (`raw_Opmerking`):
 
 ```{r show_spaces_obs_and_acts}
 map_dfr(obs_and_acts %>%
