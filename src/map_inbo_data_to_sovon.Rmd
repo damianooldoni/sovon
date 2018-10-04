@@ -235,6 +235,7 @@ No spaces should be present in character columns of `obs_and_acts` except for co
 
 ```{r show_spaces_obs_and_acts}
 map_dfr(obs_and_acts %>%
+          select_if(is.character) %>%
           select(-c(starts_with("raw_Plaats"), 
                     raw_Opmerking, 
                     ends_with("Datum"))), ~ 
