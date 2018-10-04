@@ -736,13 +736,13 @@ birds <- birds %>%
 ### Observation reference
 
 ```{r obs_ref}
-obs <- obs %>% mutate(observation_reference = raw_Nummer)
+obs_and_acts <- obs_and_acts %>% mutate(observation_reference = raw_Nummer)
 ```
 
 ### Observation date
 
 ```{r obs_date}
-obs <- obs %>% mutate(observation_date = raw_Datum)
+obs_and_acts <- obs_and_acts %>% mutate(observation_date = raw_Datum)
 ```
 
 ### Observation time
@@ -750,7 +750,7 @@ obs <- obs %>% mutate(observation_date = raw_Datum)
 No time is found for observations in `obs`. `NA` is given:
 
 ```{r obs_time}
-obs <- obs %>% mutate(observation_time = NA)
+obs_and_acts <- obs_and_acts %>% mutate(observation_time = NA)
 ```
 
 ### Observation latitude
@@ -758,7 +758,7 @@ obs <- obs %>% mutate(observation_time = NA)
 Observation latitude should be converted to decimal degrees:
 
 ```{r obs_latitude}
-obs <- obs %>% mutate(
+obs_and_acts <- obs_and_acts %>% mutate(
   observation_lat = conv_unit(
     str_c(raw_PlaatsBreedtegraadGraden,
           raw_PlaatsBreedtegraadMinuten,
@@ -773,7 +773,7 @@ obs <- obs %>% mutate(
 Observation longitude should be converted to decimal degrees:
 
 ```{r obs_longitude}
-obs <- obs %>% mutate(
+obs_and_acts <- obs_and_acts %>% mutate(
   observation_long = conv_unit(
     str_c(raw_PlaatsLengtegraadGraden,
           raw_PlaatsLengtegraadMinuten,
@@ -788,7 +788,7 @@ obs <- obs %>% mutate(
 Aggregate information about observation location. We follow the following structure: `raw_PlaatsGemeente` [+ `, ` + `raw_PlaatsToponym` [+ `: ` + `raw_PlaatsToponymDetail`]]:
 
 ```{r}
-obs <- obs %>% mutate(
+obs_and_acts <- obs_and_acts %>% mutate(
   observation_location = ifelse(!is.na(raw_PlaatsToponym),
                                 str_c(raw_PlaatsGemeente,
                                       raw_PlaatsToponym, 
