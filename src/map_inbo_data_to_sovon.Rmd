@@ -656,7 +656,7 @@ obs_and_acts %>%
 
 ### Bird age ringing
 
-Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs` when related code action in `obs_actions` is equal to `rngkl` (code action of applying colour ring). Such age can then be added to data frame `birds` by matching the color ring number:
+Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs_and_acts` when related code action is equal to `rngkl` (code action of applying colour ring). Check for anomalies:
 
 ```{r retrieve_age_ringing}
 birds <- left_join(obs_actions %>% 
