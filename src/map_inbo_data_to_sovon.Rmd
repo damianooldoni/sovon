@@ -813,6 +813,15 @@ obs_and_acts <- obs_and_acts %>%
   select(-c(user_first_name, user_last_name))
 ```
 
+### Observation reporter reference number
+
+The field `melder_ringersnummer` is equal to `user_reference` and should be left to SOVON. `NA` is given:
+
+```{r melder_ringersnummer}
+obs_and_acts <- obs_and_acts %>%
+  mutate(melder_ringersnummer = NA)
+```
+
 ### Observation notes
 
 ```{r obs_notes}
