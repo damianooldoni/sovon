@@ -801,6 +801,26 @@ obs_and_acts <- obs_and_acts %>% mutate(
                                        paste(observation_location)))
 ```
 
+### Observation status
+
+The need of adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
+
+```{r breed_show}
+actions_meaning %>%
+  filter(Code %in% c("br", "vang"))
+```
+
+The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document, we define the following mapping:
+
+```{r}
+obs_and_acts %>%
+  mutate(status = case_when(
+    raw_AktieCode %in% c("br", "vang") ~ "N",
+    raw_LeeftijdCode == "PU" ~ "-",
+    TRUE ~ "U"
+  ))
+```
+
 ### Observation reporter
 
 The field `melder` is equal to `user_first_name` and `user_last_name` in `users`:
