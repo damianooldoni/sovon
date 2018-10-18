@@ -706,7 +706,7 @@ birds <- birds %>%
 
 ### Bird name
 
-Bird name will be provided by SOVON.  `NA` is given:
+Bird name will be provided by SOVON. `NA` is given:
 
 ```{r bird_name}
 birds <- birds %>%
@@ -724,7 +724,7 @@ birds <- birds %>%
 
 ### Bird date end
 
-This field should be left to SOVON.  `NA` is given:
+This field should be left to SOVON. `NA` is given:
 
 ```{r bird_date_end}
 birds <- birds %>%
