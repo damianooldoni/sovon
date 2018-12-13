@@ -437,7 +437,7 @@ obs_and_acts <-
   select(-starts_with("raw_Metaalring"))
 ```
 
-### Solve GPS trackers ID
+### Solve GPS tracker IDs
 
 Some birds have a suspect `raw_Nummer` which is formed by letters `GPS` or `GP` followed by some numbers. These are a kind of GPS IDs which should not be in columns related to color rings:
 
@@ -453,11 +453,11 @@ The right mapping of them is saved in `map_gps`:
 map_gps %>% head()
 ```
 
-We import the color rings in new column `first_Nummer`. For all other rings will be `first_nummer = raw_Nummer` as they are the very first rings. We will also add note `'uvabits_gps_tagged.'`
+We import the color rings in new column `first_Nummer`. For all other rings will be `first_nummer = raw_Nummer` as they are the very first rings. We will also add note `'uvabits_gps_tag'`
 
 ```{r map_to_first_Nummer}
 map_gps_add_notes <- map_gps %>%
-  mutate(bird_notes = "uvabits_gps_tagged.")
+  mutate(bird_notes = "uvabits_gps_tag")
 birds <- birds %>%
   # create column first_Nummer with right color rings for the GPS or GP** rings
   left_join(map_gps_add_notes, by = c("raw_Nummer" = "gps_id")) %>%
@@ -491,23 +491,24 @@ head(uvabits_names)
 Add names to `bird_notes`:
 
 ```{r add_names_to_notes}
-birds <- 
+birds_t <- 
   birds %>%
   left_join(uvabits_names %>%
-              select(ring_number, individual_remarks) %>%
-              # add point at the end of name for possible extra notes in future
-              mutate(individual_remarks = paste0(individual_remarks, ".")), 
+              select(ring_number, individual_remarks), 
             by = c("raw_MetaalringNummer" = "ring_number")) %>% 
   replace_na(list(individual_remarks = "", bird_notes = "")) %>% 
  unite(col = "bird_notes", 
        bird_notes, individual_remarks,
-       sep = "", remove = TRUE)
+       sep = " | ", remove = TRUE) %>%
+  mutate(bird_notes = ifelse(bird_notes == " | ",
+                             NA_character_,
+                             bird_notes))
 ```
 
 So, for example the bird with `raw_Nummer` equal to GP130 is mapped as follows:
 
 ```{r example_gps_mapping_and_name}
-birds %>%
+birds_t %>%
   filter(raw_Nummer == "GP130") %>%
   select(raw_Nummer, first_Nummer, bird_notes)
 ```
