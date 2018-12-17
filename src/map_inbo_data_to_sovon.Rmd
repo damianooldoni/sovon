@@ -476,33 +476,23 @@ birds %>%
   select(first_Nummer)
 ```
 
-### Add bird names
+Mapping example: the bird with `raw_Nummer` equal to GP130 is mapped as follows:
 
-As suggested by experts, it woudl be handy to add bird name in `bird_notes` as well. The bird names can be got by reading this [file](https://raw.githubusercontent.com/inbo/bird-tracking/master/data/interim/individuals.csv); The names are saved in column `individual_remarks`:
-
-```{r read_names}
-uvabits_file <- "https://raw.githubusercontent.com/inbo/bird-tracking/master/data/interim/individuals.csv"
-uvabits_names <- 
-  read_csv(uvabits_file) %>%
-  select(individual_id, ring_number, individual_remarks, everything())
-head(uvabits_names)
+```{r example_gps_mapping_and_name}
+birds %>%
+  filter(raw_Nummer == "GP130") %>%
+  select(raw_Nummer, first_Nummer, bird_notes)
 ```
 
-Add names to `bird_notes`:
+Column `first_Nummer` should contain unique elements. Check for exceptions:
 
-```{r add_names_to_notes}
-birds_t <- 
-  birds %>%
-  left_join(uvabits_names %>%
-              select(ring_number, individual_remarks), 
-            by = c("raw_MetaalringNummer" = "ring_number")) %>% 
-  replace_na(list(individual_remarks = "", bird_notes = "")) %>% 
- unite(col = "bird_notes", 
-       bird_notes, individual_remarks,
-       sep = " | ", remove = TRUE) %>%
-  mutate(bird_notes = ifelse(bird_notes == " | ",
-                             NA_character_,
-                             bird_notes))
+```{r}
+birds %>%
+  group_by(first_Nummer) %>%
+  count() %>%
+  filter(n>1) %>%
+  left_join(birds) %>%
+  select(-n)
 ```
 
 So, for example the bird with `raw_Nummer` equal to GP130 is mapped as follows:
@@ -620,6 +610,133 @@ users <- users %>%
 ```
 
 ## Map color ring data
+
+### Bird reference
+
+The relation color ring (SOVON field `bird_shorthand`) - bird is a multi-to-one relation. By assigning a bird reference as unique integer to a bird we can link any color ring to the bird it belongs to.
+
+```{r bird_reference}
+birds <- birds %>%
+  mutate(bird_reference = seq_len(nrow(birds))) %>%
+  select(bird_reference, first_Nummer, raw_NummerNieuw, 
+         raw_NummerDesc, everything())
+head(birds)
+```
+
+We have to solve the lack of unicity discussed in preprocessing, which ends up in multiple `bird_reference` for the same bird. See here the few issues encountered:
+
+```{r issues_shorthand}
+birds %>%
+  group_by(first_Nummer) %>%
+  count() %>%
+  filter(n>1) %>%
+  left_join(birds %>%
+              select(bird_reference, 
+                     first_Nummer, 
+                     raw_NummerNieuw, 
+                     raw_NummerDesc, 
+                     raw_Nummer),
+            by = "first_Nummer") %>%
+  select(-n)
+```
+
+We assign the lower `bird_reference`:
+
+```{r solve_unicity_issues}
+birds <-
+  birds %>%
+  group_by(first_Nummer) %>%
+  mutate(bird_reference = min(bird_reference)) %>%
+  ungroup()
+```
+
+Check:
+
+```{r check_solution_unicity_shorthand}
+birds %>%
+  group_by(first_Nummer) %>%
+  count() %>%
+  filter(n>1) %>%
+  left_join(birds %>%
+              select(bird_reference, 
+                     first_Nummer, 
+                     raw_NummerNieuw, 
+                     raw_NummerDesc, 
+                     raw_Nummer),
+            by = "first_Nummer") %>%
+  select(-n)
+```
+
+We add column `bird_reference` to `obs_and_acts` as it will be needed to map the dates of ringing:
+
+```{r apply_bird_ref_to_obs_acts}
+obs_and_acts <- 
+  obs_and_acts %>%
+  left_join(birds %>% select(raw_Nummer, bird_reference),
+            by = c("raw_KleurringNummer" = "raw_Nummer")) %>%
+  select(bird_reference, everything())
+```
+
+Check whether there are observation without link to any bird:
+
+```{r check_NA_bird_ref}
+filter(obs_and_acts, is.na(bird_reference))
+```
+
+The reconstruction of the series of color rings linked to each bird is made by using columns `first_Nummer`, `raw_NummerNieuw` and the information from spreadsheets of experts. We will collect the needed information in new dataframe called `crbirding_birds`:
+
+First step is to gather `first_Nummer`  and `raw_NummerNieuw` in new column `bird_shorthand`:
+
+```{r backbone_mapping_shorthand}
+crbirding_birds <- 
+  birds %>%
+  select(bird_reference, first_Nummer, raw_NummerNieuw, raw_NummerDesc) %>%
+  gather(key = col_nummer,
+         value = bird_shorthand,
+         first_Nummer, raw_NummerNieuw) %>%
+  select(-col_nummer)
+```
+
+We can also assign the color ring version with point (`bird_shorthand_pt`) by matching columns `bird_shorthand` and `raw_NummerDesc` where possible. Note that `bird_shorthand_pt` may contain points, but for old rings it is equal to `bird_shorthand`:
+
+```{r map_shorthand_with_point}
+crbirding_birds <-
+  crbirding_birds %>%
+  mutate(bird_shorthand_pt = ifelse(
+    str_remove_all(string = raw_NummerDesc, pattern = "\\.") == bird_shorthand,
+    raw_NummerDesc,
+    bird_shorthand)
+    ) %>%
+  distinct() %>%
+  select(bird_reference, bird_shorthand, bird_shorthand_pt) %>%
+  # to map correctly MKAU (bird_reference: 3716)
+  group_by(bird_reference, bird_shorthand) %>%
+  filter(bird_shorthand_pt == bird_shorthand_pt[which.max(nchar(bird_shorthand_pt))])
+```
+
+Example of mapping: the bird with `bird_reference` equal to 14 is associated to the following series of two rings:
+
+```{r example_mapping_shorthand_birds}
+birds %>%
+  filter(bird_reference == 14) %>%
+  select(bird_reference, first_Nummer, raw_NummerNieuw, raw_NummerDesc)
+```
+
+will be mapped as follows:
+
+```{r example_mapping_shorthand}
+crbirding_birds %>%
+  filter(bird_reference == 14) %>%
+  select(bird_reference, bird_shorthand, bird_shorthand_pt)
+```
+
+Another example:
+
+```{r}
+crbirding_birds %>%
+  filter(bird_reference == 3716) %>%
+  select(bird_reference, bird_shorthand, bird_shorthand_pt)
+```
 
 ### Euring
 
@@ -825,6 +942,10 @@ birds <- birds %>%
     .missing = "O"))
 ```
 
+### Bird shorthand
+
+The INBO `tblKleurring` assumes the principle one row = one bird. Columns `rawNummer` and `rawNummerNieuw` refer to same bird: `rawNummer` is the first color ring the bird got, while `rawNummerNieuw` is the second one (in case it is different to `rawNummer`). `rawNummerDesc` is the dot version of `rawNummerNieuw` (dot has exclusively the function to improve readibility). SOVON table is organized differently: it assumes the principle one row = one color ring. We use information provided in `control_df` to map (most of) the rings.
+
 ### Bird ID
 
 Bird identifiers will be provided by SOVON. `NA` is given:
@@ -845,11 +966,30 @@ birds <- birds %>%
 
 ### Bird name
 
-Bird name will be provided by SOVON. `NA` is given:
+Some birds, the ones with a GPS tracker, have a name saved in [this file](https://raw.githubusercontent.com/inbo/bird-tracking/master/data/interim/individuals.csv). The names are saved in column `individual_remarks`:
 
-```{r bird_name}
-birds <- birds %>%
-  mutate(bird_name = NA)
+```{r read_names}
+uvabits_file <- "https://raw.githubusercontent.com/inbo/bird-tracking/master/data/interim/individuals.csv"
+uvabits_names <- 
+  read_csv(uvabits_file) %>%
+  select(individual_id, ring_number, individual_remarks, everything())
+head(uvabits_names)
+```
+
+Assigning the name is given to the bird (based on `bird_reference`), by joining on `birdshorthand`:
+
+```{r add_names}
+bird_ref_uvabits <- 
+  crbirding_birds %>%
+  left_join(uvabits_names %>%
+              select(colour_ring, individual_remarks), 
+            by = c("bird_shorthand" = "colour_ring")) %>%
+  rename("bird_name" = "individual_remarks") %>%
+  filter(!is.na(bird_name)) %>%
+  select(bird_reference, bird_name)
+crbirding_birds <-
+  crbirding_birds %>%
+  left_join(bird_ref_uvabits, by = "bird_reference")
 ```
 
 ### Bird birth year
