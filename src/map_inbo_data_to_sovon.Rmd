@@ -244,7 +244,7 @@ birds <- birds %>%
 
 In order to ease the mapping of birds and observations, we add action codes to observations in order to have a unique **tidy** data frame:
 
-```{r}
+```{r merge_obs_with_acts}
 obs_and_acts <- obs %>% 
   left_join(obs_actions %>% 
               select(-c(raw_Nummer, 
@@ -350,7 +350,7 @@ obs_and_acts %>%
 
 We remove them:
 
-```{r}
+```{r remove_obs_and_acts_linked_to_invalid_bird_ring}
 raw_KleurringNummer_remove <- obs_and_acts %>%
   filter(!raw_KleurringNummer %in% birds$raw_Nummer) %>% 
   distinct(raw_KleurringNummer) %>%
@@ -413,7 +413,7 @@ names(birds)[which(grepl("raw_Metaalring", names(birds)))]
 
 and `obs_and_acts`:
 
-```{r}
+```{r cols_metal_ring_obs_and_acts}
 names(obs_and_acts)[which(grepl("raw_Metaalring", names(obs_and_acts)))]
 ```
 
@@ -486,11 +486,11 @@ birds %>%
 
 Column `first_Nummer` should contain unique elements. Check for exceptions:
 
-```{r}
+```{r check_uniqueness_first_Nummer}
 birds %>%
   group_by(first_Nummer) %>%
   count() %>%
-  filter(n>1) %>%
+  filter(n > 1) %>%
   left_join(birds) %>%
   select(-n)
 ```
@@ -629,7 +629,7 @@ We have to solve the lack of unicity discussed in preprocessing, which ends up i
 birds %>%
   group_by(first_Nummer) %>%
   count() %>%
-  filter(n>1) %>%
+  filter(n > 1) %>%
   left_join(birds %>%
               select(bird_reference, 
                      first_Nummer, 
@@ -656,7 +656,7 @@ Check:
 birds %>%
   group_by(first_Nummer) %>%
   count() %>%
-  filter(n>1) %>%
+  filter(n > 1) %>%
   left_join(birds %>%
               select(bird_reference, 
                      first_Nummer, 
@@ -714,7 +714,7 @@ crbirding_birds <-
   filter(bird_shorthand_pt == bird_shorthand_pt[which.max(nchar(bird_shorthand_pt))])
 ```
 
-Example of mapping: the bird with `bird_reference` equal to 14 is associated to the following series of two rings:
+Example of mapping: the bird with `bird_reference` 14 is associated to the following two rings:
 
 ```{r example_mapping_shorthand_birds}
 birds %>%
@@ -722,7 +722,7 @@ birds %>%
   select(bird_reference, first_Nummer, raw_NummerNieuw, raw_NummerDesc)
 ```
 
-will be mapped as follows:
+and will be mapped as follows:
 
 ```{r example_mapping_shorthand}
 crbirding_birds %>%
@@ -732,7 +732,7 @@ crbirding_birds %>%
 
 Another example:
 
-```{r}
+```{r example_bird_ref_3716}
 crbirding_birds %>%
   filter(bird_reference == 3716) %>%
   select(bird_reference, bird_shorthand, bird_shorthand_pt)
@@ -847,7 +847,7 @@ birds_others %>%
   select(bird_ring_number)
 ```
 
-We remove all of them:
+We remove the asteriks:
 
 ```{r remove_*_in_ring_number}
 birds_others <- birds_others %>%
