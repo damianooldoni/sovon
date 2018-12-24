@@ -495,13 +495,7 @@ birds %>%
   select(-n)
 ```
 
-So, for example the bird with `raw_Nummer` equal to GP130 is mapped as follows:
-
-```{r example_gps_mapping_and_name}
-birds_t %>%
-  filter(raw_Nummer == "GP130") %>%
-  select(raw_Nummer, first_Nummer, bird_notes)
-```
+Exceptions are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions should be handled separately while mapping `bird_shorthand`.
 
 # Map data
 
@@ -667,7 +661,7 @@ birds %>%
   select(-n)
 ```
 
-We add column `bird_reference` to `obs_and_acts` as it will be needed to map the dates of ringing:
+We add column `bird_reference` to `obs_and_acts` as it will be needed to map the dates of ringing. The link are the columns `raw_Nummer` (birds data) and  `raw_KleurringNummer` (observation data):
 
 ```{r apply_bird_ref_to_obs_acts}
 obs_and_acts <- 
@@ -683,9 +677,22 @@ Check whether there are observation without link to any bird:
 filter(obs_and_acts, is.na(bird_reference))
 ```
 
-The reconstruction of the series of color rings linked to each bird is made by using columns `first_Nummer`, `raw_NummerNieuw` and the information from spreadsheets of experts. We will collect the needed information in new dataframe called `crbirding_birds`:
+We will also add column `first_Nummer` from birds to observations as well:
 
-First step is to gather `first_Nummer`  and `raw_NummerNieuw` in new column `bird_shorthand`:
+```{r add_first_Nummer_to_obs_and_acts}
+obs_and_acts <- 
+  obs_and_acts %>%
+  left_join(
+    birds %>%
+      select(bird_reference, first_Nummer, raw_Nummer),
+    by = c("bird_reference", 
+           "raw_KleurringNummer" = "raw_Nummer")
+)
+```
+
+The reconstruction of the series of color rings for each bird is made by using columns `first_Nummer`, `raw_NummerNieuw` and the information from spreadsheets of experts. We will collect the needed information in new dataframe, called `crbirding_birds` which will grow up to become the end product of color ring table.
+
+First step is to *gather* `first_Nummer`  and `raw_NummerNieuw` in new column `bird_shorthand`:
 
 ```{r backbone_mapping_shorthand}
 crbirding_birds <- 
@@ -737,6 +744,389 @@ crbirding_birds %>%
   filter(bird_reference == 3716) %>%
   select(bird_reference, bird_shorthand, bird_shorthand_pt)
 ```
+
+### Bird ringing date
+
+The date of ringing (to be mapped as `bird_date_begin`) can be found in data frame `obs_and_acts` in the column `raw_Datum` relatively to code action `rngkl` (code action of applying colour ring).
+
+```{r example_rngkl_actions}
+obs_and_acts %>% 
+  filter(raw_AktieCode == "rngkl") %>%
+  select(bird_reference, first_Nummer, 
+         raw_Datum, raw_AktieCode) %>%
+  head(n = 10)
+```
+
+We can add automatically the date of the very first ring for each bird (`bird_reference`), based on date of action code `rngkl`. In fact, there should be just one observation with action `rngkl` for each bird. Exceptions:
+
+```{r exception_rule_one_bird_one_rngkl}
+exceptions_one_bird_one_rngkl <- obs_and_acts %>%
+  filter(raw_AktieCode == "rngkl") %>%
+  select(bird_reference, raw_Datum) %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(obs_and_acts %>%
+              select(bird_reference, raw_Datum, raw_AktieCode),
+            by = "bird_reference") %>%
+  filter(raw_AktieCode == "rngkl") %>%
+  left_join(crbirding_birds %>%
+              select(bird_reference, bird_shorthand),
+            by = "bird_reference") %>%
+  distinct()
+exceptions_one_bird_one_rngkl
+```
+
+We will manage the very few exceptions later.
+
+Assign the date of first ringing:
+
+```{r get_first_ring_date}
+crbirding_birds <- 
+  obs_and_acts %>%
+  filter(raw_AktieCode == "rngkl") %>%
+  select(bird_reference, first_Nummer, raw_Datum) %>%
+  group_by(bird_reference, first_Nummer) %>%
+  summarize(bird_date_begin = min(raw_Datum)) %>%
+  right_join(crbirding_birds,
+             by = c("bird_reference", 
+                    "first_Nummer" = "bird_shorthand")) %>%
+  rename(bird_shorthand = first_Nummer) %>%
+  select(bird_reference, bird_shorthand, bird_shorthand_pt, bird_date_begin)
+```
+
+Some examples (birds with `bird_reference` 1, 14 and 4543):
+
+```{r examples_date_ringing}
+crbirding_birds %>%
+  filter(bird_reference %in% c(1, 14, 4543)) %>%
+  arrange(bird_reference, bird_date_begin)
+```
+
+Check date of birds in exceptions:
+
+```{r check_date_of_exceptions_double_rngkl}
+crbirding_birds %>%
+  filter(bird_shorthand %in% c("MKAU", "CZOZ"))
+```
+
+And in case solve:
+
+```{r solve_date_of_exceptions_double_rngkl, evaluate = FALSE}
+crbirding_birds <- 
+  crbirding_birds %>% 
+  mutate(bird_date_begin = case_when(
+    bird_shorthand == "MKAU" ~ bird_date_begin,
+    bird_shorthand ==  "CZOZ" ~ as.POSIXct(NA_character_),
+    TRUE ~ bird_date_begin
+    )
+  )
+```
+
+Summary of rings with date (`bird_date_begin`):
+
+```{r summary_n_rings_with_date}
+crbirding_birds %>%
+  mutate(date_is_present = !is.na(bird_date_begin)) %>%
+  group_by(date_is_present) %>%
+  count()
+```
+
+The rings without date are the last rings of birds ringed more than once. 
+
+```{r summary_bird_with_more_rings}
+birds_multiple_rings <- 
+  crbirding_birds %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n > 1)
+birds_multiple_rings
+```
+
+Not only, the structure of our database limits to 2 the maximum number of rings linked to the same bird, as two are the columns containing such information (`raw_Nummer` and `raw_NummerNieuw`):
+
+```{r check_max_rings_is_2}
+birds_two_rings <- 
+  crbirding_birds %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n == 2)
+all(birds_two_rings$bird_reference == birds_multiple_rings$bird_reference)
+```
+
+Experts explained us that the very first and the very last ring are mapped in `birds`. By consulting the spreadsheet of the experts we will later fill the gap by adding intermediate rings.
+
+We can try to retrieve the date of applying last ring based on observations/actions with code `vang` (caught at the nest). Birds ringed twice and linked to one `vang` action:
+
+```{r birds_two_rings_one_vang}
+bird_one_vang <- obs_and_acts %>%
+  filter(bird_reference %in% birds_multiple_rings$bird_reference,
+         raw_AktieCode %in% c("vang", "vangl")) %>%
+  select(bird_reference, raw_Datum) %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n == 1) %>%
+  left_join(obs_and_acts %>%
+              select(bird_reference, raw_Datum, raw_AktieCode),
+            by = "bird_reference") %>%
+  filter(raw_AktieCode %in% c("vang", "vangl")) %>%
+  rename("bird_date_begin" = "raw_Datum") %>%
+  arrange(bird_reference)
+bird_one_vang
+```
+
+As you cannot change a ring without catching him, we can use these unique dates as date of ringing, `bird_date_begin`:
+
+```{r set_date_ringing_bird_catched_once}
+bird_one_vang_with_date <- 
+  crbirding_birds %>%
+  filter(bird_reference %in% bird_one_vang$bird_reference,
+         bird_reference %in% birds_two_rings$bird_reference) %>%
+  group_by(bird_reference) %>%
+  filter(is.na(bird_date_begin)) %>%
+  select(-bird_date_begin) %>%
+  left_join(bird_one_vang, 
+            by = c("bird_reference")
+  ) %>%
+  select(-c(n, raw_AktieCode))
+crbirding_birds <- 
+  crbirding_birds %>%
+  anti_join(bird_one_vang_with_date,
+            by = c("bird_reference", "bird_shorthand")) %>%
+  bind_rows(bird_one_vang_with_date) %>%
+  arrange(bird_reference)
+```
+
+Examples of date mapping (birds with `bird_reference` 11 and 14):
+
+```{r examples_assign_date_second_ring_by_vang_date}
+crbirding_birds %>%
+  filter(bird_reference %in% c(11, 14))
+```
+
+Some birds have been catched twice:
+
+```{r birds_two_rings_two_vang}
+bird_two_vang <- obs_and_acts %>%
+  filter(bird_reference %in% birds_two_rings$bird_reference,
+         raw_AktieCode %in% c("vang", "vangl")) %>%
+  select(bird_reference, raw_Datum) %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n == 2) %>%
+  left_join(obs_and_acts %>%
+              select(bird_reference, raw_Datum, raw_AktieCode),
+            by = "bird_reference") %>%
+  filter(raw_AktieCode  %in% c("vang", "vangl")) %>%
+  rename("bird_date_begin" = "raw_Datum") %>%
+  arrange(bird_reference)
+bird_two_vang
+```
+
+In the expert spreadsheet, we can see that the ring is typically applied during the last `vang` action. We will assign the most recent date by default as first step, correcting the exceptions later:
+
+```{r get_second_ring_via_vang}
+bird_two_vang_get_date <- 
+  crbirding_birds %>%
+  filter(bird_reference %in% bird_two_vang$bird_reference,
+         bird_reference %in% birds_two_rings$bird_reference) %>%
+  group_by(bird_reference) %>%
+  filter(is.na(bird_date_begin)) %>%
+  select(-bird_date_begin) %>%
+  left_join(bird_two_vang %>%
+              group_by(bird_reference) %>%
+              filter(bird_date_begin == max(bird_date_begin)), 
+            by = c("bird_reference")
+  ) %>%
+  select(-c(n, raw_AktieCode))
+bird_two_vang_get_date
+```
+
+By consulting the spreadsheet we can find that the following rings have been applied during the earliest `vang`/`vangl` action, so they are exceptions:
+
+```{r correct_zexceptions_bird_date_begin_earliest_date}
+bird_shorthand_exceptions <- c("NGAP", "NGAX", "GVAR", 
+                               "KPAZ", "KAAK", "KAAN")
+bird_exceptions <- 
+  crbirding_birds %>%
+  filter(bird_shorthand %in% bird_shorthand_exceptions)
+```
+
+We set `bird_date_begin` equal to the date of the earliest `vang`/`vangl` action:
+
+```{r}
+bird_two_vang_get_date <- 
+  bird_two_vang %>%
+  filter(bird_reference %in% bird_exceptions$bird_reference) %>%
+  group_by(bird_reference) %>%
+  filter(bird_date_begin == min(bird_date_begin)) %>%
+  left_join(bird_exceptions %>%
+              select(-bird_date_begin), by = "bird_reference") %>%
+  select(-c(n, raw_AktieCode)) %>%
+  select(names(bird_two_vang_get_date)) %>%
+  bind_rows(bird_two_vang_get_date %>%
+              filter(!bird_shorthand %in% bird_exceptions$bird_shorthand))
+```
+
+Add this information to `crbirding_birds`:
+
+```{r}
+crbirding_birds <- 
+  crbirding_birds %>%
+  anti_join(bird_two_vang_get_date,
+            by = c("bird_reference", 
+                   "bird_shorthand", 
+                   "bird_shorthand_pt")) %>%
+  bind_rows(bird_two_vang_get_date) %>%
+  arrange(bird_reference)
+crbirding_birds
+```
+
+Rings still without date:
+
+```{r summary_date_begin_after}
+crbirding_birds %>%
+  mutate(date_is_present = !is.na(bird_date_begin)) %>%
+  filter(!date_is_present)
+```
+
+Based on spreadsheet and observation data, we found that the dates of applying the rings FAAG and YCAF are linked to actions `ziek`, i.e. the ring has been applied while taking care of the birds. 
+
+The date of applying FAAG:
+
+```{r get_info_FAAG}
+info_faag <- 
+  crbirding_birds %>%
+  filter(bird_shorthand == "FAAG") %>%
+  mutate(bird_date_begin = 
+           obs_and_acts %>%
+           filter(bird_reference == 176, 
+                  first_Nummer == "ALAU",
+                  raw_AktieCode == "ziek") %>%
+           # get the second "ziek" action (2006-07-07)
+           filter(raw_Datum == max(raw_Datum)) %>%
+           pull(raw_Datum))
+info_faag
+```
+
+The date of applying YCAF:
+
+```{r get_info_YCAF}
+info_ycaf <- 
+  crbirding_birds %>%
+  filter(bird_shorthand == "YCAF") %>%
+  mutate(bird_date_begin = 
+           obs_and_acts %>%
+           filter(bird_reference == 3293, 
+                  first_Nummer == "PLAB",
+                  raw_AktieCode == "ziek") %>%
+           # there is juwt one "ziek" action
+           pull(raw_Datum))
+
+```
+
+Add this dates to `crbirding_birds`:
+
+```{r add_to_crbirding_birds}
+crbirding_birds <- 
+  bind_rows(crbirding_birds %>% 
+              filter(!bird_shorthand %in% c("FAAG", "YCAF")),
+            info_faag,
+            info_ycaf)
+```
+
+Based on spreadsheet of experts, we have to add new rings, as some birds have been ringed more than twice, so the information contained in `first_Nummer` and `raw_NummerNieuw` is not complete, as they map the very first and the very last ring. The intermediate rings are the following:
+
+```{r intermediate_rings_df}
+intermediate_rings <- tibble(
+    first_Nummer = c(
+      "E633",
+      "DJAB",
+      "BWAD",
+      "KLAT",
+      "PR3",
+      "TY2",
+      "RTO",
+      "E099",
+      "MKAU",
+      "ASAH",
+      "ADAF"
+      ),
+    intermediate_ring = c(
+      "BUAG",
+      "TRAP",
+      "GTAS",
+      "UPAB",
+      "DHAZ",
+      "GMAJ",
+      "DGAH",
+      "GHAT",
+      "ZVAU",
+      "HWAX",
+      "DJAU"
+      ),
+    bird_date_begin = as.POSIXct(c(
+      "2000-05-08", # BUAG
+      "2012-05-25", # TRAP
+      "2007-06-01", # GTAS
+      "2012-05-29", # UPAB
+      "2006-05-26", # DHAZ 
+      "2007-06-06", # GMAJ
+      "2006-05-17", # DGAH
+      "2007-06-18", # GHAT
+      "2014-05-23", # ZVAU
+      "2009-05-18", # HWAX
+      "2006-05-26" # DJAU
+      ), tz = "UTC")
+)
+intermediate_rings
+```
+
+Retrieve `bird_reference`:
+
+```{r retrieve_bird_ref_intermediate_rings}
+intermediate_rings <- 
+  intermediate_rings %>%
+  left_join(crbirding_birds %>%
+              select(bird_reference, bird_shorthand),
+            by = c("first_Nummer" = "bird_shorthand")) %>%
+  select(bird_reference, first_Nummer, intermediate_ring, bird_date_begin)
+intermediate_rings
+```
+
+Check whether all dates are linked to a valid observation and check whether they are linked to `vang/vangl` actions:
+
+```{r get_actins_intermediate_rings}
+intermediate_rings %>%
+  left_join(obs_and_acts %>%
+              select(bird_reference, 
+                     raw_Datum, 
+                     raw_AktieCode, 
+                     first_Nummer), 
+            by = c("bird_reference", 
+                   "bird_date_begin" = "raw_Datum",
+                   "first_Nummer")) %>%
+  filter(raw_AktieCode %in% c("vang", "vangl"))
+```
+
+We can then add the intermediate rings to  `crbirding_birds`:
+
+```{r add_intermediate_ring}
+crbirding_birds <- 
+  crbirding_birds %>%
+  bind_rows(intermediate_rings %>%
+              select(-first_Nummer) %>%
+              rename(bird_shorthand = intermediate_ring) %>%
+              mutate(bird_shorthand_pt = bird_shorthand)) %>%
+  arrange(bird_reference, bird_date_begin)
+```
+
+Example of ring sequence:
+
+```{r}
+crbirding_birds %>% filter(bird_reference == 7592)
+```
+
 
 ### Euring
 
