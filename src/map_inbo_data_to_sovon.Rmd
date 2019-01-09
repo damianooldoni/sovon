@@ -1023,7 +1023,23 @@ info_ycaf <-
                   raw_AktieCode == "ziek") %>%
            # there is juwt one "ziek" action
            pull(raw_Datum))
+info_ycaf
+```
 
+The date of applying FHOV:
+
+```{r get_info_FHOV}
+info_fhov <- 
+  crbirding_birds %>%
+  filter(bird_shorthand == "FHOV") %>%
+  mutate(bird_date_begin = 
+           obs_and_acts %>%
+           filter(bird_reference == 6360, 
+                  first_Nummer == "SUAV",
+                  raw_AktieCode == "ziek") %>%
+           # there is juwt one "ziek" action
+           pull(raw_Datum))
+info_fhov
 ```
 
 Add this dates to `crbirding_birds`:
@@ -1031,9 +1047,11 @@ Add this dates to `crbirding_birds`:
 ```{r add_to_crbirding_birds}
 crbirding_birds <- 
   bind_rows(crbirding_birds %>% 
-              filter(!bird_shorthand %in% c("FAAG", "YCAF")),
+              filter(!bird_shorthand %in% c("FAAG", "YCAF", "FHOV")),
             info_faag,
-            info_ycaf)
+            info_ycaf,
+            info_fhov) %>%
+  arrange(bird_reference, bird_date_begin)
 ```
 
 Based on spreadsheet of experts, we have to add new rings, as some birds have been ringed more than twice, so the information contained in `first_Nummer` and `raw_NummerNieuw` is not complete, as they map the very first and the very last ring. The intermediate rings are the following:
@@ -1122,12 +1140,20 @@ crbirding_birds <-
   arrange(bird_reference, bird_date_begin)
 ```
 
-Example of ring sequence:
+Example of a triplet ring sequence:
 
 ```{r}
 crbirding_birds %>% filter(bird_reference == 7592)
 ```
 
+All rings should be now have a `bird_date_begin`:
+
+```{r summary_n_rings_with_date_final}
+crbirding_birds %>%
+  mutate(date_is_present = !is.na(bird_date_begin)) %>%
+  group_by(date_is_present) %>%
+  count()
+```
 
 ### Euring
 
