@@ -47,9 +47,9 @@ library(lubridate) # To ease working with dates
 Set output file paths:
 
 ```{r file_paths}
-cr_users_file <- here("data", "processed", "data_users.tsv")
-cr_birds_file <- here("data", "processed", "data_birds.tsv")
-cr_obs_file <- here("data", "processed", "data_observations.tsv")
+cr_users_file <- here::here("data", "processed", "data_users.tsv")
+cr_birds_file <- here::here("data", "processed", "data_birds.tsv")
+cr_obs_file <- here::here("data", "processed", "data_observations.tsv")
 ```
 
 # Extract data from INBO kleurring database
@@ -139,7 +139,7 @@ actions_meaning
 The INBO seebird team provided a spreadsheet to map color rings (see section [bird shorthand](#bird-shorthand)). From this spreadhseet we distilled some text files with specific mapping information:
 
 ```{r import_csv_from_control_spreadsheet}
-map_gps_path <- here("data", "input", "map_gps_id_to_color_ring.tsv")
+map_gps_path <- here::here("data", "input", "map_gps_id_to_color_ring.tsv")
 map_gps <- read_tsv(map_gps_path)
 map_gps %>% head()
 ```
