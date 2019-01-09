@@ -661,7 +661,7 @@ birds %>%
   select(-n)
 ```
 
-We add column `bird_reference` to `obs_and_acts` as it will be needed to map the dates of ringing. The link are the columns `raw_Nummer` (birds data) and  `raw_KleurringNummer` (observation data):
+We add column `bird_reference` to `obs_and_acts` as it will be needed to map the dates of ringing. The link is made by the columns `raw_Nummer` (birds data) and  `raw_KleurringNummer` (observation data):
 
 ```{r apply_bird_ref_to_obs_acts}
 obs_and_acts <- 
@@ -757,7 +757,7 @@ obs_and_acts %>%
   head(n = 10)
 ```
 
-We can add automatically the date of the very first ring for each bird (`bird_reference`), based on date of action code `rngkl`. In fact, there should be just one observation with action `rngkl` for each bird. Exceptions:
+We can add automatically the date of the very first ring for each bird (`bird_reference`), based on date of action code `rngkl`. In fact, there should be just one observation with action `rngkl` for each bird (`bird_reference`). Exceptions:
 
 ```{r exception_rule_one_bird_one_rngkl}
 exceptions_one_bird_one_rngkl <- obs_and_acts %>%
@@ -773,7 +773,8 @@ exceptions_one_bird_one_rngkl <- obs_and_acts %>%
   left_join(crbirding_birds %>%
               select(bird_reference, bird_shorthand),
             by = "bird_reference") %>%
-  distinct()
+  distinct() %>%
+  select(-n)
 exceptions_one_bird_one_rngkl
 ```
 
@@ -854,9 +855,9 @@ birds_two_rings <-
 all(birds_two_rings$bird_reference == birds_multiple_rings$bird_reference)
 ```
 
-Experts explained us that the very first and the very last ring are mapped in `birds`. By consulting the spreadsheet of the experts we will later fill the gap by adding intermediate rings.
+Experts explained us that the very first and the very last ring are mapped in `birds`. By consulting the spreadsheet of the experts we will later fill the gap by adding _intermediate rings_.
 
-We can try to retrieve the date of applying last ring based on observations/actions with code `vang` (caught at the nest). Birds ringed twice and linked to one `vang` action:
+We can try to retrieve the date of applying last ring based on observations/actions with code `vang` (caught at the nest) or `vangl` (caught otherwise). Birds ringed twice and linked to one `vang`/`vangl` action:
 
 ```{r birds_two_rings_one_vang}
 bird_one_vang <- obs_and_acts %>%
@@ -923,7 +924,7 @@ bird_two_vang <- obs_and_acts %>%
 bird_two_vang
 ```
 
-In the expert spreadsheet, we can see that the ring is typically applied during the last `vang` action. We will assign the most recent date by default as first step, correcting the exceptions later:
+In the expert spreadsheet, we can see that the ring is **typically** applied during the last `vang`/`vangl` action. We will assign the most recent date by default as first step, correcting the exceptions later:
 
 ```{r get_second_ring_via_vang}
 bird_two_vang_get_date <- 
