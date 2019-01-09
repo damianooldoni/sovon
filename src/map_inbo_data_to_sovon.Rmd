@@ -41,6 +41,7 @@ library(tidyr) # To transform data
 library(purrr) # To transform data via loops
 library(measurements) # To convert units of measurement 
 library(here) # To find files
+library(lubridate) # To ease working with dates
 ```
 
 Set output file paths:
@@ -429,7 +430,7 @@ birds %>%
   distinct(raw_Nummer, metal_ring_from_birds, metal_ring_from_obs)
 ```
 
-Based on expert's knowledge only the metal ring information in `birds` is correct. I remove the columns related to metal ring information from `obs_and_acts` as this information is redundant and not needed for the mapping:
+Based on expert's knowledge only the metal ring information in `birds` is correct. We remove the columns related to metal ring information from `obs_and_acts` as this information is redundant and not needed for the mapping:
 
 ```{r remove_metal_ring_infos_from_obs}
 obs_and_acts <-
@@ -1153,6 +1154,39 @@ crbirding_birds %>%
   mutate(date_is_present = !is.na(bird_date_begin)) %>%
   group_by(date_is_present) %>%
   count()
+```
+
+### Bird ringing end date
+
+For birds ringed more than once, we can assign an end date for the changed rings. This information will be stored in field `bird_date_end`. The end date is equal to the date of applying the new ring
+
+```{r assign_bird_date_end}
+assign_end_date <- function(data) {
+  if (nrow(data) > 1) {
+    return(c(as_date(data$bird_date_begin[2:nrow(data)], tz = "UTC"), 
+             as_date(NA, tz = "UTC")))
+  } else {
+    return(as_date(NA, tz = "UTC"))
+  }
+}
+
+crbirding_birds <- 
+  crbirding_birds %>%
+  arrange(bird_reference, bird_date_begin) %>%
+  group_by(bird_reference) %>%
+  nest() %>%
+  mutate(bird_date_end = map(data, assign_end_date)) %>%
+  unnest() %>%
+  select(bird_reference, bird_shorthand, bird_shorthand_pt, 
+         bird_date_begin, bird_date_end)
+```
+
+Some examples:
+
+```{r examples_bird_date_end}
+crbirding_birds %>%
+  filter(!is.na(bird_date_end)) %>%
+  head(n = 10)
 ```
 
 ### Euring
