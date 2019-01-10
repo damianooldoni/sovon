@@ -1189,65 +1189,6 @@ crbirding_birds %>%
   head(n = 10)
 ```
 
-### Euring
-
-Present values:
-
-```{r euring_in_db}
-birds %>% distinct(raw_EuringCode)
-```
-
-We apply the following mapping:
-
-```{r bird_euring}
-birds <- birds %>%
-  mutate(bird_euring = recode(raw_EuringCode,
-                              "5920" = "05920",
-                              "5910" = "05910",
-                              "5926" = "05926",
-                              "5922" = "05922",
-                              "zz" = NA_character_,
-                              "zzz" = NA_character_))
-```
-
-Effects of mapping:
-
-```{r comparison_euring}
-birds %>% distinct(raw_EuringCode, bird_euring)
-```
-
-### Short hand
-
-```{r shorthand}
-
-```
-
-### Scheme
-
-Actual values:
-
-```{r scheme}
-birds %>% distinct(raw_MetaalringLandCode)
-```
-
-We apply the following mapping:
-
-```{r scheme_mapping}
-birds <- birds %>%
-  mutate(bird_scheme = recode(raw_MetaalringLandCode,
-                              "BE " = "BLB",
-                              "FR" = "FRP",
-                              "NL" = "NLA",
-                              "PT" = "POL",
-                              "UK" = "GBT"))
-```
-
-Effects of mapping:
-
-```{r comparison_scheme}
-birds %>% distinct(raw_MetaalringLandCode, bird_scheme)
-```
-
 ### Ring number
 
 The ring number can be found in field `raw_MetaalringNummer`. Ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
@@ -1336,6 +1277,63 @@ Effects of mapping (part of it):
 
 ```{r}
 birds %>% distinct(raw_MetaalringNummer, bird_ring_number)
+### Euring
+
+Present values:
+
+```{r euring_in_db}
+birds %>% distinct(raw_EuringCode)
+```
+
+We assign the euring codes by applying the following mapping:
+
+```{r bird_euring}
+crbirding_birds <-
+  crbirding_birds %>%
+  left_join(birds %>% 
+              select(bird_reference, raw_EuringCode),
+            by = "bird_reference") %>%
+  mutate(bird_euring = recode(raw_EuringCode,
+                              "5920" = "05920",
+                              "5910" = "05910",
+                              "5926" = "05926",
+                              "5922" = "05922",
+                              "zz" = NA_character_,
+                              "zzz" = NA_character_)) %>%
+  ungroup()
+```
+
+Effects of mapping:
+
+```{r comparison_euring}
+crbirding_birds %>% 
+  distinct(raw_EuringCode, bird_euring)
+```
+
+### Scheme
+
+Actual values:
+
+```{r scheme}
+birds %>% distinct(raw_MetaalringLandCode)
+```
+
+We apply the following mapping:
+
+```{r scheme_mapping}
+birds <- birds %>%
+  mutate(bird_scheme = recode(raw_MetaalringLandCode,
+                              "BE " = "BLB",
+                              "FR" = "FRP",
+                              "NL" = "NLA",
+                              "PT" = "POL",
+                              "UK" = "GBT"))
+```
+
+Effects of mapping:
+
+```{r comparison_scheme}
+birds %>% distinct(raw_MetaalringLandCode, bird_scheme)
 ```
 
 ### Bird sex
