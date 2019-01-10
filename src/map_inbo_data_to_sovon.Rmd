@@ -1191,7 +1191,7 @@ crbirding_birds %>%
 
 ### Ring number
 
-The ring number can be found in field `raw_MetaalringNummer`. Ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
+The _ring number_, or _metal ring number_, can be found in field `raw_MetaalringNummer`. Ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
 
 > Where the ring number consist of fewer than ten numbers/letters, the number is padded with dots. These dots are always inserted to the left of the rightmost
 row of numbers.
