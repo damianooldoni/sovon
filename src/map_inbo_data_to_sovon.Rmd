@@ -458,7 +458,7 @@ We import the color rings in new column `first_Nummer`. For all other rings will
 
 ```{r map_to_first_Nummer}
 map_gps_add_notes <- map_gps %>%
-  mutate(bird_notes = "uvabits_gps_tag")
+  mutate(bird_notes = "uvabits_gps_tag.")
 birds <- birds %>%
   # create column first_Nummer with right color rings for the GPS or GP** rings
   left_join(map_gps_add_notes, by = c("raw_Nummer" = "gps_id")) %>%
