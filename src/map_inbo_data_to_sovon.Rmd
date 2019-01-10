@@ -718,7 +718,7 @@ crbirding_birds <-
     bird_shorthand)
     ) %>%
   distinct() %>%
-  select(bird_reference, bird_shorthand, bird_shorthand_pt) %>%
+  select(bird_reference, bird_shorthand, bird_shorthand_pt, bird_notes) %>%
   # to map correctly MKAU (bird_reference: 3716)
   group_by(bird_reference, bird_shorthand) %>%
   filter(bird_shorthand_pt == bird_shorthand_pt[which.max(nchar(bird_shorthand_pt))])
@@ -796,7 +796,8 @@ crbirding_birds <-
              by = c("bird_reference", 
                     "first_Nummer" = "bird_shorthand")) %>%
   rename(bird_shorthand = first_Nummer) %>%
-  select(bird_reference, bird_shorthand, bird_shorthand_pt, bird_date_begin)
+  select(bird_reference, bird_shorthand, bird_shorthand_pt, 
+         bird_date_begin, bird_notes)
 ```
 
 Some examples (birds with `bird_reference` 1, 14 and 4543):
@@ -1180,7 +1181,7 @@ crbirding_birds <-
   mutate(bird_date_end = map(data, assign_end_date)) %>%
   unnest() %>%
   select(bird_reference, bird_shorthand, bird_shorthand_pt, 
-         bird_date_begin, bird_date_end)
+         bird_date_begin, bird_date_end, bird_notes)
 ```
 
 Some examples:
