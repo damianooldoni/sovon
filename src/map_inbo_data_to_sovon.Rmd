@@ -693,7 +693,7 @@ obs_and_acts <-
 
 The reconstruction of the series of color rings for each bird is made by using columns `first_Nummer`, `raw_NummerNieuw` and the information from spreadsheets of experts. We will collect the needed information in new dataframe, called `crbirding_birds` which will grow up to become the end product of color ring table.
 
-First step is to *gather* `first_Nummer`  and `raw_NummerNieuw` in new column `bird_shorthand`:
+First step is to *gather* `first_Nummer`  and `raw_NummerNieuw` in new column `bird_shorthand`. We do it and we create a new data.frame called `crbirding_birds` which will be the end product related to rings:
 
 ```{r backbone_mapping_shorthand}
 crbirding_birds <- 
