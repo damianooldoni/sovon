@@ -698,11 +698,13 @@ First step is to *gather* `first_Nummer`  and `raw_NummerNieuw` in new column `b
 ```{r backbone_mapping_shorthand}
 crbirding_birds <- 
   birds %>%
-  select(bird_reference, first_Nummer, raw_NummerNieuw, raw_NummerDesc) %>%
+  select(bird_reference, first_Nummer, 
+         raw_NummerNieuw, raw_NummerDesc, bird_notes) %>%
   gather(key = col_nummer,
          value = bird_shorthand,
          first_Nummer, raw_NummerNieuw) %>%
-  select(-col_nummer)
+  select(-col_nummer) %>%
+  select(bird_reference, bird_shorthand, raw_NummerDesc, bird_notes)
 ```
 
 We can also assign the color ring version with point (`bird_shorthand_pt`) by matching columns `bird_shorthand` and `raw_NummerDesc` where possible. Note that `bird_shorthand_pt` may contain points, but for old rings it is equal to `bird_shorthand`:
