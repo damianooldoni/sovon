@@ -1113,9 +1113,10 @@ Retrieve `bird_reference`:
 intermediate_rings <- 
   intermediate_rings %>%
   left_join(crbirding_birds %>%
-              select(bird_reference, bird_shorthand),
+              select(bird_reference, bird_shorthand, bird_notes),
             by = c("first_Nummer" = "bird_shorthand")) %>%
-  select(bird_reference, first_Nummer, intermediate_ring, bird_date_begin)
+  select(bird_reference, first_Nummer, intermediate_ring, 
+         bird_date_begin, bird_notes)
 intermediate_rings
 ```
 
