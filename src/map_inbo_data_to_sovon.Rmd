@@ -721,7 +721,9 @@ crbirding_birds <-
   select(bird_reference, bird_shorthand, bird_shorthand_pt, bird_notes) %>%
   # to map correctly MKAU (bird_reference: 3716)
   group_by(bird_reference, bird_shorthand) %>%
-  filter(bird_shorthand_pt == bird_shorthand_pt[which.max(nchar(bird_shorthand_pt))])
+  filter(bird_shorthand_pt == 
+           bird_shorthand_pt[which.max(nchar(bird_shorthand_pt))]) %>%
+  ungroup()
 ```
 
 Example of mapping: the bird with `bird_reference` 14 is associated to the following two rings:
