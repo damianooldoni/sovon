@@ -1565,7 +1565,15 @@ birds <- birds %>%
 Effects of mapping:
 
 ```{r comparison_scheme}
-birds %>% distinct(raw_MetaalringLandCode, bird_scheme)
+crbirding_birds %>% distinct(raw_MetaalringLandCode, bird_scheme)
+```
+
+We remove the help column `raw_MetaalringLandCode` from `crbirding_birds`:
+
+```{r remove_raw_MetaalringLandCode}
+crbirding_birds <- 
+  crbirding_birds %>%
+  select(-raw_MetaalringLandCode)
 ```
 
 ### Bird sex
