@@ -1291,6 +1291,26 @@ birds %>%
   head(n = 200)
 ```
 
+We have to be sure that no multiple metal rings are assigned to the same bird (`bird_reference`). Exceptions:
+
+```{r multiple_metal_rings_bird_reference}
+birds %>%
+  select(bird_reference, bird_ring_number) %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(birds) %>%
+  select(-n)
+```
+
+Whie waiting for an official answer from INBO experts (see [issue 36](https://github.com/inbo/sovon/issues/36), we solve this lack of uniqueness by discarding the first row:
+
+```{r remove_wrong_one}
+birds <-
+  birds %>%
+  filter(raw_NummerNieuw != "MKAU")
+```
+
 Thanks to observations with action `rngme` we can retrieve the date of applying the metal ring.
 
 ```{r example_apply_metalring}
@@ -1300,7 +1320,32 @@ obs_and_acts  %>%
   head(n = 20)
 ```
 
-Some metal rings are not linked to an observation with action `rngme`, so we have not a date for them:
+Similarly to color rings and action `rngkl`, there should be one and only one action `rngme` for each bird. Exceptions:
+
+```{r exceptions_one_bird_one_rngme}
+obs_and_acts %>%
+  filter(raw_AktieCode == "rngme") %>%
+  select(bird_reference, raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
+  group_by(bird_reference) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(obs_and_acts %>%
+              filter(raw_AktieCode == "rngme") %>%
+              select(bird_reference, raw_KleurringNummer, 
+                     raw_Datum, raw_AktieCode),
+            by = "bird_reference") %>%
+  select(-n)
+```
+
+We solve the uniqueness issue:
+
+```{r remove_last_one}
+obs_and_acts <- 
+  obs_and_acts %>%
+  filter(raw_KleurringNummer != "GPS28" | raw_AktieCode != "rngme")
+```
+
+Some metal rings are not linked to an observation with action `rngme`, so we have no date for them:
 
 ```{r check_apply_rngme}
 no_rngme <- 
@@ -1336,7 +1381,15 @@ no_rngme_date <-
 no_rngme_date
 ```
 
-Check if all `bird_reference` are linked to one and only one `rngkl` action:
+Be sure this solution provides a date for applying all metal rings:
+
+```{r check_date_for_all_metal_rings}
+no_rngme_date %>%
+  filter(!is.na(raw_Datum)) %>%
+  nrow() == nrow(no_rngme_date)
+```
+
+Check also that all `bird_reference` are linked to one and only one `rngme` action:
 
 ```{r check_no_ambiguity_rngkl}
 nrow(no_rngme_date) == nrow(no_rngme)
@@ -1428,8 +1481,26 @@ crbirding_birds %>%
 
 Notice how nothing has been added in `bird_notes` for birds getting a metal ring while changing the color ring.
 
-```{r}
-birds %>% distinct(raw_MetaalringNummer, bird_ring_number)
+Based on code actions `klgev` (only colour ring found) and `meweg` (metal ring missing) we can retrieve the end date of some metal rings:
+
+```{r example_klgev}
+obs_and_acts  %>%  
+  filter(raw_AktieCode == "klgev") %>%
+  select(bird_reference, raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
+  head(n = 20) %>%
+  arrange(bird_reference, raw_Datum)
+```
+
+```{r example_meweg}
+obs_and_acts  %>%  
+  filter(raw_AktieCode == "meweg") %>%
+  select(bird_reference, raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
+  head(n = 20) %>%
+  arrange(bird_reference, raw_Datum)
+``` 
+
+Waiting answer from INBO experts about the mapping of these actions: see [issue 34](https://github.com/inbo/sovon/issues/34).
+
 ### Euring
 
 Present values:
