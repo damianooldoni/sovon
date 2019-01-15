@@ -1515,7 +1515,7 @@ We assign the euring codes by applying the following mapping:
 crbirding_birds <-
   crbirding_birds %>%
   left_join(birds %>% 
-              select(bird_reference, raw_EuringCode),
+              distinct(bird_reference, raw_EuringCode),
             by = "bird_reference") %>%
   mutate(bird_euring = recode(raw_EuringCode,
                               "5920" = "05920",
@@ -1532,6 +1532,14 @@ Effects of mapping:
 ```{r comparison_euring}
 crbirding_birds %>% 
   distinct(raw_EuringCode, bird_euring)
+```
+
+We remove the help column `raw_EuringCode` from `crbirding_birds`:
+
+```{r remove_raw_euringCode}
+crbirding_birds <- 
+  crbirding_birds %>%
+  select(-raw_EuringCode)
 ```
 
 ### Scheme
