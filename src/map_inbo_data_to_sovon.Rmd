@@ -1578,15 +1578,21 @@ crbirding_birds <-
 
 ### Bird sex
 
-Bird sex is translated to English: `M` (mannetje) will not change so no need to convert it:
+Bird sex is translated to English. Letter `M` (Dutch word _mannetje_) will not change so no need to convert it:
 
 ```{r sex}
-birds <- birds %>%
+crbirding_birds <- 
+  crbirding_birds %>%
+  left_join(birds %>% 
+              select(bird_reference, raw_GeslachtCode),
+            by = "bird_reference") %>%
   mutate(bird_sex = recode(raw_GeslachtCode,
     "V" = "F", # V(rouwtje) ->F(emale)
     "O" = "U" # O(nbekend) ->  U(nknown)
-))
+    )) %>%
+  select(-raw_GeslachtCode)
 ```
+      
 
 ### Bird ringing date
 
