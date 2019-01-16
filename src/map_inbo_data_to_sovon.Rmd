@@ -1665,7 +1665,8 @@ birds <- birds %>%
 Bird BTO will be provided by SOVON.  `NA` is given:
 
 ```{r bird_bto}
-birds <- birds %>%
+crbirding_birds <- 
+  crbirding_birds %>%
   mutate(bird_bto = NA)
 ```
 
@@ -1707,7 +1708,8 @@ crbirding_birds <-
 This field will be filled by SOVON. `NA` is given:
 
 ```{r bird_birth_year}
-birds <- birds %>%
+crbirding_birds <- 
+  crbirding_birds %>%
   mutate(bird_birth_year = NA)
 ```
 
