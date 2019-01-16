@@ -536,7 +536,11 @@ Exceptions are due to double entry, one with the original color ring, a second o
 
 # Map data
 
-We tranform the information extracted from INBO color ring database to SOVON format.
+We tranform the information extracted from INBO color ring database to SOVON format. The goal is to create three dataframes:
+
+1. `crbirding_users`
+2. `crbirding_birds`
+3. `crbirding_observations`
 
 ## Map user data
 
