@@ -1338,14 +1338,6 @@ birds %>%
   select(-n)
 ```
 
-Whie waiting for an official answer from INBO experts (see [issue 36](https://github.com/inbo/sovon/issues/36), we solve this lack of uniqueness by discarding the first row:
-
-```{r remove_wrong_one}
-birds <-
-  birds %>%
-  filter(raw_NummerNieuw != "MKAU")
-```
-
 Thanks to observations with action `rngme` we can retrieve the date of applying the metal ring.
 
 ```{r example_apply_metalring}
@@ -1370,14 +1362,6 @@ obs_and_acts %>%
                      raw_Datum, raw_AktieCode),
             by = "bird_reference") %>%
   select(-n)
-```
-
-We solve the uniqueness issue:
-
-```{r remove_last_one}
-obs_and_acts <- 
-  obs_and_acts %>%
-  filter(raw_KleurringNummer != "GPS28" | raw_AktieCode != "rngme")
 ```
 
 Some metal rings are not linked to an observation with action `rngme`, so we have no date for them:
