@@ -1614,27 +1614,28 @@ crbirding_birds <-
     "O" = "U" # O(nbekend) ->  U(nknown)
     ))
 ```
-### Bird age ringing
 
-Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs_and_acts` when related code action is equal to `rngkl` (code action of applying colour ring). Check for anomalies:
+Effects of mapping:
 
-```{r retrieve_age_ringing}
-birds <- left_join(obs_actions %>% 
-                     select(raw_WaarnemingNummer, raw_AktieCode) %>%
-                     filter(raw_AktieCode == "rngkl"), 
-                   obs, 
-                   by = c("raw_WaarnemingNummer" = "raw_Nummer")) %>%
-  select(raw_WaarnemingNummer,
-         raw_KleurringNummer,
-         raw_LeeftijdCode) %>%
-  right_join(birds, 
-             by = c("raw_KleurringNummer" = "raw_Nummer"))
+```{r comparison_sex}
+crbirding_birds %>% distinct(raw_GeslachtCode, bird_sex)
 ```
 
-Mapping the age while applying color ring from INBO format to SOVON standard (Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14)
+We remove the help column `raw_GeslachtCode` from `crbirding_birds`:
 
-```{r}
-birds <- birds %>%
+```{r remove_raw_GeslachtCode}
+crbirding_birds <- 
+  crbirding_birds %>%
+  select(-raw_GeslachtCode)
+```
+
+### Bird age ringing
+
+Mapping the age while applying color ring from INBO format to SOVON standard (Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14). Bird age at the moment of any observation can be found in column `raw_LeeftijdCode` of `obs_and_acts`:
+
+```{r map_age_code}
+obs_and_acts <- 
+  obs_and_acts %>%
   mutate(bird_age_ringing = recode(raw_LeeftijdCode,
     "PU" = "1",
     "AD" = "A",
@@ -1680,9 +1681,9 @@ uvabits_names <-
 head(uvabits_names)
 ```
 
-Assigning the name is given to the bird (based on `bird_reference`), by joining on `birdshorthand`:
+We couple the birds to the correspondent names:
 
-```{r add_names}
+```{r coupling_bird_reference_name}
 bird_ref_uvabits <- 
   crbirding_birds %>%
   left_join(uvabits_names %>%
@@ -1691,6 +1692,11 @@ bird_ref_uvabits <-
   rename("bird_name" = "individual_remarks") %>%
   filter(!is.na(bird_name)) %>%
   select(bird_reference, bird_name)
+```
+
+And we assign the names by joining on `bird_reference`:
+
+```{r add_names}
 crbirding_birds <-
   crbirding_birds %>%
   left_join(bird_ref_uvabits, by = "bird_reference")
