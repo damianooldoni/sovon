@@ -1191,11 +1191,10 @@ crbirding_birds %>% filter(bird_reference == 7591)
 
 At this point all rings should have a `bird_date_begin`:
 
-```{r summary_n_rings_with_date_final}
+```{r final_check_all_rings_with_date}
 crbirding_birds %>%
-  mutate(date_is_present = !is.na(bird_date_begin)) %>%
-  group_by(date_is_present) %>%
-  count()
+  filter(!is.na(bird_date_begin)) %>%
+  nrow() == nrow(crbirding_birds)
 ```
 
 ### Bird ringing end date
