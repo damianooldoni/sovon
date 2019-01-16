@@ -375,42 +375,34 @@ birds <- birds %>%
   filter(raw_Nummer %in% obs_and_acts$raw_KleurringNummer)
 ```
 
-### Check duplicates in date of applying (color) ring
+### Check duplicates in date of applying rings
 
-We control the presence of duplicates in date of applying color or metal rings (action code `rngkl` or `rngme`):
+Detect duplicates in date of applying (the very first) color or metal ring (action code `rngkl` or `rngme`):
 
 ```{r duplicates_apply_color_rings}
 duplicates_ringing <- obs_and_acts %>%
   filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
-  filter(raw_KleurringNummer %in% (
-    obs_and_acts %>% 
-      filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
-      group_by(raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
-      count() %>%
-      filter(n > 1) %>%
-      pull(raw_KleurringNummer))) %>%
-  arrange(raw_KleurringNummer)
+  distinct(raw_KleurringNummer, raw_Datum)  %>%
+  group_by(raw_KleurringNummer, raw_Datum) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(obs_and_acts %>%
+              filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
+              select(raw_Nummer, raw_KleurringNummer, 
+                     raw_Datum, raw_AktieCode)) %>%
+  select(-n) %>%
+  select(raw_Nummer, everything())
 duplicates_ringing
 ```
 
-If no inconsistencies are detected in other columns (e.g. bird age or place while ringing), duplicates can be removed:
-
-```{r remove_duplicates_ringing}
-obs_and_acts <- bind_rows(obs_and_acts %>% 
-            filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
-            distinct(raw_Datum, raw_KleurringNummer, raw_AktieCode, 
-                     .keep_all = TRUE),
-          obs_and_acts %>%
-            filter(!raw_AktieCode %in% c("rngkl", "rngme")))
-```
-
-### Check age inconsistencies
+### Check age while applying rings
 
 For each bird, observations with same date should refer to same bird age. Exceptions:
 
 ```{r check_anomalies_age_ringing}
 obs_and_acts %>%
   filter(!is.na(raw_LeeftijdCode)) %>%
+  filter(raw_AktieCode %in% c("rngkl", "rngme")) %>%
   distinct(raw_KleurringNummer, raw_Datum, raw_LeeftijdCode)  %>%
   group_by(raw_KleurringNummer, raw_Datum) %>%
   count() %>%
@@ -422,6 +414,30 @@ obs_and_acts %>%
   select(-n) %>%
   select(raw_Nummer, raw_KleurringNummer, raw_Datum, 
          raw_LeeftijdCode, raw_AktieCode)
+```
+
+### Check bird sex inconsistencies
+
+All birds should have a sex, which could be one of `M` (_mannetje_), `V` (_vrouwtje_), `O` (_onbekend_):
+
+```{r present_GeslachtCode}
+distinct(birds, raw_GeslachtCode)
+```
+
+Exceptions:
+
+```{r exceptions_bird_sex}
+birds %>%
+  filter(is.na(raw_GeslachtCode)) %>%
+  distinct(raw_Nummer, raw_NummerNieuw, raw_NummerDesc, raw_GeslachtCode)
+```
+
+For all birds a one-to-one relation bird - sex should hold true:
+
+```{r check_one-to-one_bird_sex}
+birds %>% 
+  distinct(raw_Nummer, raw_GeslachtCode) %>%
+  nrow() == nrow(birds)
 ```
 
 ### Handle information about metal ring number
