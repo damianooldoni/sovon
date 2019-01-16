@@ -404,6 +404,26 @@ obs_and_acts <- bind_rows(obs_and_acts %>%
             filter(!raw_AktieCode %in% c("rngkl", "rngme")))
 ```
 
+### Check age inconsistencies
+
+For each bird, observations with same date should refer to same bird age. Exceptions:
+
+```{r check_anomalies_age_ringing}
+obs_and_acts %>%
+  filter(!is.na(raw_LeeftijdCode)) %>%
+  distinct(raw_KleurringNummer, raw_Datum, raw_LeeftijdCode)  %>%
+  group_by(raw_KleurringNummer, raw_Datum) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(obs_and_acts %>%
+              filter(!is.na(raw_LeeftijdCode)) %>%
+              select(raw_Nummer, raw_KleurringNummer, raw_Datum, 
+                     raw_LeeftijdCode, raw_AktieCode)) %>%
+  select(-n) %>%
+  select(raw_Nummer, raw_KleurringNummer, raw_Datum, 
+         raw_LeeftijdCode, raw_AktieCode)
+```
+
 ### Handle information about metal ring number
 
 There are columns containing metal ring related information in `birds`:
