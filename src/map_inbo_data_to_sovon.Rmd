@@ -1493,7 +1493,7 @@ This is how `bird_notes` has been updated, limited to rows where changes could h
 crbirding_birds %>% 
        filter(is.na(bird_ring_number)) %>%
        select(bird_reference) %>%
-       left_join(crbirding_birds_t,
+       left_join(crbirding_birds,
                  by = "bird_reference") %>%
   select(-bird_shorthand_pt)
 ```
