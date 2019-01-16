@@ -606,11 +606,11 @@ users <- users %>%
 
 ### User reference
 
-Field provided by SOVON: `NA` is given
+We use the unique ID in `raw_Nummer`:
 
 ```{r user_ref}
 users <- users %>%
-  mutate(user_reference  = NA)
+  mutate(user_reference  = raw_Nummer)
 ```
 
 ### User language
