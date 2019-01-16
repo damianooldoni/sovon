@@ -1076,7 +1076,7 @@ info_fhov <-
   filter(bird_shorthand == "FHOV") %>%
   mutate(bird_date_begin = 
            obs_and_acts %>%
-           filter(bird_reference == 6360, 
+           filter(bird_reference == 6359, 
                   first_Nummer == "SUAV",
                   raw_AktieCode == "ziek") %>%
            # there is juwt one "ziek" action
@@ -1186,7 +1186,7 @@ crbirding_birds <-
 Example of a triplet ring sequence:
 
 ```{r}
-crbirding_birds %>% filter(bird_reference == 7592)
+crbirding_birds %>% filter(bird_reference == 7591)
 ```
 
 At this point all rings should have a `bird_date_begin`:
