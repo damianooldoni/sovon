@@ -1681,7 +1681,8 @@ crbirding_birds <-
 Bird identifiers will be provided by SOVON. `NA` is given:
 
 ```{r birdID}
-birds <- birds %>%
+crbirding_birds <- 
+  crbirding_birds %>%
   mutate(bird_id = NA)
 ```
 
