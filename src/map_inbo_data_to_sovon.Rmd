@@ -1612,10 +1612,8 @@ crbirding_birds <-
   mutate(bird_sex = recode(raw_GeslachtCode,
     "V" = "F", # V(rouwtje) ->F(emale)
     "O" = "U" # O(nbekend) ->  U(nknown)
-    )) %>%
-  select(-raw_GeslachtCode)
+    ))
 ```
-      
 ### Bird age ringing
 
 Map the age of the bird while ringing. This information can be found in column `raw_LeeftijdCode` of data frame `obs_and_acts` when related code action is equal to `rngkl` (code action of applying colour ring). Check for anomalies:
