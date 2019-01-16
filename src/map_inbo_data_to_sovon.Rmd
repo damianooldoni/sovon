@@ -466,7 +466,7 @@ birds %>%
   distinct(raw_Nummer, metal_ring_from_birds, metal_ring_from_obs)
 ```
 
-Based on expert's knowledge only the metal ring information in `birds` is correct. We remove the columns related to metal ring information from `obs_and_acts` as this information is redundant and not needed for the mapping:
+Based on experts' knowledge only the metal ring information in `birds` is correct. We remove the columns related to metal ring information from `obs_and_acts` as this information is redundant and not needed for the mapping:
 
 ```{r remove_metal_ring_infos_from_obs}
 obs_and_acts <-
@@ -490,7 +490,7 @@ The right mapping of them is saved in `map_gps`:
 map_gps %>% head()
 ```
 
-We import the color rings in new column `first_Nummer`. For all other rings will be `first_nummer = raw_Nummer` as they are the very first rings. We will also add note `'uvabits_gps_tag'`
+We import the color rings in new column `first_Nummer`. For all other rings will be `first_nummer = raw_Nummer` as they are the very first rings. We will also add note `'uvabits_gps_tag'`:
 
 ```{r map_to_first_Nummer}
 map_gps_add_notes <- map_gps %>%
@@ -1189,7 +1189,7 @@ Example of a triplet ring sequence:
 crbirding_birds %>% filter(bird_reference == 7592)
 ```
 
-All rings should be now have a `bird_date_begin`:
+At this point all rings should have a `bird_date_begin`:
 
 ```{r summary_n_rings_with_date_final}
 crbirding_birds %>%
@@ -1417,7 +1417,7 @@ no_rngme_date <-
 no_rngme_date
 ```
 
-Be sure this solution provides a date for applying all metal rings:
+Be sure this solution provides a date for all metal rings:
 
 ```{r check_date_for_all_metal_rings}
 no_rngme_date %>%
