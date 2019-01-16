@@ -1713,15 +1713,6 @@ crbirding_birds <-
   mutate(bird_birth_year = NA)
 ```
 
-### Bird date end
-
-This field should be left to SOVON. `NA` is given:
-
-```{r bird_date_end}
-birds <- birds %>%
-  mutate(bird_date_end = NA)
-```
-
 ## Map observation data
 
 ### Observation reference
