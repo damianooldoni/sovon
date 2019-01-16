@@ -622,26 +622,14 @@ users <- users %>%
   mutate(user_language  = "Dutch")
 ```
 
-### User role
+### Create `crbirding_users`
 
-The distinction between ringer and observer is not present in `users`, but can be retrieved by combining it with `obs_and_acts`.
+Export the needed columns to `crbirding_users`:
 
-We filter by ring actions (`rngkl` or `rngme`) and we retrieve the ringers by `raw_WaarnemerNummer`:
-
-```{r find_ringers}
-ringers_number <- obs_and_acts %>% 
-  filter(raw_AktieCode %in% c("rngkl","rngme")) %>%
-  distinct(raw_WaarnemerNummer) %>% pull()
-print(paste("Number of ringers:", 
-            length(ringers_number)))
-```
-
-And we assign a `R` (ringer) to them, `O` (observer) otherwise:
-
-```{r assign_ringer}
-users <- users %>%
-  mutate(user_role = ifelse(raw_Nummer %in% ringers_number,
-                      "R", "O"))
+```{r make_crbirding_users}
+crbirding_users <- 
+  users %>%
+  select(-starts_with("raw_"))
 ```
 
 ## Map color ring data
@@ -1741,6 +1729,46 @@ This field will be filled by SOVON. `NA` is given:
 crbirding_birds <- 
   crbirding_birds %>%
   mutate(bird_birth_year = NA)
+```
+
+## Finalize `crbirding_users`
+
+We have now sufficient information to define the role of any user in `crbirding_users`.
+
+### Add user role to `crbirding_users`
+
+Based on `bird_date_begin` we can retrieve the observations linked to apply rings. These observations can be labelled as `rngkl` (applying very first color ring), but they can sometimes come from `vang` or `vangl` as we have discussed before. We retrieve the ringers by joining on  `raw_WaarnemerNummer` between `crbirding_users` and `obs_and_acts`:
+
+```{r find_ringers}
+ringers_number <- 
+  crbirding_birds %>%
+  select(bird_reference, bird_date_begin) %>%
+  left_join(obs_and_acts %>% 
+              filter(raw_AktieCode %in% c("rngkl", "rngme", "vang", "vangl")) %>%
+              select(bird_reference, raw_Datum, raw_WaarnemerNummer),
+            by = c("bird_reference", "bird_date_begin" = "raw_Datum")) %>%
+  filter(!is.na(raw_WaarnemerNummer)) %>%
+  distinct(raw_WaarnemerNummer) %>%
+  pull(raw_WaarnemerNummer)
+print(paste("Number of ringers:", 
+            length(ringers_number)))
+```
+
+We assign a `R` (ringer) to them, `O` (observer) otherwise:
+
+```{r assign_ringer}
+crbirding_users <- 
+  crbirding_users %>%
+  mutate(user_role = ifelse(user_reference %in% ringers_number,
+                      "R", "O"))
+```
+
+Number of ringers and observers:
+
+```{r summary_n_ringers_observers}
+crbirding_users %>%
+  group_by(user_role) %>%
+  count()
 ```
 
 ## Map observation data
