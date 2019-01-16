@@ -1572,7 +1572,11 @@ birds %>% distinct(raw_MetaalringLandCode)
 We apply the following mapping:
 
 ```{r scheme_mapping}
-birds <- birds %>%
+crbirding_birds <- 
+  crbirding_birds %>%
+  left_join(birds %>% 
+              select(bird_reference, raw_MetaalringLandCode),
+            by = "bird_reference") %>%
   mutate(bird_scheme = recode(raw_MetaalringLandCode,
                               "BE " = "BLB",
                               "FR" = "FRP",
