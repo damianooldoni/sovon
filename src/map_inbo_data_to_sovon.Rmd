@@ -642,7 +642,7 @@ users <- users %>%
 
 ## Map color ring data
 
-### Bird reference
+### Bird reference & bird shorthand
 
 The relation color ring (SOVON field `bird_shorthand`) - bird is a multi-to-one relation. By assigning a bird reference as unique integer to a bird we can link any color ring to the bird it belongs to.
 
