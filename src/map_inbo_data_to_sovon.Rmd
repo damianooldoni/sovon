@@ -1647,9 +1647,34 @@ obs_and_acts <-
     .missing = "O"))
 ```
 
-### Bird shorthand
+For mapping the bird age while applying color ring we should not only take into account observations with actions `rngkl` (applying very first color ring) but also actions `vang` and `vangl` as applying a new color ring is linked to one of this two actions (see section [bird shorthand](#bird-shorthand)). The age can be added to `crbirding_birds` by matching `bird_date_begin` of `crbirding_birds` and `raw_Datum` of `obs_and_acts` for each `bird_reference`. First we check that this strategy ends up with an one-to-one relation:
 
-The INBO `tblKleurring` assumes the principle one row = one bird. Columns `rawNummer` and `rawNummerNieuw` refer to same bird: `rawNummer` is the first color ring the bird got, while `rawNummerNieuw` is the second one (in case it is different to `rawNummer`). `rawNummerDesc` is the dot version of `rawNummerNieuw` (dot has exclusively the function to improve readibility). SOVON table is organized differently: it assumes the principle one row = one color ring. We use information provided in `control_df` to map (most of) the rings.
+```{r check_uniqueness_approach}
+crbirding_birds %>%
+  left_join(obs_and_acts %>%
+              distinct(bird_reference, raw_Datum, 
+                       bird_age_ringing, raw_AktieCode) %>%
+              # remove rows with raw_Datum equal to NA or field observations
+              filter(!is.na(bird_age_ringing), 
+                     raw_AktieCode %in% c("vang", "vangl", "rngkl")),
+            by = c("bird_reference", "bird_date_begin" = "raw_Datum")) %>% 
+  nrow() == nrow(crbirding_birds)
+```
+
+If TRUE then, we proceed with the mapping:
+
+```{r apply_mapping_bird_age_ringing}
+crbirding_birds <- 
+  crbirding_birds %>%
+  left_join(obs_and_acts %>%
+              distinct(bird_reference, raw_Datum, 
+                       bird_age_ringing, raw_AktieCode) %>%
+              # remove rows with raw_Datum equal to NA or field observations
+              filter(!is.na(bird_age_ringing), 
+                     raw_AktieCode %in% c("vang", "vangl", "rngkl")),
+            by = c("bird_reference", "bird_date_begin" = "raw_Datum")) %>%
+  select(-raw_AktieCode)
+```
 
 ### Bird ID
 
