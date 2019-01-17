@@ -1927,16 +1927,18 @@ obs_and_acts <-
   ))
 ```
 
-### Observation reporter
+### Condition
 
-The field `melder` is equal to `user_first_name` and `user_last_name` in `users`:
+The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
 
-```{r obs_melder}
-obs_and_acts <- obs_and_acts %>%
-  left_join((users %>% select(raw_Nummer, user_first_name, user_last_name)),
-            by = c("raw_WaarnemerNummer" = "raw_Nummer")) %>%
-  mutate(melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
-  select(-c(user_first_name, user_last_name))
+```{r obs_condition}
+obs_and_acts %>%
+  mutate(condition = case_when(
+    raw_AktieCode == "dood" ~ 1,
+    raw_AktieCode %in% c("vang", "vangl") ~ 8,
+    raw_AktieCode == "veld" ~ 7,
+    raw_AktieCode == "ziek" ~ 4
+))
 ```
 
 ### Ring number
