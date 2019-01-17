@@ -1833,8 +1833,12 @@ obs_and_acts <-
 
 ### Observation date
 
+The date is saved in column `raw_Datum`. We copy it in required column `observation_date`:
+
 ```{r obs_date}
-obs_and_acts <- obs_and_acts %>% mutate(observation_date = raw_Datum)
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(observation_date = raw_Datum)
 ```
 
 ### Observation time
