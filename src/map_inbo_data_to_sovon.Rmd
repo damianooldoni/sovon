@@ -1846,7 +1846,9 @@ obs_and_acts <-
 No time is found for observations in `obs`. `NA` is given:
 
 ```{r obs_time}
-obs_and_acts <- obs_and_acts %>% mutate(observation_time = NA)
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(observation_time = NA)
 ```
 
 ### Observation latitude
