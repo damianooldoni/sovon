@@ -1823,8 +1823,12 @@ crbirding_users %>%
 
 ### Observation reference
 
+We add an id number to each observation:
+
 ```{r obs_ref}
-obs_and_acts <- obs_and_acts %>% mutate(observation_reference = raw_Nummer)
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(observation_reference = seq_len(nrow(obs_and_acts)))
 ```
 
 ### Observation date
