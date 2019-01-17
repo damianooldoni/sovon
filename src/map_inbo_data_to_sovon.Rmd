@@ -560,6 +560,28 @@ birds %>%
 
 Exceptions are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions should be handled separately while mapping `bird_shorthand`.
 
+### Check inconsistencies between users and observers
+
+We have to be sure that all observations have a valid observator reference, i.e. an ID contained in column `raw_Nummer` of `users`.
+
+Observations without an observator reference:
+
+```{r raw_WaarnemerNummer_is_na}
+obs_and_acts %>%
+  filter(is.na(raw_WaarnemerNummer))
+```
+
+All observator references in `obs_and_acts` should be present in `users`:
+
+```{r check_observators_in_users}
+observers_ids <- unique(
+  obs_and_acts %>%
+    filter(!is.na(raw_WaarnemerNummer)) %>%
+    distinct(raw_WaarnemerNummer) %>%
+    pull())
+all(observers_ids %in% users$raw_Nummer)
+```
+
 # Map data
 
 We tranform the information extracted from INBO color ring database to SOVON format. The goal is to create three dataframes:
