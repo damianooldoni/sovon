@@ -2115,6 +2115,22 @@ obs_and_acts <-
   mutate(observation_notes = raw_Opmerking)
 ```
 
+As other notes could follow, we add a dot at the end of the notes if not present already:
+
+```{r}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(
+    observation_notes = 
+      if_else(
+        !is.na(observation_notes) & str_length(observation_notes) > 0,
+        if_else(str_sub(observation_notes, -1) != ".",
+                str_c(observation_notes, ".", sep = ""),
+                observation_notes),
+        observation_notes)
+)
+```
+
 We have to add the note `no_color_ring.` to observations of birds not wearing any color ring (only metal ring), a situation tackled in previous section:
 
 ```{r add_note_no_color_ring}
