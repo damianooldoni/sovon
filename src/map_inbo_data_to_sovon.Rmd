@@ -1968,6 +1968,16 @@ Further mapping steps need the knowledge of an expert.
 
 ```
 
+### Observation reporter reference number
+
+The field `melder_ringersnummer` is equal to `user_reference`:
+
+```{r melder_ringersnummer}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(melder_ringersnummer = raw_WaarnemerNummer)
+```
+
 # Post-processing
 
 ## User data 
