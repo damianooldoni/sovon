@@ -2028,11 +2028,6 @@ obs_and_acts <-
 )
 ```
 
-### Observation notes
-
-```{r obs_notes}
-obs <- obs %>% mutate(observation_notes = raw_Opmerking)
-```
 
 ### MRI: metal ring information
 
@@ -2072,6 +2067,39 @@ obs_and_acts <- obs_and_acts %>%
   select(-c(user_first_name, user_last_name))
 ```
 
+### Observation notes
+
+We copy the notes in `raw_Opmerking` to SOVON field  `observation_notes`:
+
+```{r obs_notes}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(observation_notes = raw_Opmerking)
+```
+
+We have to add the note `no_color_ring.` to observations of birds not wearing any color ring (only metal ring), a situation tackled in previous section:
+
+```{r add_note_no_color_ring}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(
+    observation_notes = if_else(
+      is.na(ring_number),
+      if_else(is.na(observation_notes),
+              "no_color_ring.",
+              paste(observation_notes, "no_color_ring.", sep = " ")),
+      observation_notes)
+)
+```
+
+Mapping:
+
+```{r}
+obs_and_acts %>%
+  filter(is.na(ring_number)) %>%
+  select(observation_reference, ring_number, observation_notes) %>%
+  head(n = 10)
+```
 
 # Post-processing
 
