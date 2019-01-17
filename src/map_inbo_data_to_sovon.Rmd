@@ -52,6 +52,32 @@ cr_birds_file <- here::here("data", "processed", "data_birds.tsv")
 cr_obs_file <- here::here("data", "processed", "data_observations.tsv")
 ```
 
+Set column orders of output files:
+
+```{r cols_order}
+# users
+cr_users_cols <- c(
+  "user_id", "user_reference", "user_email", "user_first_name",
+  "user_last_name", "user_address", "user_postal_code", "user_place",
+  "user_country", "user_language", "user_role"
+)
+# birds
+cr_birds_cols <- c(
+  "bird_id", "bird_reference", "bird_euring", "bird_bto", 
+  "bird_shorthand", "bird_scheme", "bird_ring_number", "bird_name", "bird_sex",
+  "bird_birth_year", "bird_date_begin", "bird_date_end", "bird_age_ringing"
+)
+# observations
+cr_obs_cols <- c(
+  "user_id", "user_reference", "bird_id", "bird_reference", "observation_id",
+  "observation_reference", "observation_date", "observation_time", 
+  "observation_lat", "observation_lng", "observation_location", 
+  "observation_is_capture", "observation_notes", "check_bird", "MRI", "Melder",
+  "Melder_email", "Melder_ringersnummer", "Ringnumber", "Conditie", 
+  "Bird_age_ringing", "Bird_sex"
+)
+```
+
 # Extract data from INBO kleurring database
 
 ## Connection to INBO database
@@ -1906,61 +1932,94 @@ Further mapping steps need the knowledge of an expert.
 
 ## User data 
 
-Remove the original columns:
+Are all required columns present?
 
-```{r user_remove_originals}
-users <- users %>% select(-starts_with("raw_"))
+```{r check_presence_required_cols_users}
+all(cr_users_cols %in% names(crbirding_users))
 ```
 
-Preview data:
+Arrange columns `crbirding_users`:
+
+```{r get_right_order_cols_users}
+crbirding_users <-
+  crbirding_users %>%
+  select(cr_users_cols)
+```
+
+Preview data (e-mail, first and last names removed for privacy reasons):
 
 ```{r final_preview_users}
-users %>% head()
+crbirding_users %>%
+  select(-c(user_email, user_first_name, user_last_name)) %>%
+  head(n = 10)
 ```
 
 Save to CSV:
 
 ```{r write_user_data_txt}
-readr::write_csv(users, path = cr_users, na = "")
+write_csv(crbirding_users, path = cr_users_file, na = "")
 ```
 
 ## Bird data
 
-Remove the original columns:
+SOVON is interested in color rings versions with a dot in case dots are present, even if the dots are for readibility reasons. At the end of the mapping we can overwrite `bird_shorthand` with `bird_shorthand_pt`:
+```{r remove_col_bird_shorthand_pt}
+crbirding_birds <- 
+  crbirding_birds %>%
+  select(-bird_shorthand) %>% 
+  rename(bird_shorthand = bird_shorthand_pt)
+```
 
-```{r birds_remove_originals}
-birds <- birds %>% select(-starts_with("raw_"))
+Are all required columns present?
+
+```{r check_presence_required_cols_birds}
+all(cr_birds_cols %in% names(crbirding_birds))
+```
+
+Arrange columns `crbirding_birds`:
+
+```{r get_right_order_cols_birds}
+crbirding_birds <-
+  crbirding_birds %>%
+  select(cr_birds_cols)
 ```
 
 Preview data:
 
 ```{r final_preview_birds}
-birds %>% head()
+crbirding_birds %>% head(n = 10)
 ```
 
 Save to CSV:
 
 ```{r write_bird_data_txt}
-readr::write_csv(birds, path = cr_birds, na = "")
+write_csv(crbirding_birds, path = cr_birds_file, na = "")
 ```
 
 ## Observation data
 
+Are all required columns present?
 
-Remove the original columns:
+```{r check_presence_required_cols_obs}
+all(cr_obs_cols %in% names(crbirding_obs))
+```
 
-```{r obs_remove_originals}
-obs <- obs %>% select(-starts_with("raw_"))
+Arrange columns `crbirding_birds`:
+
+```{r get_right_order_cols_obs}
+crbirding_obs <-
+  crbirding_obs %>%
+  select(cr_obs_cols)
 ```
 
 Preview data:
 
 ```{r final_preview_obs}
-obs %>% head()
+crbirding_obs %>% head(n = 10)
 ```
 
 Save to CSV:
 
 ```{r write_obs_data_txt}
-readr::write_csv(obs, path = cr_obs, na = "")
+write_csv(crbirding_obs, path = cr_obs_file, na = "")
 ```
