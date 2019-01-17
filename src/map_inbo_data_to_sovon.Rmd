@@ -2056,6 +2056,21 @@ obs_and_acts <-
   mutate(melder_ringersnummer = raw_WaarnemerNummer)
 ```
 
+### Observation reporter
+
+The field `melder` is equal to `user_first_name` and `user_last_name` in `users`:
+
+```{r obs_melder}
+obs_and_acts <- obs_and_acts %>%
+  left_join(
+    users %>% 
+      select(raw_Nummer, user_first_name, user_last_name),
+    by = c("raw_WaarnemerNummer" = "raw_Nummer")) %>%
+  mutate(melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
+  select(-c(user_first_name, user_last_name))
+```
+
+
 # Post-processing
 
 ## User data 
