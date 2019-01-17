@@ -1856,14 +1856,16 @@ obs_and_acts <-
 Observation latitude should be converted to decimal degrees:
 
 ```{r obs_latitude}
-obs_and_acts <- obs_and_acts %>% mutate(
-  observation_lat = conv_unit(
-    str_c(raw_PlaatsBreedtegraadGraden,
-          raw_PlaatsBreedtegraadMinuten,
-          raw_PlaatsBreedtegraadSeconden, 
-          sep = " "), 
-    from = 'deg_min_sec', to = 'dec_deg'
-))
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(
+    observation_lat = conv_unit(
+      str_c(raw_PlaatsBreedtegraadGraden,
+            raw_PlaatsBreedtegraadMinuten,
+            raw_PlaatsBreedtegraadSeconden, 
+            sep = " "), 
+      from = 'deg_min_sec', to = 'dec_deg')
+)
 ```
 
 ### Observation longitude
@@ -1871,14 +1873,16 @@ obs_and_acts <- obs_and_acts %>% mutate(
 Observation longitude should be converted to decimal degrees:
 
 ```{r obs_longitude}
-obs_and_acts <- obs_and_acts %>% mutate(
-  observation_long = conv_unit(
-    str_c(raw_PlaatsLengtegraadGraden,
-          raw_PlaatsLengtegraadMinuten,
-          raw_PlaatsLengtegraadSeconden, 
-          sep = " "), 
-    from = 'deg_min_sec', to = 'dec_deg'
-))
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(
+    observation_long = conv_unit(
+      str_c(raw_PlaatsLengtegraadGraden,
+            raw_PlaatsLengtegraadMinuten,
+            raw_PlaatsLengtegraadSeconden, 
+            sep = " "), 
+      from = 'deg_min_sec', to = 'dec_deg')
+)
 ```
 
 ### Observation location
