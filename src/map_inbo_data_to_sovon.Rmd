@@ -1889,18 +1889,21 @@ obs_and_acts <-
 
 Aggregate information about observation location. We follow the following structure: `raw_PlaatsGemeente` [+ `, ` + `raw_PlaatsToponym` [+ `: ` + `raw_PlaatsToponymDetail`]]:
 
-```{r}
-obs_and_acts <- obs_and_acts %>% mutate(
-  observation_location = ifelse(!is.na(raw_PlaatsToponym),
-                                str_c(raw_PlaatsGemeente,
-                                      raw_PlaatsToponym, 
-                                      sep = ", "),
-                                paste(raw_PlaatsGemeente))) %>%
-  mutate(observation_location = ifelse(!is.na(raw_PlaatsToponymDetail),
-                                       str_c(observation_location,
-                                             raw_PlaatsToponymDetail,
-                                             sep = ": "),
-                                       paste(observation_location)))
+```{r obs_location}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(
+    observation_location = ifelse(!is.na(raw_PlaatsToponym),
+                                  str_c(raw_PlaatsGemeente,
+                                        raw_PlaatsToponym, 
+                                        sep = ", "),
+                                  paste(raw_PlaatsGemeente))) %>%
+  mutate(
+    observation_location = ifelse(!is.na(raw_PlaatsToponymDetail),
+                                  str_c(observation_location,
+                                        raw_PlaatsToponymDetail,
+                                        sep = ": "),
+                                  paste(observation_location)))
 ```
 
 ### Observation status
@@ -1914,8 +1917,9 @@ actions_meaning %>%
 
 The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document, we define the following mapping:
 
-```{r}
-obs_and_acts %>%
+```{r obs_status}
+obs_and_acts <- 
+  obs_and_acts %>%
   mutate(status = case_when(
     raw_AktieCode %in% c("br", "vang") ~ "N",
     raw_LeeftijdCode == "PU" ~ "-",
