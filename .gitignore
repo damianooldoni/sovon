@@ -40,4 +40,4 @@ rsconnect/
 .Rproj.user
 
 # text file with users data (privacy reasons!)
-/data/output/data_users.tsv
+/data/processed/data_users.tsv
