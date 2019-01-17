@@ -1671,12 +1671,21 @@ crbirding_birds <-
 
 ### Bird age ringing
 
-Mapping the age while applying color ring from INBO format to SOVON standard (Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14). Bird age at the moment of any observation can be found in column `raw_LeeftijdCode` of `obs_and_acts`:
+For mapping the age while applying color rings, we have to follow the Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14. 
+
+Bird age at the moment of any observation can be found in column `raw_LeeftijdCode` of `obs_and_acts`. Values present:
+
+```{r show_present_LeeftijdCode}
+obs_and_acts %>%
+  distinct(raw_LeeftijdCode)
+```
+
+We apply a recoding in order to standardize INBO's vocabulary to the EURING standard:
 
 ```{r map_age_code}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(bird_age_ringing = recode(raw_LeeftijdCode,
+  mutate(bird_age_obs = recode(raw_LeeftijdCode,
     "PU" = "1",
     "AD" = "A",
     "J1" = "3",
@@ -1693,9 +1702,9 @@ For mapping the bird age while applying color ring we should not only take into 
 crbirding_birds %>%
   left_join(obs_and_acts %>%
               distinct(bird_reference, raw_Datum, 
-                       bird_age_ringing, raw_AktieCode) %>%
+                       bird_age_obs, raw_AktieCode) %>%
               # remove rows with raw_Datum equal to NA or field observations
-              filter(!is.na(bird_age_ringing), 
+              filter(!is.na(bird_age_obs), 
                      raw_AktieCode %in% c("vang", "vangl", "rngkl")),
             by = c("bird_reference", "bird_date_begin" = "raw_Datum")) %>% 
   nrow() == nrow(crbirding_birds)
@@ -1708,12 +1717,20 @@ crbirding_birds <-
   crbirding_birds %>%
   left_join(obs_and_acts %>%
               distinct(bird_reference, raw_Datum, 
-                       bird_age_ringing, raw_AktieCode) %>%
+                       bird_age_obs, raw_AktieCode) %>%
               # remove rows with raw_Datum equal to NA or field observations
-              filter(!is.na(bird_age_ringing), 
+              filter(!is.na(bird_age_obs), 
                      raw_AktieCode %in% c("vang", "vangl", "rngkl")),
-            by = c("bird_reference", "bird_date_begin" = "raw_Datum")) %>%
-  select(-raw_AktieCode)
+            by = c("bird_reference", "bird_date_begin" = "raw_Datum"))
+```
+
+We remove the help column `raw_AktieCode` from `crbirding_birds` and rename  `bird_age_obs` to `bird_age_ringing`:
+
+```{r remove_raw_AktieCode}
+crbirding_birds <- 
+  crbirding_birds %>%
+  select(-raw_AktieCode) %>%
+  rename(bird_age_ringing = bird_age_obs)
 ```
 
 ### Bird ID
@@ -2041,6 +2058,27 @@ Further mapping steps need the knowledge of an expert.
 
 ```{r MRI}
 
+```
+
+### Bird age ringing
+
+The required field `bird_age_ringing` is the same as the field `bird_age_ringing` in dataframe `crbirding_birds`:
+
+```{r bird_age_ringing}
+obs_and_acts <- 
+  obs_and_acts %>%
+  left_join(crbirding_birds %>%
+              select(bird_reference, bird_shorthand_pt, bird_age_ringing),
+            by = c("bird_reference", "ring_number" = "bird_shorthand_pt")
+)
+```
+
+This means that for observations without `ring_number` the field `bird_age_ringing` will be empty:
+
+```{r check_bird_age_rining_NA}
+obs_and_acts %>%
+  filter(is.na(ring_number)) %>%
+  distinct(bird_age_ringing)
 ```
 
 ### Observation reporter reference number
