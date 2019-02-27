@@ -1469,36 +1469,42 @@ no_rngme <-
   left_join(birds %>%
               select(bird_reference, 
                      raw_Nummer,
-                     raw_NummerNieuw, 
-                     raw_NummerDesc,
                      raw_MetaalringNummer),
             by = "bird_reference") %>%
   select(bird_reference, raw_Nummer, raw_MetaalringNummer) %>%
-  arrange(raw_Nummer)
+  rename(raw_KleurringNummer = raw_Nummer) %>%
+  arrange(raw_KleurringNummer)
 no_rngme
 ```
 
 Experts are sure that these metal rings have been applied while applying the color ring (see [comment on issue #33](https://github.com/inbo/sovon/issues/33#issuecomment-451876667)). So, we can use the information for rows with action `rngkl` to create similar new observations/actions with action ``rngme`:
 
 ```{r add_date_to_metal_ring_number_exceptions}
-no_rngme_date <- 
+no_rngme_info <- 
   no_rngme %>%
   left_join(obs_and_acts %>%
               filter(raw_AktieCode == "rngkl") %>%
-              select(bird_reference, raw_Datum),
-            by = "bird_reference")
-no_rngme_date
+              select(-raw_AktieCode),
+            by = c("bird_reference", "raw_KleurringNummer")) %>%
+  mutate( raw_AktieCode = "rngme")
+no_rngme_info
 ```
 
 Be sure this solution provides a date for all metal rings:
 
 ```{r check_date_for_all_metal_rings}
-no_rngme_date %>%
+no_rngme_info %>%
   filter(!is.na(raw_Datum)) %>%
-  nrow() == nrow(no_rngme_date)
+  nrow() == nrow(no_rngme_info)
 ```
 
-Check also that all `bird_reference` are linked to one and only one `rngme` action:
+We add these observations to `obs_and_acts`:
+
+```{r add_absent_rngme}
+obs_and_acts <- 
+  obs_and_acts %>%
+  bind_rows(no_rngme_info)
+```
 
 ```{r check_no_ambiguity_rngkl}
 nrow(no_rngme_date) == nrow(no_rngme)
