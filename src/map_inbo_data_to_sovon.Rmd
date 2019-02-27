@@ -168,7 +168,7 @@ dbDisconnect(conn)
 
 ### Import control data
 
-The INBO seebird team provided a spreadsheet to map color rings (see section [bird shorthand](#bird-shorthand)). From this spreadhseet we distilled some text files with specific mapping information:
+The INBO seabird team provided a spreadsheet to map color rings (see section [bird shorthand](#bird-shorthand)). From this spreadhseet we distilled some text files with specific mapping information:
 
 ```{r import_csv_from_control_spreadsheet}
 map_gps_path <- here::here("data", "input", "map_gps_id_to_color_ring.tsv")
