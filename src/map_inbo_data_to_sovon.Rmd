@@ -2017,7 +2017,7 @@ obs_and_acts %>%
 
 ### Ring number
 
-The ring number is equal to `bird_shorthand_pt` in `crbirding_birds`. We do it via joining on `bird_reference`. In case of multiple rings, the choice of `bird_shorthand` is based on a comparison between the date of the observation and the dates `bird_date_begin` (date of applying color ring) and `bird_date_end` (date of removing color ring to apply a new one):
+The field `ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
 
 ```{r obs_color_rings}
 obs_color_rings <-
