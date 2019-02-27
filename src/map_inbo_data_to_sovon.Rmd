@@ -1606,25 +1606,7 @@ crbirding_birds %>%
 
 Notice how nothing has been added in `bird_notes` for birds getting a metal ring while changing the color ring.
 
-Based on code actions `klgev` (only colour ring found) and `meweg` (metal ring missing) we can retrieve the end date of some metal rings:
-
-```{r example_klgev}
-obs_and_acts  %>%  
-  filter(raw_AktieCode == "klgev") %>%
-  select(bird_reference, raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
-  head(n = 20) %>%
-  arrange(bird_reference, raw_Datum)
-```
-
-```{r example_meweg}
-obs_and_acts  %>%  
-  filter(raw_AktieCode == "meweg") %>%
-  select(bird_reference, raw_KleurringNummer, raw_Datum, raw_AktieCode) %>%
-  head(n = 20) %>%
-  arrange(bird_reference, raw_Datum)
-``` 
-
-Waiting answer from INBO experts about the mapping of these actions: see [issue 34](https://github.com/inbo/sovon/issues/34).
+Retrieving the end date of metal rings is challenging: INBO experts informed us that the information in `raw_MetaalringNummer` refers **always** to the **most recent** ring. Some rings have been changed during observations related to action `vang` with the old ring number in field `raw_Opmerking` as textual annotation. However, the databases of INBO and SOVON are conceived around colour rings and information about the metalring is less relevant. The INBO experts suggested to not bother about the various metal ring codes that a bird had during its life. See [issue 34](https://github.com/inbo/sovon/issues/34).
 
 ### Euring
 
