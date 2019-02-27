@@ -1274,6 +1274,52 @@ crbirding_birds %>%
   head(n = 10)
 ```
 
+### Add rows for metal rings without color rings
+
+Sometimes metal rings have been applied **before** color rings. These cases should be added to `crbirding_birds` as new rows. We can detect these situtations by comparing the date of actions `rngme` and `rngkl` for each bird.
+
+```{r compare_rngme_rngkl}
+rngme_before_rngkl <- 
+  obs_and_acts %>%
+  filter(raw_AktieCode == "rngme") %>%
+  select(bird_reference, raw_Datum) %>%
+  rename(raw_Datum_rngme = raw_Datum) %>%
+  left_join(obs_and_acts %>%
+              filter(raw_AktieCode == "rngkl") %>%
+              select(bird_reference, raw_Datum) %>%
+              rename(raw_Datum_rngkl = raw_Datum),
+            by = "bird_reference") %>%
+  filter(raw_Datum_rngme < raw_Datum_rngkl) %>%
+  rename(bird_date_begin = raw_Datum_rngme,
+         bird_date_end = raw_Datum_rngkl) %>%
+  mutate(bird_shorthand = NA_character_,
+         bird_shorthand_pt = NA_character_,
+         bird_notes = "bird_shorthand not available.") %>%
+  select(bird_reference, 
+         bird_shorthand, 
+         bird_shorthand_pt,
+         everything())
+rngme_before_rngkl
+```
+
+We add these rows to `crbirding_birds`:
+
+```{r add_rngme_before_rngklt_to_crbirding_birds}
+crbirding_birds <- 
+  crbirding_birds %>%
+  bind_rows(rngme_before_rngkl) %>%
+  arrange(bird_reference, bird_date_begin)
+```
+
+A preview:
+
+```{r}
+crbirding_birds %>%
+  filter(bird_reference %in% 
+           (test %>% filter(is.na(bird_shorthand)) %>% pull(bird_reference))) %>%
+  head(n = 50)
+```
+
 ### Ring number
 
 The _ring number_, or _metal ring number_, can be found in field `raw_MetaalringNummer`. Ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
