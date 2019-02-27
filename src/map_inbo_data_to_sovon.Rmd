@@ -1904,6 +1904,15 @@ crbirding_users %>%
 
 ## Map observation data
 
+Our dataframe `obs_and_acts` contains informations related to all observations and related actions. By merging observations and actions we have sometimes multiple actions for same observation. Just an example:
+
+```{r example_umltiple_actions_same_obs}
+obs_and_acts %>%
+  filter(bird_reference == 262) %>%
+  select(bird_reference, raw_Nummer, raw_Datum, raw_AktieCode) %>%
+  arrange(raw_Datum)
+```
+
 ### Observation reference
 
 We add an id number to each observation:
