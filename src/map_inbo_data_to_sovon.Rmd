@@ -1261,6 +1261,7 @@ crbirding_birds <-
   nest() %>%
   mutate(bird_date_end = map(data, assign_end_date)) %>%
   unnest() %>%
+  mutate(bird_date_end = as.POSIXct(bird_date_end)) %>%
   select(bird_reference, bird_shorthand, bird_shorthand_pt, 
          bird_date_begin, bird_date_end, bird_notes)
 ```
