@@ -2019,89 +2019,11 @@ obs_and_acts %>%
 
 The field `ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
 
-```{r obs_color_rings}
-obs_color_rings <-
+```{r add_ring_number}
+obs_and_acts <-
   obs_and_acts %>%
-  left_join(crbirding_birds %>%
-              select(bird_reference, bird_shorthand_pt, 
-                     bird_date_begin, bird_date_end),
-            by = "bird_reference") %>%
-  filter(raw_Datum >= bird_date_begin & 
-            (is.na(bird_date_end) | raw_Datum < bird_date_end)) %>%
-  mutate(ring_number = bird_shorthand_pt)
-```
-
-Examples:
-
-```{r examples_ring_number_not_NA}
-obs_color_rings %>% 
-  select(observation_reference, bird_reference,
-         raw_Datum, bird_date_begin, bird_date_end,
-         ring_number) %>%
-  head(n = 10)
-```
-
-These observations are still a subset of all observations:
-
-```{r show_obs_color_rings_subset_obs_and_acts}
-nrow(obs_color_rings) < nrow(obs_and_acts)
-```
-
-The reason is that some birds got a color ring **after** the metal ring was applied. Some examples:
-
-```{r obs_without_color_ring}
-# retrieve date of applying first color ring
-obs_and_acts_rngkl <- obs_and_acts %>%
-  filter(raw_AktieCode == "rngkl") %>%
-  select(bird_reference, raw_Datum)
-
-# observations with no color ring
-obs_only_metal_rings <-
-  obs_and_acts %>%
-  anti_join(obs_color_rings) %>%
-  left_join(obs_and_acts_rngkl %>%
-              rename(datum_rngkl = raw_Datum),
-            by = c("bird_reference")) %>%
-  filter(raw_Datum < datum_rngkl)
-
-obs_only_metal_rings %>% head(n = 10)
-```
-
-In all these cases the field `ring_number` should be left empty:
-
-```{r assign_ring_number_as_NA}
-obs_only_metal_rings <-
-  obs_only_metal_rings %>%
   mutate(ring_number = NA_character_)
 ```
-
-Check whether we have a `ring_number` for all observations:
-
-```{r same_n_rows}
-nrow(obs_and_acts) == nrow(obs_color_rings) + nrow(obs_only_metal_rings)
-```
-
-and that no duplicates have been created:
-
-```{r check_no_duplicates_while_making_ring_number}
-bind_rows(obs_color_rings, obs_only_metal_rings) %>% 
-  distinct(observation_reference) %>%
-  nrow() == nrow(obs_and_acts)
-```
-
-Then we can add field `ring_number` to  `obs_and_acts`:
-
-```{r assign_ring_number}
-obs_and_acts <- 
-  obs_and_acts %>%
-  left_join(
-    bind_rows(obs_color_rings %>% select(-starts_with("bird_date_")), 
-              obs_only_metal_rings) %>%
-      select(observation_reference, ring_number),
-    by = "observation_reference"
-)
-```
-
 
 ### MRI: metal ring information
 
