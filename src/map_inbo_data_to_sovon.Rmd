@@ -1506,8 +1506,19 @@ obs_and_acts <-
   bind_rows(no_rngme_info)
 ```
 
+and check that all birds (`bird_reference`) with a valid metal ring are linked to one and only one `rngme` action. Exceptions:
+
 ```{r check_no_ambiguity_rngkl}
-nrow(no_rngme_date) == nrow(no_rngme)
+birds %>%
+  filter(!is.na(bird_ring_number)) %>%
+  distinct(bird_reference) %>%
+  anti_join(
+    obs_and_acts %>%
+      filter(raw_AktieCode == "rngme") %>%
+      group_by(bird_reference) %>%
+      count() %>%
+      filter(n == 1),
+    by = "bird_reference")
 ```
 
 If `TRUE`, then we can proceed to add the field `bird_ring_number` to `crbirding_birds` based on:
@@ -1524,9 +1535,7 @@ We first retrieve dates of applying the (very first) metal ring:
 ```{r retrieve_date_rngme}
 obs_and_acts_rngme <- obs_and_acts %>%
   filter(raw_AktieCode == "rngme") %>%
-  select(bird_reference, raw_Datum) %>%
-  bind_rows(no_rngme_date %>%
-              select(bird_reference, raw_Datum))
+  select(bird_reference, raw_Datum)
 ```
 
 in order to fill the field `bird_ring_number`:
@@ -1556,7 +1565,7 @@ Few examples (`bird_reference` 74 and 75 refer to birds which got metal ring fir
 
 ```{r}
 crbirding_birds %>%
-  filter(bird_reference %in% c(8999, 9028))
+  filter(bird_reference %in% c(8999, 9028, 74, 75))
 ```
 
 Add note about absence of metal ring based on original values in column `raw_MetaaalringNummer` and the fields `bird_reference`, `bird_ring_number`:
@@ -1583,7 +1592,7 @@ crbirding_birds <-
   select(-raw_MetaalringNummer)
 ```
 
-This is how `bird_notes` has been updated, limited to rows where changes could happen:
+This is how `bird_notes` has been updated, limited to birds where changes could happen:
 
 ```{r updated_bird_notes}
 crbirding_birds %>% 
@@ -1591,7 +1600,8 @@ crbirding_birds %>%
        select(bird_reference) %>%
        left_join(crbirding_birds,
                  by = "bird_reference") %>%
-  select(-bird_shorthand_pt)
+  select(-bird_shorthand_pt) %>%
+  arrange(bird_reference, bird_date_begin)
 ```
 
 Notice how nothing has been added in `bird_notes` for birds getting a metal ring while changing the color ring.
