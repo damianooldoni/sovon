@@ -498,12 +498,13 @@ birds %>%
   distinct(raw_Nummer, metal_ring_from_birds, metal_ring_from_obs)
 ```
 
-Based on experts' knowledge only the metal ring information in `birds` is correct. We remove the columns related to metal ring information from `obs_and_acts` as this information is redundant and not needed for the mapping:
+Based on experts' knowledge only the metal ring information in `birds` is correct. We rename the columns related to metal ring information from `obs_and_acts` by adding suffix `_obs`:
 
 ```{r remove_metal_ring_infos_from_obs}
 obs_and_acts <-
   obs_and_acts %>%
-  select(-starts_with("raw_Metaalring"))
+  rename_at(vars(starts_with("raw_Metaalring")),
+            ~ paste0(., "_obs"))
 ```
 
 ### Solve GPS tracker IDs
