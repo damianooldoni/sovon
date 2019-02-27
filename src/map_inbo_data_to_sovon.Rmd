@@ -160,6 +160,12 @@ actions_meaning <- dbGetQuery(conn, "SELECT * FROM dbo.cdeAktie")
 actions_meaning
 ```
 
+We can now close the connection to server:
+
+```{r close_connection}
+dbDisconnect(conn)
+```
+
 ### Import control data
 
 The INBO seebird team provided a spreadsheet to map color rings (see section [bird shorthand](#bird-shorthand)). From this spreadhseet we distilled some text files with specific mapping information:
