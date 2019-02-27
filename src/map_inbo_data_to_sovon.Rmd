@@ -1322,7 +1322,7 @@ crbirding_birds %>%
 
 ### Ring number
 
-The _ring number_, or _metal ring number_, can be found in field `raw_MetaalringNummer`. Ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
+The _ring number_, or _metal ring number_, can be found in field `raw_MetaalringNummer`, which contains the **most recent** metal ring number. A ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
 
 > Where the ring number consist of fewer than ten numbers/letters, the number is padded with dots. These dots are always inserted to the left of the rightmost
 row of numbers.
@@ -1428,7 +1428,7 @@ birds %>%
   select(-n)
 ```
 
-Thanks to observations with action `rngme` we can retrieve the date of applying the metal ring.
+Thanks to observations with action `rngme` we can retrieve the date of applying the (very first) metal ring.
 
 ```{r example_apply_metalring}
 obs_and_acts  %>%  
@@ -1478,7 +1478,7 @@ no_rngme <-
 no_rngme
 ```
 
-Experts are sure that these metal rings have been applied while applying the color ring. So, we can use the date related to action `rngkl`:
+Experts are sure that these metal rings have been applied while applying the color ring (see [comment on issue #33](https://github.com/inbo/sovon/issues/33#issuecomment-451876667)). So, we can use the information for rows with action `rngkl` to create similar new observations/actions with action ``rngme`:
 
 ```{r add_date_to_metal_ring_number_exceptions}
 no_rngme_date <- 
@@ -1513,7 +1513,7 @@ If `TRUE`, then we can proceed to add the field `bird_ring_number` to `crbirding
 
 This mapping takes into account the fact that some metal rings could have been applied while applying a second color ring or even after.
 
-We first retrieve dates of applying metal rings:
+We first retrieve dates of applying the (very first) metal ring:
 
 ```{r retrieve_date_rngme}
 obs_and_acts_rngme <- obs_and_acts %>%
@@ -1546,7 +1546,7 @@ crbirding_birds <-
          bird_notes)
 ```
 
-Two examples:
+Few examples (`bird_reference` 74 and 75 refer to birds which got metal ring first, see previous section):
 
 ```{r}
 crbirding_birds %>%
