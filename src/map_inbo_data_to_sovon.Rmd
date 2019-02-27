@@ -1915,7 +1915,7 @@ obs_and_acts %>%
 
 ### Observation reference
 
-We add an id number to each observation:
+We add an id number to each observation/action:
 
 ```{r obs_ref}
 obs_and_acts <- 
@@ -2000,7 +2000,7 @@ obs_and_acts <-
 
 ### Observation status
 
-The need of adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
+Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
 
 ```{r breed_show}
 actions_meaning %>%
