@@ -599,8 +599,6 @@ We tranform the information extracted from INBO color ring database to SOVON for
 
 ## Map user data
 
-We start mapping user data.
-
 ### E-mail
 
 ```{r e-mail}
@@ -1107,8 +1105,7 @@ info_ycaf <-
   filter(bird_shorthand == "YCAF") %>%
   mutate(bird_date_begin = 
            obs_and_acts %>%
-           filter(bird_reference == 3293, 
-                  first_Nummer == "PLAB",
+           filter(first_Nummer == "PLAB",
                   raw_AktieCode == "ziek") %>%
            # there is juwt one "ziek" action
            pull(raw_Datum))
@@ -1123,8 +1120,7 @@ info_fhov <-
   filter(bird_shorthand == "FHOV") %>%
   mutate(bird_date_begin = 
            obs_and_acts %>%
-           filter(bird_reference == 6359, 
-                  first_Nummer == "SUAV",
+           filter(first_Nummer == "SUAV",
                   raw_AktieCode == "ziek") %>%
            # there is juwt one "ziek" action
            pull(raw_Datum))
@@ -1218,7 +1214,7 @@ intermediate_rings %>%
   filter(raw_AktieCode %in% c("vang", "vangl"))
 ```
 
-We can then add the intermediate rings to  `crbirding_birds`:
+We can then add the intermediate rings to `crbirding_birds`:
 
 ```{r add_intermediate_ring}
 crbirding_birds <- 
