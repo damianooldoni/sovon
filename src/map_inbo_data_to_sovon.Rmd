@@ -1322,7 +1322,21 @@ crbirding_birds %>%
 
 ### Ring number
 
-The _ring number_, or _metal ring number_, can be found in field `raw_MetaalringNummer`, which contains the **most recent** metal ring number. A ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
+The _ring number_, or _metal ring number_, can be found in field `raw_MetaalringNummer`, which contains the **most recent** metal ring number. Recoverying the complete chronology of metal rings for each bird is almost impossible as it is:
+
+1. not complete
+2. included in texutal description (field `raw_Opmerking` of `tblWaarneming`)
+
+We can have an idea by selecting observations linked to action `vang` and containing 6 or more consecutive numbers in the notes:
+
+```{r example_notes_changes_metalring}
+obs_and_acts %>%
+  filter(str_detect(raw_Opmerking, pattern = "[0-9]{6,}")) %>%
+  filter(raw_AktieCode == "vang") %>%
+  select(raw_Opmerking)
+```
+
+A ring number should consist of up to ten **alphanumeric** characters. At page 7 of the [EURING Exchange Code 2000+ document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) we read the following instructions:
 
 > Where the ring number consist of fewer than ten numbers/letters, the number is padded with dots. These dots are always inserted to the left of the rightmost
 row of numbers.
