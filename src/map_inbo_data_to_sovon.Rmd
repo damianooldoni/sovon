@@ -1827,13 +1827,14 @@ uvabits_names <-
 head(uvabits_names)
 ```
 
-We couple the birds to the correspondent names:
+We couple the birds to the correspondent names by color ring:
 
 ```{r coupling_bird_reference_name}
 bird_ref_uvabits <- 
   crbirding_birds %>%
   left_join(uvabits_names %>%
-              select(colour_ring, individual_remarks), 
+              select(colour_ring, individual_remarks) %>%
+              filter(!is.na(colour_ring)), 
             by = c("bird_shorthand" = "colour_ring")) %>%
   rename("bird_name" = "individual_remarks") %>%
   filter(!is.na(bird_name)) %>%
