@@ -2019,6 +2019,16 @@ obs_and_acts <- obs_and_acts %>%
   select(-c(user_first_name, user_last_name))
 ```
 
+### Ring number
+
+The field `ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
+
+```{r add_ring_number}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(ring_number = NA_character_)
+```
+
 ### Observation reference
 
 The observation reference is an unique identifier (number) assigned to each observation, which could entail multiple actions. This field exists already: `raw_Nummer`.
