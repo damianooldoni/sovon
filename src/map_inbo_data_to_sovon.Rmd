@@ -1910,16 +1910,6 @@ obs_and_acts %>%
   arrange(raw_Datum)
 ```
 
-### Observation reference
-
-We add an id number to each observation/action:
-
-```{r obs_ref}
-obs_and_acts <- 
-  obs_and_acts %>% 
-  mutate(observation_reference = seq_len(nrow(obs_and_acts)))
-```
-
 ### Observation date
 
 The date is saved in column `raw_Datum`. We copy it in required column `observation_date`:
@@ -1995,6 +1985,50 @@ obs_and_acts <-
                                   paste(observation_location)))
 ```
 
+### Check bird
+
+The field `check_bird` is provided by SOVON. `NA` is given:
+
+```{r check_bird}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(check_bird = NA)
+```
+
+### Observation reporter reference number
+
+The field `melder_ringersnummer` is equal to `user_reference`:
+
+```{r melder_ringersnummer}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(melder_ringersnummer = raw_WaarnemerNummer)
+```
+
+### Observation reporter
+
+The field `melder` is equal to `user_first_name` and `user_last_name` in `users`:
+
+```{r obs_melder}
+obs_and_acts <- obs_and_acts %>%
+  left_join(
+    users %>% 
+      select(raw_Nummer, user_first_name, user_last_name),
+    by = c("raw_WaarnemerNummer" = "raw_Nummer")) %>%
+  mutate(melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
+  select(-c(user_first_name, user_last_name))
+```
+
+### Observation reference
+
+The observation reference is an unique identifier (number) assigned to each observation, which could entail multiple actions. This field exists already: `raw_Nummer`.
+
+```{r obs_ref}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(observation_reference = raw_Nummer)
+```
+
 ### Observation status
 
 Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
@@ -2030,16 +2064,6 @@ obs_and_acts %>%
 ))
 ```
 
-### Ring number
-
-The field `ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
-
-```{r add_ring_number}
-obs_and_acts <-
-  obs_and_acts %>%
-  mutate(ring_number = NA_character_)
-```
-
 ### MRI: metal ring information
 
 Metal ring information table can be found at page 8 of [this pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf)
@@ -2073,30 +2097,6 @@ This means that for observations without `ring_number` the field `bird_age_ringi
 obs_and_acts %>%
   filter(is.na(ring_number)) %>%
   distinct(bird_age_ringing)
-```
-
-### Observation reporter reference number
-
-The field `melder_ringersnummer` is equal to `user_reference`:
-
-```{r melder_ringersnummer}
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(melder_ringersnummer = raw_WaarnemerNummer)
-```
-
-### Observation reporter
-
-The field `melder` is equal to `user_first_name` and `user_last_name` in `users`:
-
-```{r obs_melder}
-obs_and_acts <- obs_and_acts %>%
-  left_join(
-    users %>% 
-      select(raw_Nummer, user_first_name, user_last_name),
-    by = c("raw_WaarnemerNummer" = "raw_Nummer")) %>%
-  mutate(melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
-  select(-c(user_first_name, user_last_name))
 ```
 
 ### Observation notes
