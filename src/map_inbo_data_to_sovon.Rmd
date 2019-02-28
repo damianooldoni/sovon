@@ -2039,6 +2039,88 @@ obs_and_acts <-
   mutate(observation_reference = raw_Nummer)
 ```
 
+### MRI: metal ring information
+
+Metal ring information is an integer between 0 and 9. A table can be found at page 8 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
+
+We initialize it:
+
+```{r intialize_MRI}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(MRI = NA_integer_)
+```
+
+Position of metal ring:
+
+```{r}
+birds %>% 
+  distinct(raw_MetaalringPlaats)
+```
+
+where `LL` means *left leg* and  `RL` means *right leg*. So, we will never have MRI values 2 or 3.
+
+All observations linked to `rngme` get MRI equal to 1:
+
+```{r set_MRI_1}
+obs_ref_rngme <- 
+  obs_and_acts %>%
+  filter(raw_AktieCode == "rngme") %>%
+  pull(observation_reference)
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_rngme, 1, MRI))
+```
+
+Preview of changes:
+
+```{r preview_changes_MRI_1}
+obs_and_acts %>%
+  filter(observation_reference %in% obs_ref_rngme) %>%
+  select(observation_reference, bird_reference, raw_AktieCode, MRI) %>%
+  head(n = 50)
+```
+
+MRI is 4 for observations linked to action `me`:
+
+```{r MRI_4}
+obs_ref_me <- 
+  obs_and_acts %>%
+  filter(raw_AktieCode == "me") %>%
+  pull(observation_reference)
+
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_me, 4, MRI))
+```
+
+Preview of changes:
+
+```{r preview_changes_MRI_4}
+obs_and_acts %>%
+  filter(observation_reference %in% obs_ref_me) %>%
+  select(observation_reference, bird_reference, raw_AktieCode, MRI) %>%
+  head(n = 50)
+```
+
+MRI is 0 for observations linked to action `meweg` and no `vang` (a new metal ring is applied when a bird without metal ring is caught):
+
+```{r}
+obs_ref_meweg_no_vang <- 
+  obs_and_acts %>%
+  filter(raw_AktieCode == "meweg") %>%
+  distinct(observation_reference) %>%
+  anti_join(obs_and_acts %>%
+              filter(raw_AktieCode == "vang") %>%
+              distinct(observation_reference),
+            by = "observation_reference") %>%
+  pull(observation_reference)
+
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_meweg_no_vang, 0, MRI))
+```
+
 ### Observation status
 
 Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
