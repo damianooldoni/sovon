@@ -2126,30 +2126,198 @@ obs_and_acts %>%
   head(n = 50)
 ```
 
-MRI is 4 for observations linked to action `klweg` (color ring missing):
+By screening the texual notes of observations related to `vang` with 6 or more consecutive numbers, we can see which observations refer to changing the metal ring (MRI equal to 5), which ones refer to apply a new metal ring as the old one is not present anymore (MRI equal to 1), and which ones confirm the presence of metal ring without any change (MRI equal to 4):
 
-```{r MRI_4_klweg}
-obs_ref_klweg <- 
+```{r vang_notes}
+vang_notes <- 
   obs_and_acts %>%
-  filter(raw_AktieCode == "klweg") %>%
-  distinct(observation_reference) %>%
+  filter(str_detect(raw_Opmerking, pattern = "[0-9]{6,}")) %>%
+  filter(raw_AktieCode == "vang") %>%
+  select(observation_reference, raw_Opmerking, bird_reference, raw_Datum) %>%
+  arrange(bird_reference)
+vang_notes
+```
+
+Observations linked to `vang` where a metal ring is added (old metal ring absent):
+
+```{r vang_metal_ring_added}
+vang_notes_metalring_added <- 
+  vang_notes %>%
+  filter(raw_Opmerking %in%
+           c("AFAB > LBAW + metaal L907345 (oud metaal was niet meer aanwezig)",
+             "oud metaal L89066 was niet aanwezig, L913152 aangebracht",	
+             "ASAP --> SZAT en H902297",
+             "oud metaal niet meer aanwezig? (H106600) > H901760\r\nASAV > PMAV",
+             "L89137 verloren --> L914601, AVAD -> UTAL",
+             "L89303 was reeds verloren > L909956, BBAX -> KZAC",
+             "BHAW --> URAA en L914607, bloedstaal genomen, oude metaal ring L89377 verloren",
+             "gevangen op nest EA676412  toegvoegd",
+             "oude metaalring L89460 verloren, nieuwe metaalring L909611 aangelegd",
+             "L89160 was niet meer aanwezig ---> nieuw metaal is L914621",
+             "BSAY ---> TSAK en L912663",
+             "CFAC -> YNAJ, kleurring bijna doorgeslsten. NB oude metaalring verloren nieuw=H901953",
+             "eerste metaalring verloren, wordt L904816"
+             )
+)
+```
+
+where the metal ring is present and not changed:
+
+```{r vang_metal_ring_not_chagend}
+vang_notes_metalring_present_no_changed <- 
+  vang_notes %>%
+  filter(raw_Opmerking %in% 
+           c("we B[DPAS] met L.905880 op het nest teruggevangen (vleugel 423, geslacht vrouw) en deze heeft nu B[HAAB] gekregen (staal niet vervangen)."))
+```
+
+and all the others referring to `vang` actions where metal ring has been changed:
+
+```{r vang_metal_ring_changed}
+vang_notes_metalring_changed <- 
+  anti_join(vang_notes, 
+            bind_rows(vang_notes_metalring_added, vang_notes_metalring_present_no_changed),
+            by = names(vang_notes)
+)
+```
+
+Check we covered all cases:
+
+```{r check_nrows_vang_notes}
+nrow(vang_notes) == 
+  (nrow(vang_notes_metalring_added) + 
+     nrow(vang_notes_metalring_present_no_changed) +
+     nrow(vang_notes_metalring_changed))
+```
+
+Assign MRI equal to 1 to observations linked to `vang` where a metal ring is added (old metal ring absent):
+
+```{r MRI_1_vang}
+obs_ref_vang_ring_added <- 
+  vang_notes_metalring_added %>%
   pull(observation_reference)
 
-obs_and_acts_test <- 
+obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_klweg, 4, MRI))
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_vang_ring_added, 1, MRI))
 ```
 
 Preview of changes:
 
-```{r preview_changes_MRI_4_klweg}
+```{r preview_changes_MRI_1_vang}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_klweg) %>%
+  filter(observation_reference %in% obs_ref_vang_ring_added) %>%
   select(observation_reference, bird_reference, raw_AktieCode, MRI) %>%
   head(n = 50)
 ```
 
+Assign MRI equal to 4 to observations linked to `vang` where a metal ring is already present and not changed:
+
+```{r MRI_4_vang}
+obs_ref_vang_ring_present <- 
+  vang_notes_metalring_present_no_changed %>%
+  pull(observation_reference)
+
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_vang_ring_present, 4, MRI))
 ```
+
+Preview of changes:
+
+```{r preview_changes_MRI_4_vang}
+obs_and_acts %>%
+  filter(observation_reference %in% obs_ref_vang_ring_present) %>%
+  select(observation_reference, bird_reference, raw_AktieCode, MRI)
+```
+
+Assign MRI equal to 5 to observations linked to `vang` where a metal ring is changed:
+
+```{r MRI_5_vang}
+obs_ref_vang_ring_changed <- 
+  vang_notes_metalring_changed %>%
+  pull(observation_reference)
+
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_vang_ring_changed, 5, MRI))
+```
+
+Preview of changes:
+
+```{r preview_changes_MRI_5_vang}
+obs_and_acts %>%
+  filter(observation_reference %in% obs_ref_vang_ring_changed) %>%
+  select(observation_reference, bird_reference, raw_AktieCode, MRI)
+```
+
+The MRI chronology:
+
+```{r}
+MRI_chronology <- 
+  obs_and_acts %>% 
+  filter(!is.na(MRI)) %>%
+  distinct(bird_reference, observation_reference, MRI, observation_date) %>%
+  arrange(bird_reference, observation_date)
+MRI_chronology
+```
+
+We correct MRI when a 5 follows a 0: it should be 1. This is the case of observations linked to `vang` actions occurring just after `meweg` actions.
+
+```{r correct_5_to_1}
+MRI_chronology <-
+  MRI_chronology %>%
+  mutate(MRI = ifelse(MRI == 5 & lag(MRI) == 0,
+                       MRI == 1, MRI))
+```
+
+Now we can spread the table to create intervals for each row:
+
+```{r spread_chronology}
+MRI_chronology_spread <- 
+  MRI_chronology %>%
+  group_by(bird_reference) %>%
+  mutate(MRI_after = lead(MRI),
+         MRI_after_observation_date = lead(observation_date)) %>%
+  rename(MRI_before = MRI,
+         MRI_before_observation_date = observation_date,
+         observation_chronology = observation_reference)
+MRI_chronology_spread
+```
+
+We can now assess the MRI value of all observations with missing MRI for each bird based on these rules:
+
+1. observation taken after MRI 1 or 5 and before MRI 0: set MRI = 4
+2. observation taken after MRI 0 and before MRI 1: set MRI = 0
+
+```{r assign_last_MRI}
+obs_and_acts_assign_last_MRI <- 
+  obs_and_acts %>%
+  filter(is.na(MRI)) %>%
+  left_join(MRI_chronology_spread,
+            by = c("bird_reference")) %>%
+  group_by(bird_reference) %>%
+  mutate(MRI = case_when(
+    observation_date > MRI_before_observation_date & 
+      (MRI_before == 1 | MRI_before == 5) & 
+      ((MRI_after == 0 & observation_date < MRI_after_observation_date) | 
+         is.na(MRI_after)) ~ 4,
+    observation_date > MRI_before_observation_date & 
+      MRI_before == 0 & 
+      ((MRI_after == 1 & observation_date < MRI_after_observation_date) | 
+         is.na(MRI_after)) ~ 0,
+    TRUE ~ MRI)) %>%
+  select(names(obs_and_acts))
+obs_ref_assign_last_MRI <- obs_and_acts_assign_last_MRI %>%
+  distinct(observation_reference) %>%
+  pull(observation_reference)
+obs_and_acts <-
+  obs_and_acts %>%
+  filter(! observation_reference %in% obs_ref_assign_last_MRI) %>%
+  bind_rows(obs_and_acts_assign_last_MRI) %>%
+  arrange(bird_reference, observation_date)
+obs_and_acts
+```
+
 
 ### Observation status
 
