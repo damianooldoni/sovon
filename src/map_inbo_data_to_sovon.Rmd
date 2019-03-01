@@ -1316,7 +1316,8 @@ A preview:
 ```{r}
 crbirding_birds %>%
   filter(bird_reference %in% 
-           (test %>% filter(is.na(bird_shorthand)) %>% pull(bird_reference))) %>%
+           (rngme_before_rngkl %>% 
+              pull(bird_reference))) %>%
   head(n = 50)
 ```
 
