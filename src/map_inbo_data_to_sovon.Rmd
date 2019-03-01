@@ -2355,20 +2355,6 @@ obs_and_acts %>%
 ))
 ```
 
-### MRI: metal ring information
-
-Metal ring information table can be found at page 8 of [this pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf)
-
-A summary of the mapping follows:
-
-1. observations with action code `meweg` should be mapped to 0 (metal ring is not present)
-
-Further mapping steps need the knowledge of an expert.
-
-```{r MRI}
-
-```
-
 ### Bird age ringing
 
 The required field `bird_age_ringing` is the same as the field `bird_age_ringing` in dataframe `crbirding_birds`:
