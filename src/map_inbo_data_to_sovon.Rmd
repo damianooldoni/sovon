@@ -2081,24 +2081,24 @@ obs_and_acts %>%
   head(n = 50)
 ```
 
-MRI is 4 for observations linked to action `me`:
+MRI is 4 for observations linked to action `me` (metal ring read) or `klweg` (color ring missing):
 
-```{r MRI_4}
-obs_ref_me <- 
+```{r MRI_4_me_klweg}
+obs_ref_me_klweg <- 
   obs_and_acts %>%
-  filter(raw_AktieCode == "me") %>%
+  filter(raw_AktieCode %in% c("me", "klweg")) %>%
   pull(observation_reference)
 
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_me, 4, MRI))
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_me_klweg, 4, MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_4}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_me) %>%
+  filter(observation_reference %in% obs_ref_me_klweg) %>%
   select(observation_reference, bird_reference, raw_AktieCode, MRI) %>%
   head(n = 50)
 ```
