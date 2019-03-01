@@ -2126,6 +2126,29 @@ obs_and_acts %>%
   head(n = 50)
 ```
 
+MRI is 4 for observations linked to action `klweg` (color ring missing):
+
+```{r MRI_4_klweg}
+obs_ref_klweg <- 
+  obs_and_acts %>%
+  filter(raw_AktieCode == "klweg") %>%
+  distinct(observation_reference) %>%
+  pull(observation_reference)
+
+obs_and_acts_test <- 
+  obs_and_acts %>%
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_klweg, 4, MRI))
+```
+
+Preview of changes:
+
+```{r preview_changes_MRI_4_klweg}
+obs_and_acts %>%
+  filter(observation_reference %in% obs_ref_klweg) %>%
+  select(observation_reference, bird_reference, raw_AktieCode, MRI) %>%
+  head(n = 50)
+```
+
 ```
 
 ### Observation status
