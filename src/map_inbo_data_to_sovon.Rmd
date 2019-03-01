@@ -2103,22 +2103,19 @@ obs_and_acts %>%
   head(n = 50)
 ```
 
-MRI is 0 for observations linked to action `meweg` and no `vang` (a new metal ring is applied when a bird without metal ring is caught):
+MRI is 0 for observations linked to action `meweg` (metal ring missing):
 
-```{r}
-obs_ref_meweg_no_vang <- 
+```{r MRI_0_meweg}
+obs_ref_meweg <- 
   obs_and_acts %>%
   filter(raw_AktieCode == "meweg") %>%
   distinct(observation_reference) %>%
-  anti_join(obs_and_acts %>%
-              filter(raw_AktieCode == "vang") %>%
-              distinct(observation_reference),
-            by = "observation_reference") %>%
   pull(observation_reference)
 
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_meweg_no_vang, 0, MRI))
+  mutate(MRI = ifelse(observation_reference %in% obs_ref_meweg, 0, MRI))
+```
 ```
 
 ### Observation status
