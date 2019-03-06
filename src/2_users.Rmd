@@ -6,13 +6,13 @@ This pipeline will map user data.
 
 We start from the user tempoary data saved in TSV file `users.tsv` in folder `data\interim`:
 
-```{r}
+```{r import_temp_users}
 users <- read_tsv(here::here("data", "interim", "users.tsv"))
 ```
 
 Number of users:
 
-```{r}
+```{r n_row_users}
 nrow(users)
 ```
 

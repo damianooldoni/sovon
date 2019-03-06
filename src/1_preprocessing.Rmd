@@ -605,10 +605,24 @@ all(observers_ids %in% users$Nummer)
 
 # Save preprocessed data
 
-After data cleaning we save the data as TSVs:
+After data cleaning we save the data as TSVs in `.data/interim`:
 
 ```{r}
 write_tsv(users, path = here::here("data", "interim", "users.tsv"), na = "")
 write_tsv(birds, path = here::here("data", "interim", "birds.tsv"), na = "")
-write_tsv(obs_and_acts, path = here::here("data", "interim", "obs_and_actions.tsv"), na = "")
+write_tsv(
+  obs_and_acts, 
+  path = here::here("data", "interim", "obs_and_actions.tsv"), 
+  na = "")
 ```
+
+We save the table containing actions code and relative meaning in `./data/input` as it could be useful in following mapping steps:
+
+```{r save_actions_meaning}
+write_tsv(
+  actions_meaning, 
+  path = here::here("data", "input", "actions_meaning.tsv"), 
+  na = ""
+)
+```
+
