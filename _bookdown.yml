@@ -1,0 +1,22 @@
+# Temp file created while building:
+book_filename: mapping_color_ring_data_to_sovon.Rmd
+
+# Delete temp file after building:
+delete_merged_file: true
+
+# Generate output in:
+output_dir: docs
+
+# Order of the chapters (= which Rmd files to include):
+rmd_files: [
+  index.Rmd,
+  src/1_preprocessing.Rmd,
+  src/2_users.Rmd,
+  src/3_birds.Rmd,
+  src/4_observations.Rmd
+]
+
+# Where Rmd files are kept:
+edit: https://github.com/trias-project/unified-checklist/blob/master/src/%s
+
+# All other settings are defined in index.Rmd

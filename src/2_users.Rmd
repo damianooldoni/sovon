@@ -1,0 +1,139 @@
+# Goal
+
+This pipeline will map user data.
+
+# Map user data
+
+## E-mail
+
+```{r e-mail}
+users <- users %>%
+  mutate(sovon_user_email = raw_Email)
+```
+
+## First name
+
+```{r first_name}
+users <- users %>%
+  mutate(sovon_user_first_name = raw_Voornaam)
+```
+
+## Last name
+
+```{r last_name}
+users <- users %>%
+  mutate(sovon_user_last_name = raw_Familienaam)
+```
+
+## Address
+
+```{r address}
+users <- users %>%
+  mutate(sovon_user_address = raw_Adres)
+```
+
+## Place
+
+```{r place}
+users <- users %>%
+  mutate(sovon_user_place = raw_Gemeente)
+```
+
+## Postal code
+
+```{r postal_code}
+users <- users %>%
+  mutate(sovon_user_postal_code = raw_Postcode)
+```
+
+## Country
+
+```{r country}
+users <- users %>%
+  mutate(sovon_user_country = raw_LandCode)
+```
+
+## User ID
+
+User identifiers are provided by SOVON. `NA` is given.
+
+```{r userID}
+users <- users %>%
+  mutate(sovon_user_id  = NA)
+```
+
+## User reference
+
+We use the unique ID in `raw_Nummer`:
+
+```{r user_ref}
+users <- users %>%
+  mutate(sovon_user_reference  = raw_Nummer)
+```
+
+## User language
+
+This field is not present in `users`. However, all accounts have been made by INBO in Dutch:
+
+```{r user_language}
+users <- users %>%
+  mutate(sovon_user_language  = "Dutch")
+```
+
+# Create `crbirding_users`
+
+Export the needed columns to `crbirding_users`:
+
+```{r make_crbirding_users}
+crbirding_users <- 
+  users %>%
+  select(starts_with("sovon_"))
+```
+
+Remove prefix `sovon_`:
+
+```{r remove prefix_sovon}
+names(crbirding_users) <- str_remove_all(names(crbirding_users), pattern = "sovon_")
+```
+
+Are all required columns present?
+
+```{r check_presence_required_cols_users}
+all(cr_users_cols %in% names(crbirding_users))
+```
+
+The desired order of columns in `crbirding_users`:
+
+```{r cols_order_users}
+cr_users_cols <- c(
+  "user_id", "user_reference", "user_email", "user_first_name",
+  "user_last_name", "user_address", "user_postal_code", "user_place",
+  "user_country", "user_language", "user_role"
+)
+```
+
+Set column order:
+
+```{r get_right_order_cols_users}
+crbirding_users <-
+  crbirding_users %>%
+  select(cr_users_cols)
+```
+
+Preview data (e-mail, first and last names removed for privacy reasons):
+
+```{r final_preview_users}
+crbirding_users %>%
+  select(-c(user_email, user_first_name, user_last_name)) %>%
+  head(n = 10)
+```
+
+Save to text file (tab separated value):
+
+```{r write_user_data_txt}
+write_tsv(crbirding_users, 
+          path = here("data", "processed", "crbirding_users.tsv"), 
+          na = "")
+```
+
+**Note**: the very last field, `user_role`, will be mapped at the end of `3_birds.Rmd`.

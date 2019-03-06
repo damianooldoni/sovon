@@ -1,0 +1,615 @@
+---
+title: "Import and preprocess INBO color ring data"
+author: 
+- Damiano Oldoni
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: yeti
+    df_print: paged
+knit: (function(input_file, encoding) { rmarkdown::render(input_file, encoding = encoding, output_file = paste0("./docs/",sub(".Rmd", ".html", basename(input_file))))})
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Goal
+
+This pipeline will:
+
+1. extract data from INBO *kleurring* database
+2. perform some checks and data cleaning
+3. save temporary data as text files
+
+# Extract data from INBO kleurring database
+
+## Connection to INBO database
+
+We establish a connection to the database. Sensible data are saved in the `Renviron.site` file:
+
+```{r connect_to_db}
+conn <- dbConnect(odbc::odbc(),
+                  driver = Sys.getenv("driver"),
+                  server = Sys.getenv("server"),
+                  database = Sys.getenv("database"),
+                  port = Sys.getenv("port"),
+                  trusted_connection = Sys.getenv("tc"))
+```
+
+## Import data
+
+### Extract user data
+
+First, we extract data about users from INBO *kleurring* database:
+
+```{r get_user_data}
+users <-  dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemer") %>%
+    as_tibble()
+```
+
+### Extract color ring data
+
+```{r get_birds_data}
+birds <- dbGetQuery(conn, "SELECT * FROM dbo.tblKleurring") %>%
+  as_tibble()
+```
+
+### Extract observation data
+
+INBO's observation data contain a text type field: `Opmerking`. Text type is deprecated and an error will be returned if we perform the standard SQL query `"SELECT * FROM dbo.tblWaarneming"`. So, we need an ad-hoc query:
+
+```{r get_obs_data}
+obs <- dbGetQuery(conn,
+  "SELECT Nummer,
+          Datum,
+          EuringCode,
+          LeeftijdCode,
+          KleurringNummer,
+          KleurringPlaats,
+          MetaalringNummer,
+          MetaalringPlaats,
+          PlaatsGemeente,
+          PlaatsToponym,
+          PlaatsToponymDetail,
+          Convert(nvarchar(4000),Opmerking) as Opmerking,
+          WaarnemerNummer,
+          PlaatsLengtegraadGraden,
+          PlaatsLengtegraadMinuten,
+          PlaatsLengtegraadSeconden,
+          PlaatsBreedtegraadGraden,
+          PlaatsBreedtegraadMinuten,
+          PlaatsBreedtegraadSeconden,
+          PlaatsLengtegraadRichtingCode,
+          PlaatsBreedtegraadRichtingCode,
+          PlaatsLandCode,
+          MetaalringLandCode,
+          BevestigingDatum,
+          PlaatsProvincie,
+          AanmaakDatum,
+          WijzigDatum
+  FROM dbo.tblWaarneming") %>% as_tibble()
+```
+
+Table `tblWaarnemingAktie` is also important because contains informations about the actions taken at each observation:
+
+```{r get_waarnemingAktie}
+obs_actions <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemingAktie")
+```
+
+The action codes are described in table `dbo.cdeAktie`:
+
+```{r get_}
+actions_meaning <- dbGetQuery(conn, "SELECT * FROM dbo.cdeAktie")
+actions_meaning
+```
+
+Close connection to server:
+
+```{r close_connection}
+dbDisconnect(conn)
+```
+
+### Import control data
+
+From UVABIT repository, we copied a text file containing the mapping of GPS ids:
+
+```{r import_GPS_names_ids}
+map_gps_path <- here::here("data", "external", "map_gps_id_to_color_ring.tsv")
+map_gps <- 
+  read_tsv(map_gps_path) %>%
+  mutate(bird_notes = "uvabits_gps_tag.")
+map_gps %>% head()
+```
+
+This file will be used later in this same document.
+
+# Pre-processing
+
+## Preview raw data
+
+For privcay reasons users data cannot be shown. Users data refer to the following fields:
+
+```{r prview_users}
+colnames(users)
+```
+
+Preview birds data:
+
+```{r preview_birds}
+birds %>% head()
+```
+
+Preview observations data:
+
+```{r preview_obs}
+obs %>% head()
+```
+
+Preview observation actions data:
+
+```{r prview_obs_actions}
+obs_actions %>% head()
+```
+
+## Check spaces in `birds`
+
+No spaces should be present in any column of `birds`:
+
+```{r check_spaces}
+map_dfr(birds, ~ mutate(birds, space_detect = str_detect(., pattern = " "))) %>%
+  filter(space_detect == TRUE)
+```
+
+Remove all spaces:
+
+```{r remove_spaces}
+birds <- birds %>% 
+  mutate_all(funs(str_replace(., " ", "")))
+```
+
+## Check duplicates `WaarnemingNummer`-`AktieCode`
+
+The action acronym is contained in column `AktieCode`. Observations and their actions are linked via columns `WaarnemingNummer` (in `actions`) and `Nummer` (in `obs`).
+
+No duplicates `WaarnemingNummer`-`AktieCode` should exist:
+
+```{r show_duplicates_actions}
+obs_actions %>% 
+  filter(WaarnemingNummer %in% 
+           (obs_actions %>% 
+              group_by(WaarnemingNummer, AktieCode) %>% 
+              count() %>%
+              filter(n > 1) %>%
+              pull(WaarnemingNummer))
+)
+```
+
+Otherwise they should be removed:
+
+```{r to_be_removed}
+obs_actions <- 
+  obs_actions %>% 
+  distinct(WaarnemingNummer, AktieCode, .keep_all = TRUE)
+```
+
+## Merge observations and actions
+
+In order to ease the mapping of birds and observations, we first remove columns will be never used: 
+
+```{r remove_cols_not_used}
+obs_actions <- 
+  obs_actions %>% 
+  select(-c(Nummer,
+            AanmaakDatum, 
+            WijzigDatum)
+)
+```
+
+Then we *spread* action codes to columns:
+
+```{r }
+obs_actions <- 
+  obs_actions %>%
+  spread(AktieCode, AktieCode)
+```
+
+The following combinations occurr:
+
+```{r distinct_combinations_actions}
+combinations_actions <- obs_actions %>%
+  select(-WaarnemingNummer) %>%
+  distinct()
+combinations_actions
+```
+
+The following actions are at least once present in database:
+
+```{r colnames_actions_present}
+acts <- names(combinations_actions)
+```
+
+Actions described in `actions_meaning` never used:
+
+```{r no_used_actions}
+actions_meaning %>%
+  filter(!Code %in% acts)
+```
+
+We add action code columns to observations in order to have a unique dataframe:
+
+```{r merge_obs_with_acts}
+obs_and_acts <- 
+  obs %>% 
+  left_join(obs_actions, by = c("Nummer" = "WaarnemingNummer"))
+```
+
+Preview: 
+
+```{r merge_obs_with_acts}
+head(obs_and_acts, n = 100)
+```
+
+## Check spaces in `obs_and_acts`
+
+No spaces should be present in character columns of `obs_and_acts` except for columns related to place description (`Plaats*`), datums (`*Datum`) and notes (`Opmerking`):
+
+```{r show_spaces_obs_and_acts}
+map_dfr(obs_and_acts %>%
+          select_if(is.character) %>%
+          select(-c(starts_with("Plaats"), 
+                    Opmerking, 
+                    ends_with("Datum"))), ~ 
+          mutate(obs_and_acts, space_detect = str_detect(., pattern = " "))) %>%
+  filter(space_detect == TRUE) %>%
+  arrange(Nummer)
+```
+
+Remove spaces:
+
+```{r remove_spaces_from_obs_and_acts}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate_at(vars(-c(starts_with("Plaats"),
+                 ends_with("Datum"),
+                 one_of("Opmerking", "Nummer", "WaarnemerNummer"))), 
+            funs(str_replace(., " ", ""))
+)
+```
+
+## Check presence action code
+
+All observations should also have an action code:
+
+```{r observations_without_action}
+no_actions <- 
+  obs_and_acts %>%
+  filter_at(vars_select(names(obs_and_acts), one_of(acts)), all_vars(is.na(.)))
+no_actions
+```
+
+Observation without it will be removed:
+
+```{r remove_observations_without_action}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  filter(!Nummer %in% no_actions$Nummer)
+```
+
+## Remove data labelled as `FOUT`
+
+There are observations judged as error. They are marked by`KleurringNummmer` equal to `FOUT`:
+
+```{r show_FOUT_obs}
+obs_and_acts %>% 
+  filter(KleurringNummer == "FOUT") %>%
+  head(n = 10)
+```
+
+The value `FOUT` is also present in `birds`:
+
+```{r show_FOUT_birds}
+birds %>% 
+  filter(Nummer == "FOUT")
+```
+
+These data are related to observations judged not correct (`FOUT`: _error_) by the INBO experts and administrator of the database.
+
+Thus, at the moment, we remove these data (discussion about this issue [here](https://github.com/inbo/sovon/issues/9)) from observations:
+
+```{r remove_FOUT_obs}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  filter(KleurringNummer != "FOUT")
+```
+
+and from birds: 
+
+```{r remove_FOUT_birds}
+birds <- 
+  birds %>% filter(Nummer != "FOUT")
+```
+
+## Check color rings: uppercase
+
+Bird color rings codes are uppercase. Exceptions:
+
+```{r show_rings_lowercase}
+birds %>%
+  filter(Nummer != toupper(Nummer) | 
+           NummerNieuw != toupper(NummerNieuw))
+```
+
+are converted to uppercase:
+
+```{r convert_rings_to_uppercase}
+birds <- birds %>%
+  mutate(Nummer = toupper(Nummer),
+         NummerNieuw = toupper(NummerNieuw),
+         NummerDesc = toupper(NummerDesc))
+```
+
+The same holds true for `KleurringNummer` in `obs_and_acts`. Exceptions:
+
+```{r lowercase_kleurringNummer}
+obs_and_acts %>% 
+  filter(KleurringNummer != toupper(KleurringNummer)) %>% 
+  distinct(KleurringNummer)
+```
+
+are transformed to uppercase:
+
+```{r KleurringNummer_to_upper}
+obs_and_acts <- obs_and_acts %>% 
+  mutate(KleurringNummer = toupper(KleurringNummer))
+```
+
+## Check keys `KleurringNummer` (obs) - `Nummer` (birds)
+
+All values in `KleurringNummer` should be present in `birds$Nummer`. Exceptions:
+
+```{r KleurringNummer_not_in_birds_Nummer}
+obs_and_acts %>%
+  filter(!KleurringNummer %in% birds$Nummer) %>% 
+  distinct(KleurringNummer)
+```
+
+We remove them:
+
+```{r remove_obs_and_acts_linked_to_invalid_bird_ring}
+KleurringNummer_remove <- 
+  obs_and_acts %>%
+  filter(!KleurringNummer %in% birds$Nummer) %>% 
+  distinct(KleurringNummer) %>%
+  pull()
+obs_and_acts <- 
+  obs_and_acts %>% 
+  filter(!KleurringNummer %in% KleurringNummer_remove)
+```
+
+Finally, we search for birds (`Nummer` in  `birds`) not linked to any observation (`KleurringNummer` in `obs_and_acts`):
+
+```{r birds_not_in_obs}
+birds %>% filter(!Nummer %in% obs_and_acts$KleurringNummer)
+```
+
+We remove them:
+
+```{r remove_birds_not_in_obs}
+birds <- 
+  birds %>% 
+  filter(Nummer %in% obs_and_acts$KleurringNummer)
+```
+
+## Check duplicates in date of applying rings
+
+Detect duplicates in date of applying (the very first) color ring (action code `rngkl`):
+
+```{r duplicates_apply_first_color_ring}
+duplicates_ringing_rngkl <- 
+  obs_and_acts %>%
+  filter(!is.na(rngkl)) %>%
+  distinct(KleurringNummer, Datum, rngkl)  %>%
+  group_by(KleurringNummer, Datum, rngkl) %>%
+  count() %>%
+  filter(n > 1) %>%
+  select(-n) %>%
+  left_join(obs_and_acts,
+            by = c("KleurringNummer", "Datum", "rngkl")) %>%
+  select(Nummer, everything())
+duplicates_ringing_rngkl
+```
+
+and metal ring (action code `rngme`):
+
+```{r duplicates_apply_first_metal_ring}
+duplicates_ringing_rngme <- 
+  obs_and_acts %>%
+  filter(!is.na(rngkl)) %>%
+  distinct(KleurringNummer, Datum, rngme)  %>%
+  group_by(KleurringNummer, Datum, rngme) %>%
+  count() %>%
+  filter(n > 1) %>%
+  select(-n) %>%
+  left_join(obs_and_acts,
+            by = c("KleurringNummer", "Datum", "rngme")) %>%
+  select(Nummer, everything())
+duplicates_ringing_rngme
+```
+
+## Check age while applying rings
+
+For each bird, observations with same date should refer to same bird age. Exceptions:
+
+```{r check_anomalies_age_ringing}
+obs_and_acts %>%
+  filter(!is.na(LeeftijdCode)) %>%
+  filter(!is.na(rngkl) | !is.na(rngme)) %>%
+  distinct(KleurringNummer, Datum, LeeftijdCode)  %>%
+  group_by(KleurringNummer, Datum) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(obs_and_acts %>%
+              filter(!is.na(LeeftijdCode)) %>%
+              select(Nummer, KleurringNummer, Datum, 
+                     LeeftijdCode, rngkl, rngme)) %>%
+  select(-n) %>%
+  select(Nummer, KleurringNummer, Datum, 
+         LeeftijdCode, rngkl, rngme
+)
+```
+
+## Check bird sex inconsistencies
+
+All birds should have a sex, which could be one of `M` (_mannetje_), `V` (_vrouwtje_), `O` (_onbekend_):
+
+```{r present_GeslachtCode}
+distinct(birds, GeslachtCode)
+```
+
+Exceptions:
+
+```{r exceptions_bird_sex}
+birds %>%
+  filter(is.na(GeslachtCode)) %>%
+  distinct(Nummer, NummerNieuw, NummerDesc, GeslachtCode)
+```
+
+For all birds a one-to-one relation bird - sex should hold true:
+
+```{r check_one-to-one_bird_sex}
+birds %>% 
+  distinct(Nummer, GeslachtCode) %>%
+  nrow() == nrow(birds)
+```
+
+## Handle information about metal ring number
+
+There are columns containing metal ring related information in `birds`:
+
+```{r cols_metal_ring_birds}
+names(birds)[which(str_detect(names(birds), "Metaalring"))]
+```
+
+and `obs_and_acts`:
+
+```{r cols_metal_ring_obs_and_acts}
+names(obs_and_acts)[which(str_detect(names(obs_and_acts), "Metaalring"))]
+```
+
+This is not only redundant: inconsistencies are detected. Some examples:
+
+```{r inconsisntecy_metal_ring_info_examples}
+birds %>%
+  filter(Nummer %in% c("AAAA", "AAAR", "AAAT", "AAAW")) %>%
+  rename("metal_ring_from_birds"  = "MetaalringNummer") %>%
+  left_join(obs_and_acts %>%
+              rename("metal_ring_from_obs"  = "MetaalringNummer"),
+            by = c("Nummer" =  "KleurringNummer")) %>%
+  distinct(Nummer, metal_ring_from_birds, metal_ring_from_obs)
+```
+
+Based on experts' knowledge only the metal ring information in `birds` is correct. We rename the columns related to metal ring information from `obs_and_acts` by adding suffix `_obs`:
+
+```{r remove_metal_ring_infos_from_obs}
+obs_and_acts <-
+  obs_and_acts %>%
+  rename_at(vars(starts_with("Metaalring")),
+            ~ paste0(., "_obs"))
+```
+
+## Solve GPS tracker IDs
+
+Some birds have a suspect `Nummer` which is formed by letters `GPS` or `GP` followed by some numbers. These are a kind of GPS IDs which should not be in columns related to color rings:
+
+```{r show_gps_ids}
+birds %>%
+  filter(str_detect(Nummer, pattern = "(^(GP)\\d+)|(^(GPS)\\d+)")) %>%
+  select(Nummer)
+```
+
+The right mapping of them is saved in `map_gps`:
+
+```{r preview_map_gps}
+map_gps %>% head()
+```
+
+We import the color rings in new column `first_Nummer`. For all other rings will be `first_nummer = Nummer` as they are the very first rings:
+
+```{r map_to_first_Nummer}
+birds <- 
+  birds %>%
+  # create column first_Nummer with right color rings for the GPS or GP** risngs
+  left_join(map_gps, by = c("Nummer" = "gps_id")) %>%
+  # set first_Numer equal to Nummer in all other cases
+  mutate(first_Nummer = ifelse(is.na(color_ring),
+                               Nummer,
+                               color_ring)) %>%
+  select(Nummer, first_Nummer, everything())
+```
+
+Check whether not corrected rings (`GP***` or `GPS***`) are still present:
+
+```{r check_presence_GP_GPS_in_birds}
+birds %>%
+  filter(str_detect(first_Nummer, pattern = "(^(GP)\\d+)|(^(GPS)\\d+)")) %>%
+  select(first_Nummer)
+```
+
+Mapping example: the bird with `Nummer` equal to `GP130` is mapped as follows:
+
+```{r example_gps_mapping_and_name}
+birds %>%
+  filter(Nummer == "GP130") %>%
+  select(Nummer, first_Nummer, bird_notes)
+```
+
+Column `first_Nummer` should contain unique elements. Check for exceptions:
+
+```{r check_uniqueness_first_Nummer}
+birds %>%
+  group_by(first_Nummer) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(birds) %>%
+  select(-n)
+```
+
+Exceptions are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions, if present, should be handled separately while mapping `bird_shorthand` in document `3_birds.Rmd`.
+
+## Check inconsistencies between users and observers
+
+We have to be sure that all observations have a valid observator reference, i.e. an ID contained in column `Nummer` of `users`.
+
+Observations without an observator reference:
+
+```{r WaarnemerNummer_is_na}
+obs_and_acts %>%
+  filter(is.na(WaarnemerNummer))
+```
+
+All observator references in `obs_and_acts` should be present in `users`:
+
+```{r check_observators_in_users}
+observers_ids <- unique(
+  obs_and_acts %>%
+    filter(!is.na(WaarnemerNummer)) %>%
+    distinct(WaarnemerNummer) %>%
+    pull())
+all(observers_ids %in% users$Nummer)
+```
+
+# Save preprocessed data
+
+After data cleaning we save the data as TSVs:
+
+```{r}
+write_tsv(users, path = here::here("data", "interim", "users.tsv"), na = "")
+write_tsv(birds, path = here::here("data", "interim", "birds.tsv"), na = "")
+write_tsv(obs_and_acts, path = here::here("data", "interim", "obs_and_actions.tsv"), na = "")
+```
+

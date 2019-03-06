@@ -1,6 +1,46 @@
 ---
-title: ""
+title: "Import and preprocess INBO color ring data"
+author: Damiano Oldoni
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+github-repo: inbo/sovon
+output:
+  bookdown::gitbook:
+    split_by: rmd
+    df_print: paged
+    config:
+      search: no
+      sharing:
+        facebook: no
+        twitter: yes
+        all: []
 ---
 
-```{r, child = "../README.md"}
+```{r index-setup, include = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  rownames.print = FALSE # Option for df_print = paged
+)
+```
+
+# Intro
+
+This document contains and describes all the steps in mapping INBO color ring data to SOVON format. By running this document in R, it will create all the necessary data files. Settings to access INBO database are necessary.
+
+Load libraries:
+
+```{r load_libraries}
+library(DBI)            # To connect to database
+library(odbc)           # To connect to database
+library(stringr)        # To perform string operations
+library(stringi)        # To perform string operations
+library(readr)          # To read and write txt files
+library(dplyr)          # To transform data
+library(tidyr)          # To transform data
+library(purrr)          # To transform data via functions
+library(tidyselect)     # To select columns by matching
+library(measurements)   # To convert units of measurement 
+library(here)           # To find files
+library(lubridate)      # To ease working with dates
 ```
