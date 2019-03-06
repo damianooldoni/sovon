@@ -2,55 +2,78 @@
 
 This pipeline will map user data.
 
+# Read temporary user data
+
+We start from the user tempoary data saved in TSV file `users.tsv` in folder `data\interim`:
+
+```{r}
+users <- read_tsv(here::here("data", "interim", "users.tsv"))
+```
+
+Number of users:
+
+```{r}
+nrow(users)
+```
+
 # Map user data
+
+We map the original fields to SOVON fields.
 
 ## E-mail
 
 ```{r e-mail}
-users <- users %>%
-  mutate(sovon_user_email = raw_Email)
+users <- 
+  users %>%
+  mutate(sovon_user_email = Email)
 ```
 
 ## First name
 
 ```{r first_name}
-users <- users %>%
-  mutate(sovon_user_first_name = raw_Voornaam)
+users <- 
+  users %>%
+  mutate(sovon_user_first_name = Voornaam)
 ```
 
 ## Last name
 
 ```{r last_name}
-users <- users %>%
-  mutate(sovon_user_last_name = raw_Familienaam)
+users <- 
+  users %>%
+  mutate(sovon_user_last_name = Familienaam)
 ```
 
 ## Address
 
 ```{r address}
-users <- users %>%
-  mutate(sovon_user_address = raw_Adres)
+users <- 
+  users %>%
+  mutate(sovon_user_address = Adres)
 ```
 
 ## Place
 
 ```{r place}
-users <- users %>%
-  mutate(sovon_user_place = raw_Gemeente)
+users <- 
+  users %>%
+  mutate(sovon_user_place = Gemeente)
 ```
 
 ## Postal code
 
 ```{r postal_code}
-users <- users %>%
-  mutate(sovon_user_postal_code = raw_Postcode)
+users <- 
+  users %>%
+  mutate(sovon_user_postal_code = Postcode)
 ```
 
 ## Country
 
 ```{r country}
-users <- users %>%
-  mutate(sovon_user_country = raw_LandCode)
+users <- 
+  users %>%
+  mutate(sovon_user_country = LandCode)
 ```
 
 ## User ID
@@ -58,17 +81,19 @@ users <- users %>%
 User identifiers are provided by SOVON. `NA` is given.
 
 ```{r userID}
-users <- users %>%
+users <- 
+  users %>%
   mutate(sovon_user_id  = NA)
 ```
 
 ## User reference
 
-We use the unique ID in `raw_Nummer`:
+We use the unique ID in `Nummer`:
 
 ```{r user_ref}
-users <- users %>%
-  mutate(sovon_user_reference  = raw_Nummer)
+users <- 
+  users %>%
+  mutate(sovon_user_reference  = Nummer)
 ```
 
 ## User language
@@ -76,13 +101,14 @@ users <- users %>%
 This field is not present in `users`. However, all accounts have been made by INBO in Dutch:
 
 ```{r user_language}
-users <- users %>%
+users <- 
+  users %>%
   mutate(sovon_user_language  = "Dutch")
 ```
 
 # Create `crbirding_users`
 
-Export the needed columns to `crbirding_users`:
+Export the SOVON fields to `crbirding_users`:
 
 ```{r make_crbirding_users}
 crbirding_users <- 
@@ -93,13 +119,10 @@ crbirding_users <-
 Remove prefix `sovon_`:
 
 ```{r remove prefix_sovon}
-names(crbirding_users) <- str_remove_all(names(crbirding_users), pattern = "sovon_")
-```
-
-Are all required columns present?
-
-```{r check_presence_required_cols_users}
-all(cr_users_cols %in% names(crbirding_users))
+names(crbirding_users) <- str_remove_all(
+  names(crbirding_users), 
+  pattern = "sovon_"
+)
 ```
 
 The desired order of columns in `crbirding_users`:
@@ -112,12 +135,20 @@ cr_users_cols <- c(
 )
 ```
 
+Fields still not mapped:
+
+```{r check_presence_required_cols_users}
+cr_users_cols[which(!cr_users_cols%in% names(crbirding_users))]
+```
+
+The field `user_role` cannot be filled ath the moment: it will be mapped at the end of `3_birds.Rmd`.
+
 Set column order:
 
 ```{r get_right_order_cols_users}
 crbirding_users <-
   crbirding_users %>%
-  select(cr_users_cols)
+  select(cr_users_cols[cr_users_cols != "user_role"])
 ```
 
 Preview data (e-mail, first and last names removed for privacy reasons):
@@ -128,12 +159,12 @@ crbirding_users %>%
   head(n = 10)
 ```
 
-Save to text file (tab separated value):
+Save to TSV file `crbirding_users.tsv` in `./data/processed/`:
 
 ```{r write_user_data_txt}
-write_tsv(crbirding_users, 
-          path = here("data", "processed", "crbirding_users.tsv"), 
-          na = "")
+crbirding_users %>%
+  write_tsv(
+    path = here::here("data", "processed", "crbirding_users.tsv"), 
+    na = ""
+)
 ```
-
-**Note**: the very last field, `user_role`, will be mapped at the end of `3_birds.Rmd`.

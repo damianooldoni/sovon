@@ -612,4 +612,3 @@ write_tsv(users, path = here::here("data", "interim", "users.tsv"), na = "")
 write_tsv(birds, path = here::here("data", "interim", "birds.tsv"), na = "")
 write_tsv(obs_and_acts, path = here::here("data", "interim", "obs_and_actions.tsv"), na = "")
 ```
-
