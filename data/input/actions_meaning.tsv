@@ -1,0 +1,14 @@
+Code	Beschrijving	BeschrijvingUK	CodeExtern	CodeExternUK	Kolom
+rngkl	aanbrengen kleurring	apply colour ring	kl	co	L
+rngme	aanbrengen metaalring	apply metal ring	me	me	L
+klgev	alleen kleurring gevonden	only colour ring found	kg	cf	L
+megev	alleen metaal ring gevonden	only metal ring found	mg	mf	L
+br	broedend	nesting	br	ne	L
+vang	gevangen op nest	caught at the nest	vn	vn	L
+dood	kadaver	dead	do	de	R
+klweg	kleurring verloren	colour ring missing	kv	cm	R
+veld	losse waarneming	field observation	wa	ob	R
+meweg	metaalring verloren	metal ring missing	mv	mm	R
+me	metalen ring afgelezen	metal ring read	mt	mt	R
+vangl	vangst anders	caught otherwise	vl	ca	L
+ziek	ziek/gewond	ill/wounded	zi	il	R
