@@ -68,6 +68,16 @@ acts <- acts[acts %in% names(obs_and_acts)]
 acts
 ```
 
+## Observation reference
+
+The observation reference is an unique identifier assigned to each observation. This field exists already: `Nummer`.
+
+```{r add_obs_ref}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(sovon_observation_reference = Nummer)
+```
+
 ## Observation date
 
 The date is saved in column `Datum`. We copy it in required column `sovon_observation_date`:
@@ -185,16 +195,6 @@ The field `sovon_ring_number` contains information about the metal ring number, 
 obs_and_acts <-
   obs_and_acts %>%
   mutate(sovon_ring_number = NA_character_)
-```
-
-## Observation reference
-
-The observation reference is an unique identifier assigned to each observation, which could entail multiple actions. This field exists already: `Nummer`.
-
-```{r obs_ref}
-obs_and_acts <- 
-  obs_and_acts %>% 
-  mutate(sovon_observation_reference = Nummer)
 ```
 
 ## Observation status
