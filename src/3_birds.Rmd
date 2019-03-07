@@ -1354,7 +1354,20 @@ crbirding_users %>%
   count()
 ```
 
-## Save `crbirding_users.tsv`
+# Save modified temporary observation data
+
+We overwrite the temporary observation data based on the added columns:
+
+```{r overwrite_temp_obs_data}
+write_tsv(
+  obs_and_acts,
+  path = here::here("data", "interim", "obs_and_actions.tsv"),
+  na = "",
+  append = FALSE
+)
+```
+
+# Save `crbirding_users.tsv`
 
 The desired order of columns in `crbirding_users`:
 
