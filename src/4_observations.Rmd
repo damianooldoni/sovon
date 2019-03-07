@@ -1,32 +1,91 @@
 # Map observation data
 
-Our dataframe `obs_and_acts` contains informations related to all observations and related actions. By merging observations and actions we have sometimes multiple actions for same observation. Just an example:
+This pipeline will map observation data.
 
-```{r example_umltiple_actions_same_obs}
-obs_and_acts %>%
-  filter(bird_reference == 262) %>%
-  select(bird_reference, Nummer, Datum, AktieCode) %>%
-  arrange(Datum)
+# Read data
+
+## Read temporary observation data
+
+We start from the tempoary observation data saved as TSV file in `data\interim`:
+
+```{r import_temp_observations}
+obs_and_acts <- read_tsv(
+  here::here("data", "interim", "obs_and_actions.tsv"), 
+  guess_max = 50000
+)
+```
+
+## Read action data
+
+Import action codes and relative meaning:
+
+```{r import_actions_meaning}
+actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
+```
+
+## Read processed ring data
+
+We import finalized ring data from `./data/processed`:
+
+```{r import_final_ring_data}
+crbirding_birds <- read_tsv(
+  here::here("data", "processed", "crbirding_birds.tsv"), 
+  guess_max = 50000
+)
+```
+
+## Read temporary ring data
+
+We will need some columns from original INBO ring data. We import the temporary ring data as well:
+
+```{r import_birds_from_INBO_temp_data}
+birds <- read_tsv(
+  here::here("data", "interim", "birds.tsv"), 
+  guess_max = 50000
+)
+```
+
+## Read processed user data
+
+We import finalized user data from `./data/processed`:
+
+```{r import_final_ring_data}
+crbirding_users <- read_tsv(
+  here::here("data", "processed", "crbirding_users.tsv"), 
+  guess_max = 50000
+)
+```
+
+# Map color observation data
+
+## Extract action codes
+
+Actions present in `obs_and_acts` :
+
+```{r}
+acts <- actions_meaning$Code
+acts <- acts[acts %in% names(obs_and_acts)]
+acts
 ```
 
 ## Observation date
 
-The date is saved in column `Datum`. We copy it in required column `observation_date`:
+The date is saved in column `Datum`. We copy it in required column `sovon_observation_date`:
 
 ```{r obs_date}
 obs_and_acts <- 
   obs_and_acts %>% 
-  mutate(observation_date = Datum)
+  mutate(sovon_observation_date = Datum)
 ```
 
 ## Observation time
 
-No time is found for observations in `obs`. `NA` is given:
+There is no observation time in `obs_and_acts`. `NA` is given to `sovon_observation_time`:
 
 ```{r obs_time}
 obs_and_acts <- 
   obs_and_acts %>% 
-  mutate(observation_time = NA)
+  mutate(sovon_observation_time = NA)
 ```
 
 ## Observation latitude
@@ -37,7 +96,7 @@ Observation latitude should be converted to decimal degrees:
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    observation_lat = conv_unit(
+    sovon_observation_lat = conv_unit(
       str_c(PlaatsBreedtegraadGraden,
             PlaatsBreedtegraadMinuten,
             PlaatsBreedtegraadSeconden, 
@@ -54,7 +113,7 @@ Observation longitude should be converted to decimal degrees:
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    observation_long = conv_unit(
+    sovon_observation_long = conv_unit(
       str_c(PlaatsLengtegraadGraden,
             PlaatsLengtegraadMinuten,
             PlaatsLengtegraadSeconden, 
@@ -71,83 +130,143 @@ Aggregate information about observation location. We follow the following struct
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    observation_location = ifelse(!is.na(PlaatsToponym),
+    sovon_observation_location = ifelse(!is.na(PlaatsToponym),
                                   str_c(PlaatsGemeente,
                                         PlaatsToponym, 
                                         sep = ", "),
                                   paste(PlaatsGemeente))) %>%
   mutate(
-    observation_location = ifelse(!is.na(PlaatsToponymDetail),
-                                  str_c(observation_location,
+    sovon_observation_location = ifelse(!is.na(PlaatsToponymDetail),
+                                  str_c(sovon_observation_location,
                                         PlaatsToponymDetail,
                                         sep = ": "),
-                                  paste(observation_location)))
+                                  paste(sovon_observation_location)))
 ```
 
 ## Check bird
 
-The field `check_bird` is provided by SOVON. `NA` is given:
+The field `sovon_check_bird` is provided by SOVON. `NA` is given:
 
 ```{r check_bird}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(check_bird = NA)
+  mutate(sovon_check_bird = NA)
 ```
 
 ## Observation reporter reference number
 
-The field `melder_ringersnummer` is equal to `user_reference`:
+The field `sovon_melder_ringersnummer` is equal to `user_reference`:
 
-```{r melder_ringersnummer}
+```{r sovon_melder_ringersnummer}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(melder_ringersnummer = WaarnemerNummer)
+  mutate(sovon_melder_ringersnummer = WaarnemerNummer)
 ```
 
 ## Observation reporter
 
-The field `melder` is equal to `user_first_name` and `user_last_name` in `users`:
+The field `sovon_melder` is equal to `user_first_name` and `user_last_name` in `users`:
 
-```{r obs_melder}
+```{r obs_sovon_melder}
 obs_and_acts <- obs_and_acts %>%
   left_join(
-    users %>% 
-      select(Nummer, user_first_name, user_last_name),
-    by = c("WaarnemerNummer" = "Nummer")) %>%
-  mutate(melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
+    crbirding_users %>% 
+      select(user_reference, user_first_name, user_last_name),
+    by = c("WaarnemerNummer" = "user_reference")) %>%
+  mutate(sovon_melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
   select(-c(user_first_name, user_last_name))
 ```
 
 ## Ring number
 
-The field `ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
+The field `sovon_ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
 
 ```{r add_ring_number}
 obs_and_acts <-
   obs_and_acts %>%
-  mutate(ring_number = NA_character_)
+  mutate(sovon_ring_number = NA_character_)
 ```
 
 ## Observation reference
 
-The observation reference is an unique identifier (number) assigned to each observation, which could entail multiple actions. This field exists already: `Nummer`.
+The observation reference is an unique identifier assigned to each observation, which could entail multiple actions. This field exists already: `Nummer`.
 
 ```{r obs_ref}
 obs_and_acts <- 
   obs_and_acts %>% 
-  mutate(observation_reference = Nummer)
+  mutate(sovon_observation_reference = Nummer)
 ```
+
+## Observation status
+
+Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
+
+```{r breed_show}
+actions_meaning %>%
+  filter(Code %in% c("br", "vang"))
+```
+
+The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document, we define the following mapping:
+
+```{r obs_status}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_status = case_when(
+    !is.na("br")| !is.na(vang) ~ "N",
+    LeeftijdCode == "PU" ~ "-",
+    TRUE ~ "U"
+  ))
+```
+
+## Condition
+
+The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
+
+```{r obs_condition}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(condition = case_when(
+    !is.na(dood) ~ 1,
+    !is.na(vang) | !is.na(vangl) ~ 8,
+    !is.na(veld) ~ 7,
+    !is.na(ziek) ~ 4)
+)
+```
+
+## Bird age ringing
+
+The required field `bird_age_ringing` is the same as the field `bird_age_ringing` in dataframe `crbirding_birds`:
+
+```{r bird_age_ringing}
+obs_and_acts <- 
+  obs_and_acts %>%
+  left_join(crbirding_birds %>%
+              select(bird_reference, bird_date_begin, bird_date_end , bird_age_ringing),
+            by = c("bird_reference", "sovon_ring_number" = "bird_shorthand")) %>%
+  rename(sovon_bird_age_ringing = bird_age_ringing)
+```
+
+This means that for observations without `sovon_ring_number` the field `bird_age_ringing` will be empty:
+
+```{r check_bird_age_rining_NA}
+obs_and_acts %>%
+  filter(is.na(sovon_ring_number)) %>%
+  distinct(bird_age_ringing)
+```
+
 
 ## MRI: metal ring information
 
 Metal ring information is an integer between 0 and 9. A table can be found at page 8 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
 
-We initialize it:
+However, SOVON uses this field to map the observations referring to the applying of any kind of ring, either color or metal, as their database is purely focussed on color rings and due to a missing field in the EURING Exchange Code 2000+ specific for color rings.
+
+We initialize `sovon_MRI` as an empty column:
 
 ```{r intialize_MRI}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = NA_integer_)
+  mutate(sovon_MRI = NA_integer_)
 ```
 
 Position of metal ring:
@@ -157,73 +276,66 @@ birds %>%
   distinct(MetaalringPlaats)
 ```
 
-where `LL` means *left leg* and  `RL` means *right leg*. So, we will never have MRI values 2 or 3.
+where `LL` means *left leg* and  `RL` means *right leg*. So, we exclude MRI values 2, *Metal ring added, definitely on tarsus*, and 3, *Metal ring added, definitely above tarsus*.
 
-All observations linked to `rngme` get MRI equal to 1:
+All observations linked to `rngme` or `rngkl` get MRI equal to 1:
 
 ```{r set_MRI_1}
-obs_ref_rngme <- 
-  obs_and_acts %>%
-  filter(AktieCode == "rngme") %>%
-  pull(observation_reference)
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_rngme, 1, MRI))
+  mutate(sovon_MRI = ifelse(!is.na(rngme) | !is.na(rngkl), 1, sovon_MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_1}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_rngme) %>%
-  select(observation_reference, bird_reference, AktieCode, MRI) %>%
+  filter(sovon_MRI == 1) %>%
+  select(sovon_observation_reference, sovon_MRI, rngme, rngkl) %>%
   head(n = 50)
 ```
 
-MRI is 4 for observations linked to action `me` (metal ring read) or `klweg` (color ring missing):
+MRI is 4 for observations linked to action `me` (metal ring read)  `veld` (field observation, equiavelnt of colro ring read):
 
-```{r MRI_4_me_klweg}
-obs_ref_me_klweg <- 
-  obs_and_acts %>%
-  filter(AktieCode %in% c("me", "klweg")) %>%
-  pull(observation_reference)
-
+```{r MRI_4_me_veld}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_me_klweg, 4, MRI))
+  mutate(sovon_MRI = ifelse(!is.na(me) | !is.na(veld), 4, sovon_MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_4}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_me_klweg) %>%
-  select(observation_reference, bird_reference, AktieCode, MRI) %>%
+  filter(sovon_MRI == 4) %>%
+  select(sovon_observation_reference, sovon_MRI, me, veld) %>%
   head(n = 50)
 ```
 
-MRI is 0 for observations linked to action `meweg` (metal ring missing):
+MRI is 0 for observations of birds without any ring, thus linked to actions `meweg` (metal ring missing) and `klweg` (color ring missing):
 
 ```{r MRI_0_meweg}
-obs_ref_meweg <- 
-  obs_and_acts %>%
-  filter(AktieCode == "meweg") %>%
-  distinct(observation_reference) %>%
-  pull(observation_reference)
-
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_meweg, 0, MRI))
+  mutate(sovon_MRI = ifelse(!is.na(meweg) & !is.na(klweg), 0 , sovon_MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_0}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_meweg) %>%
-  select(observation_reference, bird_reference, AktieCode, MRI) %>%
+  filter(sovon_MRI == 0) %>%
+  select(sovon_observation_reference, sovon_MRI, me, veld) %>%
   head(n = 50)
 ```
+
+The actions `vang` related to a change of color ring can be found by checking the datum of the observation joined with table `crbirdin_birds`:
+
+```{r vang_with_change_color_ring}
+obs_and_acts %>%
+  mutate(sovon_MRI = if_else(!is.na(vang))
+```
+
 
 By screening the texual notes of observations related to `vang` with 6 or more consecutive numbers, we can see which observations refer to changing the metal ring (MRI equal to 5), which ones refer to apply a new metal ring as the old one is not present anymore (MRI equal to 1), and which ones confirm the presence of metal ring without any change (MRI equal to 4):
 
@@ -232,7 +344,7 @@ vang_notes <-
   obs_and_acts %>%
   filter(str_detect(Opmerking, pattern = "[0-9]{6,}")) %>%
   filter(AktieCode == "vang") %>%
-  select(observation_reference, Opmerking, bird_reference, Datum) %>%
+  select(sovon_observation_reference, Opmerking, bird_reference, Datum) %>%
   arrange(bird_reference)
 vang_notes
 ```
@@ -293,19 +405,19 @@ Assign MRI equal to 1 to observations linked to `vang` where a metal ring is add
 ```{r MRI_1_vang}
 obs_ref_vang_ring_added <- 
   vang_notes_metalring_added %>%
-  pull(observation_reference)
+  pull(sovon_observation_reference)
 
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_vang_ring_added, 1, MRI))
+  mutate(sovon_MRI = ifelse(sovon_observation_reference %in% obs_ref_vang_ring_added, 1, sovon_MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_1_vang}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_vang_ring_added) %>%
-  select(observation_reference, bird_reference, AktieCode, MRI) %>%
+  filter(sovon_observation_reference %in% obs_ref_vang_ring_added) %>%
+  select(sovon_observation_reference, bird_reference, AktieCode, sovon_MRI) %>%
   head(n = 50)
 ```
 
@@ -314,19 +426,19 @@ Assign MRI equal to 4 to observations linked to `vang` where a metal ring is alr
 ```{r MRI_4_vang}
 obs_ref_vang_ring_present <- 
   vang_notes_metalring_present_no_changed %>%
-  pull(observation_reference)
+  pull(sovon_observation_reference)
 
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_vang_ring_present, 4, MRI))
+  mutate(sovon_MRI = ifelse(sovon_observation_reference %in% obs_ref_vang_ring_present, 4, sovon_MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_4_vang}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_vang_ring_present) %>%
-  select(observation_reference, bird_reference, AktieCode, MRI)
+  filter(sovon_observation_reference %in% obs_ref_vang_ring_present) %>%
+  select(sovon_observation_reference, bird_reference, AktieCode, sovon_MRI)
 ```
 
 Assign MRI equal to 5 to observations linked to `vang` where a metal ring is changed:
@@ -334,19 +446,19 @@ Assign MRI equal to 5 to observations linked to `vang` where a metal ring is cha
 ```{r MRI_5_vang}
 obs_ref_vang_ring_changed <- 
   vang_notes_metalring_changed %>%
-  pull(observation_reference)
+  pull(sovon_observation_reference)
 
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(MRI = ifelse(observation_reference %in% obs_ref_vang_ring_changed, 5, MRI))
+  mutate(sovon_MRI = ifelse(sovon_observation_reference %in% obs_ref_vang_ring_changed, 5, sovon_MRI))
 ```
 
 Preview of changes:
 
 ```{r preview_changes_MRI_5_vang}
 obs_and_acts %>%
-  filter(observation_reference %in% obs_ref_vang_ring_changed) %>%
-  select(observation_reference, bird_reference, AktieCode, MRI)
+  filter(sovon_observation_reference %in% obs_ref_vang_ring_changed) %>%
+  select(sovon_observation_reference, bird_reference, AktieCode, sovon_MRI)
 ```
 
 The MRI chronology:
@@ -354,9 +466,9 @@ The MRI chronology:
 ```{r}
 MRI_chronology <- 
   obs_and_acts %>% 
-  filter(!is.na(MRI)) %>%
-  distinct(bird_reference, observation_reference, MRI, observation_date) %>%
-  arrange(bird_reference, observation_date)
+  filter(!is.na(sovon_MRI)) %>%
+  distinct(bird_reference, sovon_observation_reference, sovon_MRI, sovon_observation_date) %>%
+  arrange(bird_reference, sovon_observation_date)
 MRI_chronology
 ```
 
@@ -365,8 +477,8 @@ We correct MRI when a 5 follows a 0: it should be 1. This is the case of observa
 ```{r correct_5_to_1}
 MRI_chronology <-
   MRI_chronology %>%
-  mutate(MRI = ifelse(MRI == 5 & lag(MRI) == 0,
-                       MRI == 1, MRI))
+  mutate(sovon_MRI = ifelse(sovon_MRI == 5 & lag(sovon_MRI) == 0,
+                       sovon_MRI == 1, sovon_MRI))
 ```
 
 Now we can spread the table to create intervals for each row:
@@ -375,11 +487,11 @@ Now we can spread the table to create intervals for each row:
 MRI_chronology_spread <- 
   MRI_chronology %>%
   group_by(bird_reference) %>%
-  mutate(MRI_after = lead(MRI),
-         MRI_after_observation_date = lead(observation_date)) %>%
-  rename(MRI_before = MRI,
-         MRI_before_observation_date = observation_date,
-         observation_chronology = observation_reference)
+  mutate(MRI_after = lead(sovon_MRI),
+         MRI_after_sovon_observation_date = lead(sovon_observation_date)) %>%
+  rename(MRI_before = sovon_MRI,
+         MRI_before_sovon_observation_date = sovon_observation_date,
+         observation_chronology = sovon_observation_reference)
 MRI_chronology_spread
 ```
 
@@ -395,75 +507,19 @@ obs_and_acts_test <-
   left_join(MRI_chronology_spread,
             by = c("bird_reference")) %>%
   group_by(bird_reference) %>%
-  mutate(MRI = case_when(
-    observation_date > MRI_before_observation_date & 
+  mutate(sovon_MRI = case_when(
+    sovon_observation_date > MRI_before_sovon_observation_date & 
       (MRI_before == 1 | MRI_before == 5) & 
-      ((MRI_after == 0 & observation_date < MRI_after_observation_date) | 
+      ((MRI_after == 0 & sovon_observation_date < MRI_after_sovon_observation_date) | 
          is.na(MRI_after)) ~ 4,
-    observation_date > MRI_before_observation_date & 
+    sovon_observation_date > MRI_before_sovon_observation_date & 
       MRI_before == 0 & 
-      ((MRI_after == 1 & observation_date < MRI_after_observation_date) | 
+      ((MRI_after == 1 & sovon_observation_date < MRI_after_sovon_observation_date) | 
          is.na(MRI_after)) ~ 0,
-    TRUE ~ MRI)) %>%
+    TRUE ~ sovon_MRI)) %>%
   select(names(obs_and_acts))
 duplicated(obs_and_acts_test) | duplicated(obs_and_acts_test, fromLast = TRUE)
 nrow(obs_and_acts) == nrow(obs_and_acts_test)
-```
-
-## Observation status
-
-Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
-
-```{r breed_show}
-actions_meaning %>%
-  filter(Code %in% c("br", "vang"))
-```
-
-The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document, we define the following mapping:
-
-```{r obs_status}
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(status = case_when(
-    AktieCode %in% c("br", "vang") ~ "N",
-    LeeftijdCode == "PU" ~ "-",
-    TRUE ~ "U"
-  ))
-```
-
-## Condition
-
-The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
-
-```{r obs_condition}
-obs_and_acts %>%
-  mutate(condition = case_when(
-    AktieCode == "dood" ~ 1,
-    AktieCode %in% c("vang", "vangl") ~ 8,
-    AktieCode == "veld" ~ 7,
-    AktieCode == "ziek" ~ 4
-))
-```
-
-## Bird age ringing
-
-The required field `bird_age_ringing` is the same as the field `bird_age_ringing` in dataframe `crbirding_birds`:
-
-```{r bird_age_ringing}
-obs_and_acts <- 
-  obs_and_acts %>%
-  left_join(crbirding_birds %>%
-              select(bird_reference, bird_shorthand_pt, bird_age_ringing),
-            by = c("bird_reference", "ring_number" = "bird_shorthand_pt")
-)
-```
-
-This means that for observations without `ring_number` the field `bird_age_ringing` will be empty:
-
-```{r check_bird_age_rining_NA}
-obs_and_acts %>%
-  filter(is.na(ring_number)) %>%
-  distinct(bird_age_ringing)
 ```
 
 ## Observation notes
@@ -506,7 +562,6 @@ obs_and_acts <-
 )
 ```
 
-
 We have to add the note `no_color_ring.` to observations of birds not wearing any color ring (only metal ring), a situation tackled in previous section:
 
 ```{r add_note_no_color_ring}
@@ -526,52 +581,60 @@ Effects of mapping:
 
 ```{r}
 obs_and_acts %>%
-  filter(is.na(ring_number)) %>%
-  select(observation_reference, ring_number, observation_notes)
+  filter(is.na(sovon_ring_number)) %>%
+  select(sovon_observation_reference, sovon_ring_number, observation_notes)
 ```
-
-# Post-processing
-
-# User data 
-
 
 # Observation data
 
-Are all required columns present?
+Select the required columns, starting with prefix `sovon_`:
 
-```{r check_presence_required_cols_obs}
-all(cr_obs_cols %in% names(crbirding_obs))
+```{r select_sovoin_cols}
+crbirding_observations <-
+  crbirding_observations %>%
+  select(starts_with("sovon"))
 ```
 
-Set column orders of output files:
+The desired order of columns in `crbirding_observations`:
 
 ```{r cols_order_obs}
 cr_obs_cols <- c(
   "user_id", "user_reference", "bird_id", "bird_reference", "observation_id",
   "observation_reference", "observation_date", "observation_time", 
   "observation_lat", "observation_lng", "observation_location", 
-  "observation_is_capture", "observation_notes", "check_bird", "MRI", "Melder",
-  "Melder_email", "Melder_ringersnummer", "Ringnumber", "Conditie", 
-  "Bird_age_ringing", "Bird_sex"
+  "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
+  "melder_email", "melder_ringersnummer", "ring_number", "condition", "status", 
+  "bird_age_ringing", "bird_sex"
 )
+```
+
+Are all required columns present?
+
+```{r check_presence_required_cols_obs}
+all(cr_obs_cols %in% names(crbirding_observations)) & 
+  ncol(cr_obs_cols) == ncol(crbirding_observations)
 ```
 
 Set column order:
 
 ```{r get_right_order_cols_obs}
-crbirding_obs <-
-  crbirding_obs %>%
+crbirding_observations <-
+  crbirding_observations %>%
   select(cr_obs_cols)
 ```
 
 Preview data:
 
 ```{r final_preview_obs}
-crbirding_obs %>% head(n = 10)
+crbirding_observations %>% head(n = 10)
 ```
 
 Save to CSV:
 
-```{r write_obs_data_txt}
-write_csv(crbirding_obs, path = here("data", "processed", "crbirding_observations.tsv"), na = "")
+```{r write_processed_obs_data}
+write_csv(
+  crbirding_obs, 
+  path = here::here("data", "processed", "crbirding_observations.tsv"), 
+  na = ""
+)
 ```
