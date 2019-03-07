@@ -122,7 +122,7 @@ From UVABIT repository, we copied a text file containing the mapping of GPS ids:
 map_gps_path <- here::here("data", "external", "map_gps_id_to_color_ring.tsv")
 map_gps <- 
   read_tsv(map_gps_path) %>%
-  mutate(bird_notes = "uvabits_gps_tag.")
+  mutate(sovon_bird_notes = "uvabits_gps_tag.")
 map_gps %>% head()
 ```
 
@@ -565,7 +565,7 @@ Mapping example: the bird with `Nummer` equal to `GP130` is mapped as follows:
 ```{r example_gps_mapping_and_name}
 birds %>%
   filter(Nummer == "GP130") %>%
-  select(Nummer, first_Nummer, bird_notes)
+  select(Nummer, first_Nummer, sovon_bird_notes)
 ```
 
 Column `first_Nummer` should contain unique elements. Check for exceptions:
@@ -625,4 +625,3 @@ write_tsv(
   na = ""
 )
 ```
-
