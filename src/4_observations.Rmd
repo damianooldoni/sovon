@@ -565,7 +565,7 @@ We copy the notes in `Opmerking` to SOVON field  `observation_notes`:
 ```{r obs_notes}
 obs_and_acts <- 
   obs_and_acts %>% 
-  mutate(observation_notes = Opmerking)
+  mutate(sovon_observation_notes = Opmerking)
 ```
 
 As other notes could follow, we add a dot at the end of the notes if not present already:
@@ -574,13 +574,13 @@ As other notes could follow, we add a dot at the end of the notes if not present
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    observation_notes = 
+    sovon_observation_notes = 
       if_else(
-        !is.na(observation_notes) & str_length(observation_notes) > 0,
-        if_else(str_sub(observation_notes, -1) != ".",
-                str_c(observation_notes, ".", sep = ""),
-                observation_notes),
-        observation_notes)
+        !is.na(sovon_observation_notes) & str_length(sovon_observation_notes) > 0,
+        if_else(str_sub(sovon_observation_notes, -1) != ".",
+                str_c(sovon_observation_notes, ".", sep = ""),
+                sovon_observation_notes),
+        sovon_observation_notes)
 )
 ```
 
@@ -590,11 +590,11 @@ We also add the prefix `"INBO original notes:"`:
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    observation_notes = 
+    sovon_observation_notes = 
       if_else(
-        !is.na(observation_notes) & str_length(observation_notes) > 0,
-        str_c("INBO original notes:", observation_notes, sep = " "),
-        observation_notes)
+        !is.na(sovon_observation_notes) & str_length(sovon_observation_notes) > 0,
+        str_c("INBO original notes:", sovon_observation_notes, sep = " "),
+        sovon_observation_notes)
 )
 ```
 
