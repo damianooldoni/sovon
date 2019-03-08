@@ -228,15 +228,22 @@ obs_and_acts <-
 
 ## Condition
 
-The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
+The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. The following actions are mapped as follows:
+1. `dood`: condition = 1
+2. `vang`: condition = 8
+3. `vangl`: condition = 8
+4. `veld`: condition = 7
+5. `me`: condition = 7
+6. `ziek`: condition = 4, 5
 
 ```{r obs_condition}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(condition = case_when(
+  mutate(sovon_condition = case_when(
     !is.na(dood) ~ 1,
     !is.na(vang) | !is.na(vangl) ~ 8,
     !is.na(veld) ~ 7,
+    !is.na(me) ~ 7,
     !is.na(ziek) ~ 4)
 )
 ```
