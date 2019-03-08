@@ -56,6 +56,14 @@ crbirding_users <- read_tsv(
 )
 ```
 
+## Read list workers in bird shelters
+
+```{r import_workers}
+workers_bird_shelters <- read_tsv(
+  here::here("data", "input", "workers_in_bird_shelters.tsv")
+)
+```
+
 # Map color observation data
 
 ## Extract action codes
