@@ -11,7 +11,7 @@ We start from the tempoary observation data saved as TSV file in `data\interim`:
 ```{r import_temp_observations}
 obs_and_acts <- read_tsv(
   here::here("data", "interim", "obs_and_actions.tsv"), 
-  guess_max = 50000
+  guess_max = 500000
 )
 ```
 
