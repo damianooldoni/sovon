@@ -13,7 +13,7 @@ Import `birds.tsv`:
 ```{r import_temp_birds}
 birds <- read_tsv(
   here::here("data", "interim", "birds.tsv"), 
-  guess_max = 50000
+  guess_max = 500000
 )
 ```
 
