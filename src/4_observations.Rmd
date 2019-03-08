@@ -318,6 +318,14 @@ Metal ring information is an integer between 0 and 9. A table can be found at pa
 
 However, SOVON uses this field to map the observations referring to the applying of any kind of ring, either color or metal, as their database is purely focussed on color rings and due to a missing field in the EURING Exchange Code 2000+ specific for color rings.
 
+Some actions are related to this field and are mapped as follows: 
+1. `rngkl`: MRI = 1 
+2. `rngme`: MRI = 1
+3. `veld`: MRI = 4, 
+4. `me`: MRI = 4, 
+5. `vang` : MRI = 1,4 or 5
+6. `vangl` : MRI = 1,4 or 5
+
 We initialize `sovon_MRI` as an empty column:
 
 ```{r intialize_MRI}
