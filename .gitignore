@@ -42,3 +42,4 @@ rsconnect/
 # text file with users data (privacy reasons!)
 data/processed/crbirding_users.tsv
 data/interim/users.tsv
+data/input/workers_in_bird_shelters.tsv
