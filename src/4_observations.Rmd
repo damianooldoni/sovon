@@ -220,7 +220,7 @@ The actions `br` and `vang` refer to status `breeding` in EURING system. Based o
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(sovon_status = case_when(
-    !is.na("br")| !is.na(vang) ~ "N",
+    !is.na(br) | !is.na(vang) ~ "N",
     LeeftijdCode == "PU" ~ "-",
     TRUE ~ "U"
   ))
