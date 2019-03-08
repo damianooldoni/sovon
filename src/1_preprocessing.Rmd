@@ -648,7 +648,7 @@ write_tsv(
   na = "")
 ```
 
-We save the table containing actions code and relative meaning in `./data/input` as it could be useful in following mapping steps:
+We save the table containing action codes and relative meaning in `./data/input` as it could be useful in following mapping steps:
 
 ```{r save_actions_meaning}
 write_tsv(
