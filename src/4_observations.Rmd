@@ -248,27 +248,69 @@ obs_and_acts <-
 )
 ```
 
-## Bird age ringing
+The observations of sick birds not anymore released should get condition equal to 5. These observations are linked to the very last `ziek` action and followed by an observation with action `dood`. Not only, but the observer should be a worker of a bird shelter, in `workers_bird_shelters`.
 
-The required field `bird_age_ringing` is the same as the field `bird_age_ringing` in dataframe `crbirding_birds`:
+Reference number of observations with condition 5:
 
-```{r bird_age_ringing}
+```{r get_obs_cond_5}
+last_sick_df <- 
+  obs_and_acts %>%
+  filter(ziek == "ziek") %>%
+  group_by(sovon_bird_reference) %>%
+  filter(sovon_observation_date == max(sovon_observation_date)) %>%
+  ungroup() %>%
+  select(sovon_observation_reference, sovon_bird_reference, sovon_observation_date) %>%
+  rename(last_sick_date = sovon_observation_date,
+         obs_ref = sovon_observation_reference)
+dead_df <-
+  obs_and_acts %>%
+  filter(dood == "dood") %>%
+  select(sovon_bird_reference, sovon_observation_date) %>%
+  rename(dead_date = sovon_observation_date)
+last_sick_df <- 
+  last_sick_df %>%
+  filter(sovon_bird_reference %in% dead_df$sovon_bird_reference) %>%
+  left_join(dead_df, by = "sovon_bird_reference")
+
+condition_5_obs_ref <- 
+  obs_and_acts %>%
+  filter(sovon_bird_reference %in% last_sick_df$sovon_bird_reference) %>%
+  left_join(last_sick_df,
+            by = "sovon_bird_reference") %>%
+  group_by(sovon_bird_reference) %>%
+  filter(sovon_observation_date >= last_sick_date & 
+           sovon_observation_date < dead_date) %>%
+  count() %>%
+  # only one ziek action present
+  filter(n == 1) %>%
+  left_join(last_sick_df,
+            by = c("sovon_bird_reference")) %>%
+  pull(obs_ref)
+```
+
+Assign condition value `5` to these observations:
+
+```{r assign_5}
 obs_and_acts <- 
   obs_and_acts %>%
-  left_join(crbirding_birds %>%
-              select(bird_reference, bird_date_begin, bird_date_end , bird_age_ringing),
-            by = c("bird_reference", "sovon_ring_number" = "bird_shorthand")) %>%
-  rename(sovon_bird_age_ringing = bird_age_ringing)
+  mutate(sovon_condition = 
+           if_else(
+             sovon_observation_reference %in% condition_5_obs_ref, 
+             5,
+             sovon_condition)
+)
 ```
 
-This means that for observations without `sovon_ring_number` the field `bird_age_ringing` will be empty:
+Preview:
 
-```{r check_bird_age_rining_NA}
+```{r preview}
 obs_and_acts %>%
-  filter(is.na(sovon_ring_number)) %>%
-  distinct(bird_age_ringing)
+  filter(sovon_condition == 5) %>%
+  select(sovon_observation_reference, 
+         sovon_bird_reference, 
+         sovon_observation_date,
+         acts)
 ```
-
 
 ## MRI: metal ring information
 
