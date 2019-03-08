@@ -603,6 +603,38 @@ observers_ids <- unique(
 all(observers_ids %in% users$Nummer)
 ```
 
+## Remove data of common shelduck
+
+Data related to common shelduck, *Tadorna tadorna*, are not updated: INOB experts suggest to remove them from the mapping. More details [here](https://github.com/inbo/sovon/issues/54). Euring scheme: 01730.  We retrieve the values of field `Nummer` from `birds` related to this species:
+
+```{r common_shelduck_nummers}
+common_shellduck_nummer <- 
+  birds %>%
+  filter(EuringCode == "01730") %>%
+  pull(Nummer)
+```
+
+Number of birds to remove:
+
+```{r n_common_shelduck}
+length(common_shellduck_nummer)
+```
+
+We remove data from `birds`:
+
+```{r remove_common_shelduck_from_birds}
+birds <- birds %>%
+  filter(EuringCode != "01730")
+```
+
+and from `obs_and_acts`:
+
+```{r remove_common_shelduck_from_obs_and_acts}
+obs_and_acts <- 
+  obs_and_acts %>%
+  filter(!KleurringNummer %in% common_shellduck_nummer)
+```
+
 # Save preprocessed data
 
 After data cleaning we save the data as TSVs in `.data/interim`:
