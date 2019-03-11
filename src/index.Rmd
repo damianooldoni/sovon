@@ -1,5 +1,5 @@
 ---
-title: "Import and preprocess INBO color ring data"
+title: "Mapping INBO color ring data to SOVON format"
 author: Damiano Oldoni
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -39,8 +39,13 @@ library(readr)          # To read and write txt files
 library(dplyr)          # To transform data
 library(tidyr)          # To transform data
 library(purrr)          # To transform data via functions
-library(tidyselect)     # To select columns by matching
-library(measurements)   # To convert units of measurement 
+library(tidyselect)     # To select columns smartly
+library(measurements)   # To convert measurement units
 library(here)           # To find files
 library(lubridate)      # To ease working with dates
 ```
+
+The output of the data processing consists of three dataframes saved as tab separated files (`tsv`) in folder `data/processed/`:
+1.  `crbirding_users`: user data
+2. `crbirding_birds`: ring data
+3.  `crbirding_observations`: observation data
