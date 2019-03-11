@@ -19,7 +19,7 @@ obs_and_acts <- read_tsv(
 
 Import action codes and relative meaning:
 
-```{r import_actions_meaning}
+```{r import_actions_meaning2}
 actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
 ```
 
@@ -49,7 +49,7 @@ birds <- read_tsv(
 
 We import finalized user data from `./data/processed`:
 
-```{r import_final_ring_data}
+```{r import_final_user_data}
 crbirding_users <- read_tsv(
   here::here("data", "processed", "crbirding_users.tsv"), 
   guess_max = 50000
@@ -617,7 +617,7 @@ obs_and_acts <-
 
 The field `sovon_bird_sex` is equal to the bird sex in ring data:
 
-```{r sovon_bird_sex}
+```{r add_sovon_bird_sex_obs}
 obs_and_acts <- 
   obs_and_acts %>%
   left_join(crbirding_birds %>% 
@@ -716,7 +716,7 @@ obs_and_acts %>%
 
 We add the note `color_ring_added.` to observations linked to action `rngkl`:
 
-```{r add_note_no_color_ring}
+```{r add_note_color_ring_added}
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(
@@ -750,7 +750,7 @@ crbirding_observations <-
 
 Remove prefix `sovon_`:
 
-```{r remove prefix_sovon}
+```{r remove prefix_sovon_observations}
 names(crbirding_observations) <- str_remove_all(names(crbirding_observations), pattern = "sovon_")
 ```
 

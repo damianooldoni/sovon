@@ -118,7 +118,7 @@ crbirding_users <-
 
 Remove prefix `sovon_`:
 
-```{r remove prefix_sovon}
+```{r remove prefix_sovon_users}
 names(crbirding_users) <- str_remove(
   names(crbirding_users), 
   pattern = "sovon_"
@@ -137,7 +137,7 @@ cr_users_cols <- c(
 
 Fields still not mapped:
 
-```{r check_presence_required_cols_users}
+```{r users_fields_not_yet_mapped}
 cr_users_cols[which(!cr_users_cols%in% names(crbirding_users))]
 ```
 

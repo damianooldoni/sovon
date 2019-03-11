@@ -32,7 +32,7 @@ obs_and_acts <- read_tsv(
 
 Import action codes and relative meaning:
 
-```{r import_actions_meaning}
+```{r import_actions_meaning1}
 actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
 ```
 
@@ -1409,7 +1409,7 @@ crbirding_birds <-
 
 Remove prefix `sovon_`:
 
-```{r remove prefix_sovon}
+```{r remove prefix_sovon_birds}
 names(crbirding_birds) <- str_remove_all(names(crbirding_birds), pattern = "sovon_")
 ```
 

@@ -252,7 +252,7 @@ obs_and_acts <-
 
 Preview: 
 
-```{r merge_obs_with_acts}
+```{r merge_obs_with_acts_preview}
 head(obs_and_acts, n = 100)
 ```
 
