@@ -4,11 +4,11 @@ This pipeline will map ring data.
 
 # Read temporary data
 
-We start from the tempoary data saved in TSV files in `data\interim`. 
+We start from the temporary data saved in TSV files in `data\interim`. 
 
 ## Read ring data 
 
-Import `birds.tsv`:
+Import temporary bird data from `birds.tsv`:
 
 ```{r import_temp_birds}
 birds <- read_tsv(
@@ -19,7 +19,7 @@ birds <- read_tsv(
 
 ## Read observation data
 
-Import `obs_and_actions.tsv`:
+Import temporary observation data from `obs_and_actions.tsv`:
 
 ```{r import_temp_obs_and_acts}
 obs_and_acts <- read_tsv(
@@ -38,7 +38,7 @@ actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
 
 ## Read user data
 
-Import user data as we have still to map `user_role`:
+Import user data as we have still to map  field `user_role`:
 
 ```{r import_temp_user_data}
 crbirding_users <- read_tsv(
@@ -1317,7 +1317,7 @@ We have now sufficient information to define the role of any user in `crbirding_
 
 ## Add user role to `crbirding_users`
 
-Based on `sovon_bird_date_begin` we can retrieve the observations linked to applying rings. These observations can be labelled as `rngkl` (applying very first color ring), but they can sometimes come from `vang` or `vangl` as we have discussed before. We retrieve the ringers by joining on  `WaarnemerNummer` between `crbirding_users` and `obs_and_acts`:
+Based on `sovon_bird_date_begin` we can retrieve the observations linked to applying rings. These observations can be labelled as `rngkl` (applying very first color ring), `rngme` (applying very first metal ring) but they can sometimes come from `vang` or `vangl` as we have discussed before. We retrieve the ringers by joining `crbirding_users` and `obs_and_acts` by `WaarnemerNummer`:
 
 ```{r find_ringers}
 ringers_number <- 
@@ -1367,7 +1367,7 @@ write_tsv(
 )
 ```
 
-# Save `crbirding_users.tsv`
+# Save final user data
 
 The desired order of columns in `crbirding_users`:
 
@@ -1396,9 +1396,9 @@ write_tsv(crbirding_users,
 )
 ```
 
-# Create `crbirding_birds`
+# Save final ring data
 
-SOVON is interested in color rings versions with a dot if dots are present, even if the dots are for readibility reasons. At the end of the mapping we can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
+SOVON is interested in color ring versions with a dot if dots are present, even if their purpose is just improving readibility. We can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
 
 ```{r remove_col_bird_shorthand_pt}
 crbirding_birds <- 
