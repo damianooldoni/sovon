@@ -1,12 +1,12 @@
-# Mapping *kleurring* INBO database to crbirding (SOVON) format
+# Mapping INBO color ring database to crbirding (SOVON) format
 
 ## Rationale
 
-This repository contains the functionality to access and process data from the *kleurring* database hosted by INBO. Access to such database is restricted.
+This repository contains the functionality to map data from the *kleurring* database, hosted by INBO, to SOVON format. Access to INBO's color ring database could be restricted.
 
 ## Workflow
 
-source data from INBO database →  [mapping script](https://inbo.github.io/sovon/map_inbo_data_to_sovon.html) → generated [generated files](https://github.com/damianooldoni/sovon/blob/master/data/processed/)
+See https://inbo.github.io/sovon/
 
 ## Repo structure
 
@@ -18,31 +18,35 @@ The repository structure is based on [Cookiecutter Data Science](http://drivenda
 ├── .gitignore        : Files and directories to be ignored by git
 │
 ├── data
-│   └── processed     : Darwin Core output of mapping script GENERATED
+│   └── input         : Files used to solve some issues
+│   └── interim       : Temporary files
+│   └── processed     : Finalized user, ring and observation data
+│   └── external      : Data from SOVON or others
 │
 ├── docs              : Repository website GENERATED
 │
-├── specifications    : Data specifications for the Darwin Core files
+├── index.Rmd              : Website homepage
+├── _bookdown.yml          : Settings to build website in docs/
 │
 └── src
-    ├── map_inbo_data_to_sovon.Rmd : mapping script, core functionality of this repository
-    └── src.Rproj       : RStudio project file
+    ├── 1_preprocessing.Rmd     : Script to preprocess and perform some data cleaning
+    ├── 2_users.Rmd : Script to map user data
+    ├── 3_birds.Rmd  : Script to map bird ring data
+    ├── 4_observations.Rmd   : Script to map observations
 ```
 
 ## Installation
 
 1. Clone this repository to your computer
 2. Open the RStudio project file
-3. Open the `map_inbo_data_to_sovon.Rmd` [R Markdown file](https://rmarkdown.rstudio.com/) in RStudio
-4. Install any required package
-5. Click `Run > Run All` to generate the processed data
-6. Alternatively, click `Build > Build website` to generate the processed data and build the website in `/docs`
-
+3. Open the `index.Rmd` [R Markdown file](https://rmarkdown.rstudio.com/) in RStudio
+4. Install any required packages
+6. Click `Build > Build Book` to generate the processed data and build the website in `docs/`
 
 ## Contributors
 
-[List of contributors](https://github.com/damianooldoni/sovon/contributors)
+[List of contributors](https://github.com/inbo/sovon/contributors)
 
 ## License
 
-[MIT License](LICENSE)
+[MIT License](https://github.com/trias-project/unified-checklist/blob/master/LICENSE)
