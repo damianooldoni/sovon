@@ -76,6 +76,16 @@ acts <- acts[acts %in% names(obs_and_acts)]
 acts
 ```
 
+## Observation ID
+
+The field `sovon_observation_id` is left to SOVON:
+
+```{r add_obs_id}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_observation_id = NA)
+```
+
 ## Observation reference
 
 The observation reference is an unique identifier assigned to each observation. This field exists already: `Nummer`.
@@ -131,7 +141,7 @@ Observation longitude should be converted to decimal degrees:
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    sovon_observation_long = conv_unit(
+    sovon_observation_lng = conv_unit(
       str_c(PlaatsLengtegraadGraden,
             PlaatsLengtegraadMinuten,
             PlaatsLengtegraadSeconden, 
@@ -171,28 +181,68 @@ obs_and_acts <-
   mutate(sovon_check_bird = NA)
 ```
 
-## Observation reporter reference number
+## User ID
 
-The field `sovon_melder_ringersnummer` is equal to `user_reference`:
+The field `sovon_user_id` is left to SOVON:
 
-```{r sovon_melder_ringersnummer}
+```{r add_user_id}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(sovon_melder_ringersnummer = WaarnemerNummer)
+  mutate(sovon_user_id = NA)
 ```
 
-## Observation reporter
+
+## User reference
+
+The field `sovon_user_reference` links observations to users and it is equal to field `user_reference` in user data:
+
+```{r add_user_reference}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_user_reference = WaarnemerNummer)
+```
+
+## Observer
 
 The field `sovon_melder` is equal to `user_first_name` and `user_last_name` in `users`:
 
 ```{r obs_sovon_melder}
-obs_and_acts <- obs_and_acts %>%
+obs_and_acts <- 
+  obs_and_acts %>%
   left_join(
     crbirding_users %>% 
       select(user_reference, user_first_name, user_last_name),
     by = c("WaarnemerNummer" = "user_reference")) %>%
-  mutate(sovon_melder = str_c(user_first_name, user_last_name, sep = " ")) %>%
+  mutate(sovon_melder = case_when(
+    is.na(user_first_name) & !is.na(user_last_name) ~ user_last_name,
+    !is.na(user_first_name) & is.na(user_last_name) ~ user_first_name,
+    !is.na(user_first_name) & !is.na(user_last_name) ~ str_c(user_first_name, user_last_name, sep = " "),
+    is.na(user_first_name) & is.na(user_last_name) ~ NA_character_)) %>%
   select(-c(user_first_name, user_last_name))
+```
+
+## Observer e-mail
+
+The field `sovon_melder_email` is equal to `user_email` in `users`:
+
+```{r obs_sovon_melder_email}
+obs_and_acts <- 
+  obs_and_acts %>%
+  left_join(
+    crbirding_users %>% 
+      select(user_reference, user_email),
+    by = c("WaarnemerNummer" = "user_reference")) %>%
+  mutate(sovon_melder_email = user_email)
+```
+
+## Reporter - ringer number
+
+The field `sovon_melder_ringersnummer` is left to SOVON:
+
+```{r sovon_melder_ringersnummer}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_melder_ringersnummer = NA)
 ```
 
 ## Ring number
@@ -233,7 +283,7 @@ The SOVON field `condition` is mapped following the scheme at page 22 of [EURING
 1. `dood`: condition = 1
 2. `ziek`: condition = 4
 3. `rngkl`, `rngme`, `vang`, `vangl`: condition = 8
-7. `veld`, `me`, `meweg`: condition = 7
+4. `veld`, `me`, `meweg`, `br`: condition = 7
 
 ```{r obs_condition}
 obs_and_acts <- 
@@ -242,7 +292,7 @@ obs_and_acts <-
     !is.na(dood) ~ 1,
     !is.na(ziek) ~ 4,
     !is.na(rngkl) | !is.na(rngme) | !is.na(vang) | !is.na(vangl)  ~ 8,
-    !is.na(veld) | !is.na(me) | !is.na(meweg)  ~ 7
+    !is.na(veld) | !is.na(me) | !is.na(meweg) | !is.na(br)  ~ 7
     )
 )
 ```
@@ -254,6 +304,7 @@ Reference number of observations with condition 5:
 ```{r get_obs_cond_5}
 last_sick_df <- 
   obs_and_acts %>%
+  filter(sovon_melder_ringersnummer %in% workers_bird_shelters$user_reference) %>%
   filter(ziek == "ziek") %>%
   group_by(sovon_bird_reference) %>%
   filter(sovon_observation_date == max(sovon_observation_date)) %>%
@@ -280,11 +331,17 @@ condition_5_obs_ref <-
   filter(sovon_observation_date >= last_sick_date & 
            sovon_observation_date < dead_date) %>%
   count() %>%
-  # only one ziek action present
+  # only one ziek action present -> no obs possible if not released
   filter(n == 1) %>%
   left_join(last_sick_df,
             by = c("sovon_bird_reference")) %>%
   pull(obs_ref)
+```
+
+Number of observations selected to get condition code 5:
+
+```{r n_obs_condition_5}
+length(condition_5_obs_ref)
 ```
 
 Assign condition value `5` to these observations:
@@ -318,6 +375,7 @@ Metal ring information is an integer between 0 and 9. A table can be found at pa
 However, SOVON uses this field to map the observations referring to the applying of any kind of ring, either color or metal, as their database is purely focussed on color rings and due to a missing field in the EURING Exchange Code 2000+ specific for color rings.
 
 Some actions are related to this field and are mapped as follows: 
+
 1. `rngkl`: MRI = 1 
 2. `rngme`: MRI = 1
 3. `veld`: MRI = 4, 
@@ -359,7 +417,7 @@ obs_and_acts %>%
   head(n = 50)
 ```
 
-MRI is 4 for observations linked to action `me` (metal ring read)  `veld` (field observation, equiavlent of colror ring read):
+MRI is 4 for observations linked to action `me` (metal ring read) and `veld` (field observation, equivalent of color ring read):
 
 ```{r MRI_4_me_veld}
 obs_and_acts <- 
@@ -425,9 +483,9 @@ vang_no_change_color_ring <-
 
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(sovon_MRI = ifelse(sovon_observation_reference %in% vang_no_change_color_ring, 
-                            4, 
-                            sovon_MRI)
+  mutate(sovon_MRI = ifelse(
+    sovon_observation_reference %in% vang_no_change_color_ring, 4, sovon_MRI
+    )
 )
 ```
 
@@ -466,25 +524,18 @@ obs_and_acts %>%
   nrow()
 ```
 
-MRI is 4 for observations linked to action `br` and not `klweg`:
-
-```{r br_MRI_4}
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = ifelse(!is.na(br) & is.na(klweg), 4 , sovon_MRI))
-```
-
-Observations without MRI:
+Action combinations without MRI:
 
 ```{r check_obs_without_MRI}
 obs_and_acts %>%
   filter(is.na(sovon_MRI)) %>%
-  select(-sovon_melder) # for privacy reasons
+  select(acts) %>%
+  distinct()
 ```
 
-## Mapping of INBO actions to MRI, condition, status
+## Mapping of INBO actions to status, condition and MRI
 
-The fields  `sovon_MRI`, `sovon_condition`, `sovon_status` should cover all possible actions/observations. No observations should have all three fields empty:
+The fields  `sovon_status`, `sovon_condition` and `sovon_MRI` should cover all possible action combinations present in observations. Consequently, no observations should have all three fields empty:
 
 ```{r check_no_NA_MRI_status_condition}
 obs_and_acts %>%
@@ -492,9 +543,11 @@ obs_and_acts %>%
   nrow()
 ```
 
+General mapping of all action combinations present in observations:
+
 ```{r combinations_actions_MRI_cond_status}
 obs_and_acts %>%
-  select(acts, sovon_MRI, sovon_condition, sovon_status) %>%
+  select(acts, sovon_status, sovon_condition, sovon_MRI) %>%
   distinct()
 ```
 
@@ -534,11 +587,12 @@ obs_after_ringing <-
   filter(sovon_observation_date >= date_ringing) %>%
   filter(date_ringing == max(date_ringing)) %>%
   distinct() %>%
-  mutate(sovon_bird_age_ringing = date_ringing) %>%
+  ungroup() %>%
+  mutate(sovon_bird_age_ringing = age_ringing) %>%
   select(-c(date_ringing, age_ringing))
 ```
 
-Otherwise it cannot be assessed and the field will be left empty:
+Otherwise it will be left empty:
 
 ```{r obs_before_ringing}
 obs_before_ringing <- 
@@ -546,7 +600,9 @@ obs_before_ringing <-
   anti_join(obs_after_ringing,
             by = names(obs_and_acts)) %>%
   mutate(sovon_bird_age_ringing = as.POSIXct(NA))
-obs_before_ringing %>% head(n = 10)
+obs_before_ringing %>% 
+  select(sovon_bird_reference, ) %>%
+  head(n = 10)
 ```
 
 Merge the two subsets back together:
@@ -557,9 +613,46 @@ obs_and_acts <-
   arrange(sovon_observation_reference)
 ```
 
+## Bird sex
+
+The field `sovon_bird_sex` is equal to the bird sex in ring data:
+
+```{r sovon_bird_sex}
+obs_and_acts <- 
+  obs_and_acts %>%
+  left_join(crbirding_birds %>% 
+              select(bird_reference, bird_sex),
+            by = c("sovon_bird_reference" = "bird_reference")) %>%
+  rename(sovon_bird_sex = bird_sex)
+```
+
+## Capture
+
+The field `sovon_observation_is_capture` can be filled by evaluating the link of observations to actions `vang` or `vangl`:
+
+```{r is_capture}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_observation_is_capture = if_else(
+    !is.na(vang) | !is.na(vangl), 1, 0
+  )
+)
+```
+
+## Bird ID
+
+The field `sovon_bird_id` is left to SOVON:
+
+```{r add_bird_id}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_bird_id = NA)
+```
+
+
 ## Observation notes
 
-We copy the notes in `Opmerking` to SOVON field  `observation_notes`:
+We copy the notes in `Opmerking` to SOVON field  `sovon_observation_notes`:
 
 ```{r obs_notes}
 obs_and_acts <- 
@@ -567,7 +660,7 @@ obs_and_acts <-
   mutate(sovon_observation_notes = Opmerking)
 ```
 
-As other notes could follow, we add a dot at the end of the notes if not present already:
+We add a dot at the end of the notes if not present already:
 
 ```{r}
 obs_and_acts <- 
@@ -583,7 +676,7 @@ obs_and_acts <-
 )
 ```
 
-We also add the prefix `"INBO original notes:"`:
+We also add the prefix `"INBO original notes: "`:
 
 ```{r add_prefix}
 obs_and_acts <- 
@@ -592,32 +685,57 @@ obs_and_acts <-
     sovon_observation_notes = 
       if_else(
         !is.na(sovon_observation_notes) & str_length(sovon_observation_notes) > 0,
-        str_c("INBO original notes:", sovon_observation_notes, sep = " "),
+        str_c("INBO original notes: ", sovon_observation_notes, sep = " "),
         sovon_observation_notes)
 )
 ```
 
-We have to add the note `no_color_ring.` to observations of birds not wearing any color ring (only metal ring), a situation tackled in previous section:
+We add the note `no_color_ring.` to observations linked to action `klweg`:
 
 ```{r add_note_no_color_ring}
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(
-    observation_notes = if_else(
-      ,
-      if_else(is.na(observation_notes),
+    sovon_observation_notes = if_else(
+      !is.na(klweg),
+      if_else(is.na(sovon_observation_notes),
               "no_color_ring.",
-              paste(observation_notes, "no_color_ring.", sep = " ")),
-      observation_notes)
+              paste("no_color_ring.", sovon_observation_notes, sep = " ")),
+      sovon_observation_notes)
 )
 ```
 
-Effects of mapping:
+Preview:
 
-```{r}
+```{r no_color_ring_example}
 obs_and_acts %>%
-  filter(is.na(sovon_ring_number)) %>%
-  select(sovon_observation_reference, sovon_ring_number, observation_notes)
+  filter(!is.na(klweg)) %>%
+  select(sovon_observation_notes) %>%
+  head()
+```
+
+We add the note `color_ring_added.` to observations linked to action `rngkl`:
+
+```{r add_note_no_color_ring}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_notes = if_else(
+      !is.na(rngkl),
+      if_else(is.na(sovon_observation_notes),
+              "color_ring_added.",
+              paste("color_ring_added.", sovon_observation_notes, sep = " ")),
+      sovon_observation_notes)
+)
+```
+
+Preview:
+
+```{r add_color_ring_example}
+obs_and_acts %>%
+  filter(!is.na(rngkl)) %>%
+  select(sovon_observation_notes) %>%
+  head()
 ```
 
 # Observation data
@@ -626,9 +744,16 @@ Select the required columns, starting with prefix `sovon_`:
 
 ```{r select_sovoin_cols}
 crbirding_observations <-
-  crbirding_observations %>%
+  obs_and_acts %>%
   select(starts_with("sovon"))
 ```
+
+Remove prefix `sovon_`:
+
+```{r remove prefix_sovon}
+names(crbirding_observations) <- str_remove_all(names(crbirding_observations), pattern = "sovon_")
+```
+
 
 The desired order of columns in `crbirding_observations`:
 
@@ -647,7 +772,7 @@ Are all required columns present?
 
 ```{r check_presence_required_cols_obs}
 all(cr_obs_cols %in% names(crbirding_observations)) & 
-  ncol(cr_obs_cols) == ncol(crbirding_observations)
+  length(cr_obs_cols) == ncol(crbirding_observations)
 ```
 
 Set column order:
@@ -658,17 +783,19 @@ crbirding_observations <-
   select(cr_obs_cols)
 ```
 
-Preview data:
+Preview data (without personal observer data for privcay reasons):
 
 ```{r final_preview_obs}
-crbirding_observations %>% head(n = 10)
+crbirding_observations %>% 
+  select(-c(melder, melder_email)) %>%
+  head(n = 10)
 ```
 
-Save to CSV:
+Save to text file (tab separated value):
 
 ```{r write_processed_obs_data}
 write_csv(
-  crbirding_obs, 
+  crbirding_observations, 
   path = here::here("data", "processed", "crbirding_observations.tsv"), 
   na = ""
 )
