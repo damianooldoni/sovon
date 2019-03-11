@@ -1,12 +1,6 @@
-# Goal
+# Map ring data
 
-This pipeline will map ring data.
-
-# Read temporary data
-
-We start from the temporary data saved in TSV files in `data\interim`. 
-
-## Read ring data 
+## Read temporary ring data 
 
 Import temporary bird data from `birds.tsv`:
 
@@ -17,7 +11,7 @@ birds <- read_tsv(
 )
 ```
 
-## Read observation data
+### Read observation data
 
 Import temporary observation data from `obs_and_actions.tsv`:
 
@@ -28,7 +22,7 @@ obs_and_acts <- read_tsv(
 )
 ```
 
-## Read action data
+### Read action data
 
 Import action codes and relative meaning:
 
@@ -36,7 +30,7 @@ Import action codes and relative meaning:
 actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
 ```
 
-## Read user data
+### Read user data
 
 Import user data as we have still to map  field `user_role`:
 
@@ -47,9 +41,9 @@ crbirding_users <- read_tsv(
 ```
 
 
-# Map color ring data
+## Map color ring data
 
-## Extract action codes
+### Extract action codes
 
 Actions present in `obs_and_acts` :
 
@@ -59,7 +53,7 @@ acts <- acts[acts %in% names(obs_and_acts)]
 acts
 ```
 
-## Bird reference & bird shorthand
+### Bird reference & bird shorthand
 
 In SOVON table `crbirding_birds` each row identifies a ring. By assigning a bird reference as unique integer to a bird they can link any color ring to the bird it belongs to.
 
@@ -174,11 +168,11 @@ crbirding_birds <-
     ) %>%
   distinct() %>%
   select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_notes)
-  # to map correctly MKAU (sovon_bird_reference: 4531)
-  # group_by(sovon_bird_reference, sovon_bird_shorthand) %>%
-  # filter(sovon_bird_shorthand == 
-  #          sovon_bird_shorthand[which.max(nchar(sovon_bird_shorthand))]) %>%
-  # ungroup()
+  ## to map correctly MKAU (sovon_bird_reference: 4531)
+  ## group_by(sovon_bird_reference, sovon_bird_shorthand) %>%
+  ## filter(sovon_bird_shorthand == 
+  ##          sovon_bird_shorthand[which.max(nchar(sovon_bird_shorthand))]) %>%
+  ## ungroup()
 ```
 
 Example of mapping: the bird with `sovon_bird_reference` 14 is associated to the following two rings:
@@ -212,7 +206,7 @@ crbirding_birds %>%
   select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt)
 ```
 
-## Bird ringing date
+### Bird ringing date
 
 The date of applying a ring should be mapped as `sovon_bird_date_begin`. The date of applying the first ring can be found in data frame `obs_and_acts` in the column `Datum` for actions `rngkl` (code action of applying very first color ring):
 
@@ -224,7 +218,7 @@ obs_and_acts %>%
   head(n = 10)
 ```
 
-### Date of applying first ring
+#### Date of applying first ring
 
 We can add automatically the date of the very first ring for each bird (`sovon_bird_reference`), based on date of action code `rngkl`. In fact, there should be just one observation with action `rngkl` for each bird (`sovon_bird_reference`). Exceptions:
 
@@ -279,7 +273,7 @@ Check date of birds in exceptions:
 
 ```{r check_date_of_exceptions_double_rngkl}
 crbirding_birds %>%
-  # filter(sovon_bird_shorthand %in% c("MKAU", "CZOZ"))
+  ## filter(sovon_bird_shorthand %in% c("MKAU", "CZOZ"))
   filter(sovon_bird_shorthand %in% exceptions_one_bird_one_rngkl$sovon_bird_shorthand)
 ```
 
@@ -307,7 +301,7 @@ crbirding_birds %>%
   count()
 ```
 
-### Date of applying last ring
+#### Date of applying last ring
 
 The rings without date are the rings of birds ringed more than once. 
 
@@ -491,7 +485,7 @@ info_faag <-
            filter(sovon_bird_reference == 176, 
                   first_Nummer == "ALAU",
                   !is.na(ziek)) %>%
-           # get the second "ziek" action (2006-07-07)
+           ## get the second "ziek" action (2006-07-07)
            filter(Datum == max(Datum)) %>%
            pull(Datum))
 info_faag
@@ -507,7 +501,7 @@ info_ycaf <-
            obs_and_acts %>%
            filter(first_Nummer == "PLAB",
                   !is.na(ziek)) %>%
-           # there is just one "ziek" action
+           ## there is just one "ziek" action
            pull(Datum))
 info_ycaf
 ```
@@ -522,7 +516,7 @@ info_fhov <-
            obs_and_acts %>%
            filter(first_Nummer == "SUAV",
                   !is.na(ziek)) %>%
-           # there is just one "ziek" action
+           ## there is just one "ziek" action
            pull(Datum))
 info_fhov
 ```
@@ -547,7 +541,7 @@ crbirding_birds %>%
   nrow() == nrow(crbirding_birds)
 ```
 
-### Add intermediate color rings
+#### Add intermediate color rings
 
 Based on spreadsheet of experts, we have to add new rings, as some birds have been ringed more than twice, so the information contained in `first_Nummer` and `NummerNieuw` is not complete, as they map the very first and the very last ring. The intermediate rings are the following:
 
@@ -580,17 +574,17 @@ intermediate_rings <- tibble(
       "DJAU"
       ),
     sovon_bird_date_begin = as.POSIXct(c(
-      "2000-05-08", # BUAG
-      "2012-05-25", # TRAP
-      "2007-06-01", # GTAS
-      "2012-05-29", # UPAB
-      "2006-05-26", # DHAZ 
-      "2007-06-06", # GMAJ
-      "2006-05-17", # DGAH
-      "2007-06-18", # GHAT
-      "2014-05-23", # ZVAU
-      "2009-05-18", # HWAX
-      "2006-05-26" # DJAU
+      "2000-05-08", ## BUAG
+      "2012-05-25", ## TRAP
+      "2007-06-01", ## GTAS
+      "2012-05-29", ## UPAB
+      "2006-05-26", ## DHAZ 
+      "2007-06-06", ## GMAJ
+      "2006-05-17", ## DGAH
+      "2007-06-18", ## GHAT
+      "2014-05-23", ## ZVAU
+      "2009-05-18", ## HWAX
+      "2006-05-26" ## DJAU
       ), tz = "UTC")
 )
 intermediate_rings
@@ -657,7 +651,7 @@ crbirding_birds %>%
   nrow() == nrow(crbirding_birds)
 ```
 
-## Bird ringing end date
+### Bird ringing end date
 
 For birds ringed more than once, we can assign an end date for the changed rings. This information will be stored in field `sovon_bird_date_end`. The end date is equal to the date of applying the new ring
 
@@ -703,7 +697,7 @@ crbirding_birds %>%
   arrange(sovon_bird_reference, sovon_bird_date_begin)
 ```
 
-## Add rows for metal rings without color rings
+### Add rows for metal rings without color rings
 
 Sometimes metal rings have been applied **before** color rings. These cases should be added to `crbirding_birds` as new rows. We can detect these situtations by comparing the date of actions `rngme` and `rngkl` for each bird.
 
@@ -750,7 +744,7 @@ crbirding_birds %>%
   head(n = 50)
 ```
 
-## Ring number
+### Ring number
 
 The _ring number_, or _metal ring number_, can be found in field `MetaalringNummer`, which contains the **most recent** metal ring number. Recoverying the complete chronology of metal rings for each bird is almost impossible as it is:
 
@@ -997,9 +991,9 @@ crbirding_birds <-
                      (bird_date_begin_metalring < sovon_bird_date_end),
                    sovon_bird_ring_number,
                    NA_character_)) %>%
-  # remove help column after use
+  ## remove help column after use
   select(-bird_date_begin_metalring) %>%
-  # provide order columns
+  ## provide order columns
   select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt,
          sovon_bird_ring_number, sovon_bird_date_begin, sovon_bird_date_end,
          sovon_bird_notes)
@@ -1050,7 +1044,7 @@ crbirding_birds %>%
 
 Notice how nothing has been added in `sovon_bird_notes` for birds getting a metal ring while changing the color ring.
 
-## Euring
+### Euring
 
 Present values:
 
@@ -1091,7 +1085,7 @@ crbirding_birds <-
   select(-EuringCode)
 ```
 
-## Scheme
+### Scheme
 
 Actual values:
 
@@ -1129,7 +1123,7 @@ crbirding_birds <-
   select(-MetaalringLandCode)
 ```
 
-## Bird sex
+### Bird sex
 
 Bird sex is translated to English. Letter `M` (Dutch word _mannetje_) will not change so no need to convert it:
 
@@ -1140,8 +1134,8 @@ crbirding_birds <-
               select(sovon_bird_reference, GeslachtCode),
             by = "sovon_bird_reference") %>%
   mutate(sovon_bird_sex = recode(GeslachtCode,
-    "V" = "F", # V(rouwtje) ->F(emale)
-    "O" = "U" # O(nbekend) ->  U(nknown)
+    "V" = "F", ## V(rouwtje) ->F(emale)
+    "O" = "U" ## O(nbekend) ->  U(nknown)
     ))
 ```
 
@@ -1159,7 +1153,7 @@ crbirding_birds <-
   select(-GeslachtCode)
 ```
 
-## Bird age ringing
+### Bird age ringing
 
 For mapping the age while applying color rings, we have to follow the Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14. 
 
@@ -1191,7 +1185,7 @@ For mapping the bird age while applying color ring (and first metal ring) we sho
 ```{r check_uniqueness_approach}
 crbirding_birds %>%
   left_join(obs_and_acts %>%
-              # remove rows with Datum equal to NA or field observations
+              ## remove rows with Datum equal to NA or field observations
               filter(!is.na(bird_age_obs) & 
                        (!is.na(vang) | !is.na(vangl) | 
                           !is.na(rngkl) | !is.na(rngme))) %>%
@@ -1208,7 +1202,7 @@ If TRUE then, we proceed with the mapping:
 crbirding_birds <- 
   crbirding_birds %>%
   left_join(obs_and_acts %>%
-              # remove rows with Datum equal to NA or field observations
+              ## remove rows with Datum equal to NA or field observations
               filter(!is.na(bird_age_obs) & 
                        (!is.na(vang) | !is.na(vangl) | 
                           !is.na(rngkl) | !is.na(rngme))) %>%
@@ -1239,7 +1233,7 @@ crbirding_birds %>%
   filter(sovon_bird_reference %in% bird_reference_triplet)
 ```
 
-## Bird ID
+### Bird ID
 
 Bird identifiers will be provided by SOVON. `NA` is given:
 
@@ -1249,7 +1243,7 @@ crbirding_birds <-
   mutate(sovon_bird_id = NA)
 ```
 
-## Bird BTO
+### Bird BTO
 
 Bird BTO will be provided by SOVON.  `NA` is given:
 
@@ -1259,7 +1253,7 @@ crbirding_birds <-
   mutate(sovon_bird_bto = NA)
 ```
 
-## Bird name
+### Bird name
 
 Some birds, the ones with a GPS tracker, have a name saved in [this file](https://raw.githubusercontent.com/inbo/bird-tracking/master/data/interim/individuals.csv). The names are saved in column `individual_remarks`:
 
@@ -1301,7 +1295,7 @@ crbirding_birds %>%
   select(sovon_bird_reference, sovon_bird_name, sovon_bird_shorthand)
 ```
 
-## Bird birth year
+### Bird birth year
 
 This field will be filled by SOVON. `NA` is given:
 
@@ -1311,11 +1305,11 @@ crbirding_birds <-
   mutate(sovon_bird_birth_year = NA)
 ```
 
-# Finalize `crbirding_users`
+## Finalize `crbirding_users`
 
 We have now sufficient information to define the role of any user in `crbirding_users`.
 
-## Add user role to `crbirding_users`
+### Add user role to `crbirding_users`
 
 Based on `sovon_bird_date_begin` we can retrieve the observations linked to applying rings. These observations can be labelled as `rngkl` (applying very first color ring), `rngme` (applying very first metal ring) but they can sometimes come from `vang` or `vangl` as we have discussed before. We retrieve the ringers by joining `crbirding_users` and `obs_and_acts` by `WaarnemerNummer`:
 
@@ -1354,7 +1348,7 @@ crbirding_users %>%
   count()
 ```
 
-# Save modified temporary observation data
+## Save modified temporary observation data
 
 We overwrite the temporary observation data based on the added columns:
 
@@ -1367,7 +1361,7 @@ write_tsv(
 )
 ```
 
-# Save final user data
+## Save final user data
 
 The desired order of columns in `crbirding_users`:
 
@@ -1396,7 +1390,7 @@ write_tsv(crbirding_users,
 )
 ```
 
-# Save final ring data
+## Save final ring data
 
 SOVON is interested in color ring versions with a dot if dots are present, even if their purpose is just improving readibility. We can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
 

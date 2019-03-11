@@ -1,10 +1,8 @@
 # Map observation data
 
-This pipeline will map observation data.
+## Read data
 
-# Read data
-
-## Read temporary observation data
+### Read temporary observation data
 
 We start from the tempoary observation data saved as TSV file in `data\interim`:
 
@@ -15,7 +13,7 @@ obs_and_acts <- read_tsv(
 )
 ```
 
-## Read action data
+### Read action data
 
 Import action codes and relative meaning:
 
@@ -23,7 +21,7 @@ Import action codes and relative meaning:
 actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
 ```
 
-## Read processed ring data
+### Read processed ring data
 
 We import finalized ring data from `./data/processed`:
 
@@ -34,7 +32,7 @@ crbirding_birds <- read_tsv(
 )
 ```
 
-## Read temporary ring data
+### Read temporary ring data
 
 We will need some columns from original INBO ring data. We import the temporary ring data as well:
 
@@ -45,7 +43,7 @@ birds <- read_tsv(
 )
 ```
 
-## Read processed user data
+### Read processed user data
 
 We import finalized user data from `./data/processed`:
 
@@ -56,7 +54,7 @@ crbirding_users <- read_tsv(
 )
 ```
 
-## Read list workers in bird shelters
+### Read list workers in bird shelters
 
 ```{r import_workers}
 workers_bird_shelters <- read_tsv(
@@ -64,9 +62,9 @@ workers_bird_shelters <- read_tsv(
 )
 ```
 
-# Map color observation data
+## Map color observation data
 
-## Extract action codes
+### Extract action codes
 
 Actions present in `obs_and_acts` :
 
@@ -76,7 +74,7 @@ acts <- acts[acts %in% names(obs_and_acts)]
 acts
 ```
 
-## Observation ID
+### Observation ID
 
 The field `sovon_observation_id` is left to SOVON:
 
@@ -86,7 +84,7 @@ obs_and_acts <-
   mutate(sovon_observation_id = NA)
 ```
 
-## Observation reference
+### Observation reference
 
 The observation reference is an unique identifier assigned to each observation. This field exists already: `Nummer`.
 
@@ -96,7 +94,7 @@ obs_and_acts <-
   mutate(sovon_observation_reference = Nummer)
 ```
 
-## Observation date
+### Observation date
 
 The date is saved in column `Datum`. We copy it in required column `sovon_observation_date`:
 
@@ -106,7 +104,7 @@ obs_and_acts <-
   mutate(sovon_observation_date = Datum)
 ```
 
-## Observation time
+### Observation time
 
 There is no observation time in `obs_and_acts`. `NA` is given to `sovon_observation_time`:
 
@@ -116,7 +114,7 @@ obs_and_acts <-
   mutate(sovon_observation_time = NA)
 ```
 
-## Observation latitude
+### Observation latitude
 
 Observation latitude should be converted to decimal degrees:
 
@@ -133,7 +131,7 @@ obs_and_acts <-
 )
 ```
 
-## Observation longitude
+### Observation longitude
 
 Observation longitude should be converted to decimal degrees:
 
@@ -150,7 +148,7 @@ obs_and_acts <-
 )
 ```
 
-## Observation location
+### Observation location
 
 Aggregate information about observation location. We follow the following structure: `PlaatsGemeente` [+ `, ` + `PlaatsToponym` [+ `: ` + `PlaatsToponymDetail`]]:
 
@@ -171,7 +169,7 @@ obs_and_acts <-
                                   paste(sovon_observation_location)))
 ```
 
-## Check bird
+### Check bird
 
 The field `sovon_check_bird` is provided by SOVON. `NA` is given:
 
@@ -181,7 +179,7 @@ obs_and_acts <-
   mutate(sovon_check_bird = NA)
 ```
 
-## User ID
+### User ID
 
 The field `sovon_user_id` is left to SOVON:
 
@@ -192,7 +190,7 @@ obs_and_acts <-
 ```
 
 
-## User reference
+### User reference
 
 The field `sovon_user_reference` links observations to users and it is equal to field `user_reference` in user data:
 
@@ -202,7 +200,7 @@ obs_and_acts <-
   mutate(sovon_user_reference = WaarnemerNummer)
 ```
 
-## Observer
+### Observer
 
 The field `sovon_melder` is equal to `user_first_name` and `user_last_name` in `users`:
 
@@ -221,7 +219,7 @@ obs_and_acts <-
   select(-c(user_first_name, user_last_name))
 ```
 
-## Observer e-mail
+### Observer e-mail
 
 The field `sovon_melder_email` is equal to `user_email` in `users`:
 
@@ -235,7 +233,7 @@ obs_and_acts <-
   mutate(sovon_melder_email = user_email)
 ```
 
-## Reporter - ringer number
+### Reporter - ringer number
 
 The field `sovon_melder_ringersnummer` is left to SOVON:
 
@@ -245,7 +243,7 @@ obs_and_acts <-
   mutate(sovon_melder_ringersnummer = NA)
 ```
 
-## Ring number
+### Ring number
 
 The field `sovon_ring_number` contains information about the metal ring number, in the same format as in field `bird_ring_number` of `crbirding_birds`. As explained in the mapping of field `bird_ring_number` of `crbirding_birds`, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
 
@@ -255,7 +253,7 @@ obs_and_acts <-
   mutate(sovon_ring_number = NA_character_)
 ```
 
-## Observation status
+### Observation status
 
 Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
 
@@ -276,7 +274,7 @@ obs_and_acts <-
   ))
 ```
 
-## Condition
+### Condition
 
 The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. The following actions are mapped as follows in order of priority:
 
@@ -331,7 +329,7 @@ condition_5_obs_ref <-
   filter(sovon_observation_date >= last_sick_date & 
            sovon_observation_date < dead_date) %>%
   count() %>%
-  # only one ziek action present -> no obs possible if not released
+  ## only one ziek action present -> no obs possible if not released
   filter(n == 1) %>%
   left_join(last_sick_df,
             by = c("sovon_bird_reference")) %>%
@@ -368,7 +366,7 @@ obs_and_acts %>%
          acts)
 ```
 
-## MRI: metal ring information
+### MRI: metal ring information
 
 Metal ring information is an integer between 0 and 9. A table can be found at page 8 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
 
@@ -533,7 +531,7 @@ obs_and_acts %>%
   distinct()
 ```
 
-## Mapping of INBO actions to status, condition and MRI
+### Mapping of INBO actions to status, condition and MRI
 
 The fields  `sovon_status`, `sovon_condition` and `sovon_MRI` should cover all possible action combinations present in observations. Consequently, no observations should have all three fields empty:
 
@@ -551,7 +549,7 @@ obs_and_acts %>%
   distinct()
 ```
 
-## Bird age ringing
+### Bird age ringing
 
 The required field `bird_age_ringing` should be filled with the age of the bird while ringing. 
 
@@ -613,7 +611,7 @@ obs_and_acts <-
   arrange(sovon_observation_reference)
 ```
 
-## Bird sex
+### Bird sex
 
 The field `sovon_bird_sex` is equal to the bird sex in ring data:
 
@@ -626,7 +624,7 @@ obs_and_acts <-
   rename(sovon_bird_sex = bird_sex)
 ```
 
-## Capture
+### Capture
 
 The field `sovon_observation_is_capture` can be filled by evaluating the link of observations to actions `vang` or `vangl`:
 
@@ -639,7 +637,7 @@ obs_and_acts <-
 )
 ```
 
-## Bird ID
+### Bird ID
 
 The field `sovon_bird_id` is left to SOVON:
 
@@ -650,7 +648,7 @@ obs_and_acts <-
 ```
 
 
-## Observation notes
+### Observation notes
 
 We copy the notes in `Opmerking` to SOVON field  `sovon_observation_notes`:
 
@@ -738,7 +736,7 @@ obs_and_acts %>%
   head()
 ```
 
-# Observation data
+## Observation data
 
 Select the required columns, starting with prefix `sovon_`:
 

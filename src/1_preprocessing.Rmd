@@ -18,14 +18,6 @@ knit: (function(input_file, encoding) { rmarkdown::render(input_file, encoding =
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-# Goal
-
-This pipeline will:
-
-1. extract data from INBO *kleurring* database
-2. perform some checks and data cleaning
-3. save temporary data as text files
-
 # Extract data from INBO kleurring database
 
 ## Connection to INBO database
