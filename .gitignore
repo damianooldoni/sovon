@@ -43,4 +43,3 @@ rsconnect/
 data/processed/crbirding_users.tsv
 data/processed/crbirding_observations.tsv
 data/interim/users.tsv
-data/input/workers_in_bird_shelters.tsv
