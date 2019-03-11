@@ -736,7 +736,7 @@ obs_and_acts %>%
   head()
 ```
 
-## Observation data
+## Save final observation data
 
 Select the required columns, starting with prefix `sovon_`:
 

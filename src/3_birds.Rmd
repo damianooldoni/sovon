@@ -1305,7 +1305,7 @@ crbirding_birds <-
   mutate(sovon_bird_birth_year = NA)
 ```
 
-## Finalize `crbirding_users`
+## Finalize user data
 
 We have now sufficient information to define the role of any user in `crbirding_users`.
 

@@ -104,7 +104,7 @@ users <-
   mutate(sovon_user_language  = "Dutch")
 ```
 
-## Create `crbirding_users`
+## Save user data
 
 Export the SOVON fields to `crbirding_users`:
 
