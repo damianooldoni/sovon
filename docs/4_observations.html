@@ -5,11 +5,11 @@
 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>17 Map observation data | Mapping INBO color ring data to SOVON format</title>
-  <meta name="description" content="17 Map observation data | Mapping INBO color ring data to SOVON format">
+  <title>7 Map observation data | Mapping INBO color ring data to SOVON format</title>
+  <meta name="description" content="7 Map observation data | Mapping INBO color ring data to SOVON format">
   <meta name="generator" content="bookdown  and GitBook 2.6.7">
 
-  <meta property="og:title" content="17 Map observation data | Mapping INBO color ring data to SOVON format" />
+  <meta property="og:title" content="7 Map observation data | Mapping INBO color ring data to SOVON format" />
   <meta property="og:type" content="book" />
   
   
@@ -17,7 +17,7 @@
   <meta name="github-repo" content="inbo/sovon" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="17 Map observation data | Mapping INBO color ring data to SOVON format" />
+  <meta name="twitter:title" content="7 Map observation data | Mapping INBO color ring data to SOVON format" />
   
   
   
@@ -129,119 +129,116 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Intro</a></li>
-<li class="chapter" data-level="2" data-path="1_preprocessing.html"><a href="1_preprocessing.html"><i class="fa fa-check"></i><b>2</b> Goal</a></li>
-<li class="chapter" data-level="3" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-data-from-inbo-kleurring-database"><i class="fa fa-check"></i><b>3</b> Extract data from INBO kleurring database</a><ul>
-<li class="chapter" data-level="3.1" data-path="1_preprocessing.html"><a href="1_preprocessing.html#connection-to-inbo-database"><i class="fa fa-check"></i><b>3.1</b> Connection to INBO database</a></li>
-<li class="chapter" data-level="3.2" data-path="1_preprocessing.html"><a href="1_preprocessing.html#import-data"><i class="fa fa-check"></i><b>3.2</b> Import data</a><ul>
-<li class="chapter" data-level="3.2.1" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-user-data"><i class="fa fa-check"></i><b>3.2.1</b> Extract user data</a></li>
-<li class="chapter" data-level="3.2.2" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-color-ring-data"><i class="fa fa-check"></i><b>3.2.2</b> Extract color ring data</a></li>
-<li class="chapter" data-level="3.2.3" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-observation-data"><i class="fa fa-check"></i><b>3.2.3</b> Extract observation data</a></li>
-<li class="chapter" data-level="3.2.4" data-path="1_preprocessing.html"><a href="1_preprocessing.html#import-control-data"><i class="fa fa-check"></i><b>3.2.4</b> Import control data</a></li>
+<li class="chapter" data-level="2" data-path="1_preprocessing.html"><a href="1_preprocessing.html"><i class="fa fa-check"></i><b>2</b> Extract data from INBO kleurring database</a><ul>
+<li class="chapter" data-level="2.1" data-path="1_preprocessing.html"><a href="1_preprocessing.html#connection-to-inbo-database"><i class="fa fa-check"></i><b>2.1</b> Connection to INBO database</a></li>
+<li class="chapter" data-level="2.2" data-path="1_preprocessing.html"><a href="1_preprocessing.html#import-data"><i class="fa fa-check"></i><b>2.2</b> Import data</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-user-data"><i class="fa fa-check"></i><b>2.2.1</b> Extract user data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-color-ring-data"><i class="fa fa-check"></i><b>2.2.2</b> Extract color ring data</a></li>
+<li class="chapter" data-level="2.2.3" data-path="1_preprocessing.html"><a href="1_preprocessing.html#extract-observation-data"><i class="fa fa-check"></i><b>2.2.3</b> Extract observation data</a></li>
+<li class="chapter" data-level="2.2.4" data-path="1_preprocessing.html"><a href="1_preprocessing.html#import-control-data"><i class="fa fa-check"></i><b>2.2.4</b> Import control data</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="1_preprocessing.html"><a href="1_preprocessing.html#pre-processing"><i class="fa fa-check"></i><b>4</b> Pre-processing</a><ul>
-<li class="chapter" data-level="4.1" data-path="1_preprocessing.html"><a href="1_preprocessing.html#preview-raw-data"><i class="fa fa-check"></i><b>4.1</b> Preview raw data</a></li>
-<li class="chapter" data-level="4.2" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-spaces-in-birds"><i class="fa fa-check"></i><b>4.2</b> Check spaces in <code>birds</code></a></li>
-<li class="chapter" data-level="4.3" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-duplicates-waarnemingnummer-aktiecode"><i class="fa fa-check"></i><b>4.3</b> Check duplicates <code>WaarnemingNummer</code>-<code>AktieCode</code></a></li>
-<li class="chapter" data-level="4.4" data-path="1_preprocessing.html"><a href="1_preprocessing.html#merge-observations-and-actions"><i class="fa fa-check"></i><b>4.4</b> Merge observations and actions</a></li>
-<li class="chapter" data-level="4.5" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-spaces-in-obs_and_acts"><i class="fa fa-check"></i><b>4.5</b> Check spaces in <code>obs_and_acts</code></a></li>
-<li class="chapter" data-level="4.6" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-presence-action-code"><i class="fa fa-check"></i><b>4.6</b> Check presence action code</a></li>
-<li class="chapter" data-level="4.7" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-labelled-as-fout"><i class="fa fa-check"></i><b>4.7</b> Remove data labelled as <code>FOUT</code></a></li>
-<li class="chapter" data-level="4.8" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-color-rings-uppercase"><i class="fa fa-check"></i><b>4.8</b> Check color rings: uppercase</a></li>
-<li class="chapter" data-level="4.9" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-keys-kleurringnummer-obs---nummer-birds"><i class="fa fa-check"></i><b>4.9</b> Check keys <code>KleurringNummer</code> (obs) - <code>Nummer</code> (birds)</a></li>
-<li class="chapter" data-level="4.10" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-duplicates-in-date-of-applying-rings"><i class="fa fa-check"></i><b>4.10</b> Check duplicates in date of applying rings</a></li>
-<li class="chapter" data-level="4.11" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-age-while-applying-rings"><i class="fa fa-check"></i><b>4.11</b> Check age while applying rings</a></li>
-<li class="chapter" data-level="4.12" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-bird-sex-inconsistencies"><i class="fa fa-check"></i><b>4.12</b> Check bird sex inconsistencies</a></li>
-<li class="chapter" data-level="4.13" data-path="1_preprocessing.html"><a href="1_preprocessing.html#handle-information-about-metal-ring-number"><i class="fa fa-check"></i><b>4.13</b> Handle information about metal ring number</a></li>
-<li class="chapter" data-level="4.14" data-path="1_preprocessing.html"><a href="1_preprocessing.html#solve-gps-tracker-ids"><i class="fa fa-check"></i><b>4.14</b> Solve GPS tracker IDs</a></li>
-<li class="chapter" data-level="4.15" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-inconsistencies-between-users-and-observers"><i class="fa fa-check"></i><b>4.15</b> Check inconsistencies between users and observers</a></li>
-<li class="chapter" data-level="4.16" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-of-common-shelduck"><i class="fa fa-check"></i><b>4.16</b> Remove data of common shelduck</a></li>
+<li class="chapter" data-level="3" data-path="1_preprocessing.html"><a href="1_preprocessing.html#pre-processing"><i class="fa fa-check"></i><b>3</b> Pre-processing</a><ul>
+<li class="chapter" data-level="3.1" data-path="1_preprocessing.html"><a href="1_preprocessing.html#preview-raw-data"><i class="fa fa-check"></i><b>3.1</b> Preview raw data</a></li>
+<li class="chapter" data-level="3.2" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-spaces-in-birds"><i class="fa fa-check"></i><b>3.2</b> Check spaces in <code>birds</code></a></li>
+<li class="chapter" data-level="3.3" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-duplicates-waarnemingnummer-aktiecode"><i class="fa fa-check"></i><b>3.3</b> Check duplicates <code>WaarnemingNummer</code>-<code>AktieCode</code></a></li>
+<li class="chapter" data-level="3.4" data-path="1_preprocessing.html"><a href="1_preprocessing.html#merge-observations-and-actions"><i class="fa fa-check"></i><b>3.4</b> Merge observations and actions</a></li>
+<li class="chapter" data-level="3.5" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-spaces-in-obs_and_acts"><i class="fa fa-check"></i><b>3.5</b> Check spaces in <code>obs_and_acts</code></a></li>
+<li class="chapter" data-level="3.6" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-presence-action-code"><i class="fa fa-check"></i><b>3.6</b> Check presence action code</a></li>
+<li class="chapter" data-level="3.7" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-labelled-as-fout"><i class="fa fa-check"></i><b>3.7</b> Remove data labelled as <code>FOUT</code></a></li>
+<li class="chapter" data-level="3.8" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-color-rings-uppercase"><i class="fa fa-check"></i><b>3.8</b> Check color rings: uppercase</a></li>
+<li class="chapter" data-level="3.9" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-keys-kleurringnummer-obs---nummer-birds"><i class="fa fa-check"></i><b>3.9</b> Check keys <code>KleurringNummer</code> (obs) - <code>Nummer</code> (birds)</a></li>
+<li class="chapter" data-level="3.10" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-duplicates-in-date-of-applying-rings"><i class="fa fa-check"></i><b>3.10</b> Check duplicates in date of applying rings</a></li>
+<li class="chapter" data-level="3.11" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-age-while-applying-rings"><i class="fa fa-check"></i><b>3.11</b> Check age while applying rings</a></li>
+<li class="chapter" data-level="3.12" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-bird-sex-inconsistencies"><i class="fa fa-check"></i><b>3.12</b> Check bird sex inconsistencies</a></li>
+<li class="chapter" data-level="3.13" data-path="1_preprocessing.html"><a href="1_preprocessing.html#handle-information-about-metal-ring-number"><i class="fa fa-check"></i><b>3.13</b> Handle information about metal ring number</a></li>
+<li class="chapter" data-level="3.14" data-path="1_preprocessing.html"><a href="1_preprocessing.html#solve-gps-tracker-ids"><i class="fa fa-check"></i><b>3.14</b> Solve GPS tracker IDs</a></li>
+<li class="chapter" data-level="3.15" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-inconsistencies-between-users-and-observers"><i class="fa fa-check"></i><b>3.15</b> Check inconsistencies between users and observers</a></li>
+<li class="chapter" data-level="3.16" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-of-common-shelduck"><i class="fa fa-check"></i><b>3.16</b> Remove data of common shelduck</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="1_preprocessing.html"><a href="1_preprocessing.html#save-preprocessed-data"><i class="fa fa-check"></i><b>5</b> Save preprocessed data</a></li>
-<li class="chapter" data-level="6" data-path="2_users.html"><a href="2_users.html"><i class="fa fa-check"></i><b>6</b> Goal</a></li>
-<li class="chapter" data-level="7" data-path="2_users.html"><a href="2_users.html#read-temporary-user-data"><i class="fa fa-check"></i><b>7</b> Read temporary user data</a></li>
-<li class="chapter" data-level="8" data-path="2_users.html"><a href="2_users.html#map-user-data"><i class="fa fa-check"></i><b>8</b> Map user data</a><ul>
-<li class="chapter" data-level="8.1" data-path="2_users.html"><a href="2_users.html#e-mail"><i class="fa fa-check"></i><b>8.1</b> E-mail</a></li>
-<li class="chapter" data-level="8.2" data-path="2_users.html"><a href="2_users.html#first-name"><i class="fa fa-check"></i><b>8.2</b> First name</a></li>
-<li class="chapter" data-level="8.3" data-path="2_users.html"><a href="2_users.html#last-name"><i class="fa fa-check"></i><b>8.3</b> Last name</a></li>
-<li class="chapter" data-level="8.4" data-path="2_users.html"><a href="2_users.html#address"><i class="fa fa-check"></i><b>8.4</b> Address</a></li>
-<li class="chapter" data-level="8.5" data-path="2_users.html"><a href="2_users.html#place"><i class="fa fa-check"></i><b>8.5</b> Place</a></li>
-<li class="chapter" data-level="8.6" data-path="2_users.html"><a href="2_users.html#postal-code"><i class="fa fa-check"></i><b>8.6</b> Postal code</a></li>
-<li class="chapter" data-level="8.7" data-path="2_users.html"><a href="2_users.html#country"><i class="fa fa-check"></i><b>8.7</b> Country</a></li>
-<li class="chapter" data-level="8.8" data-path="2_users.html"><a href="2_users.html#user-id"><i class="fa fa-check"></i><b>8.8</b> User ID</a></li>
-<li class="chapter" data-level="8.9" data-path="2_users.html"><a href="2_users.html#user-reference"><i class="fa fa-check"></i><b>8.9</b> User reference</a></li>
-<li class="chapter" data-level="8.10" data-path="2_users.html"><a href="2_users.html#user-language"><i class="fa fa-check"></i><b>8.10</b> User language</a></li>
+<li class="chapter" data-level="4" data-path="1_preprocessing.html"><a href="1_preprocessing.html#save-preprocessed-data"><i class="fa fa-check"></i><b>4</b> Save preprocessed data</a></li>
+<li class="chapter" data-level="5" data-path="2_users.html"><a href="2_users.html"><i class="fa fa-check"></i><b>5</b> Map user data</a><ul>
+<li class="chapter" data-level="5.1" data-path="2_users.html"><a href="2_users.html#read-temporary-user-data"><i class="fa fa-check"></i><b>5.1</b> Read temporary user data</a></li>
+<li class="chapter" data-level="5.2" data-path="2_users.html"><a href="2_users.html#map-user-data-1"><i class="fa fa-check"></i><b>5.2</b> Map user data</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="2_users.html"><a href="2_users.html#e-mail"><i class="fa fa-check"></i><b>5.2.1</b> E-mail</a></li>
+<li class="chapter" data-level="5.2.2" data-path="2_users.html"><a href="2_users.html#first-name"><i class="fa fa-check"></i><b>5.2.2</b> First name</a></li>
+<li class="chapter" data-level="5.2.3" data-path="2_users.html"><a href="2_users.html#last-name"><i class="fa fa-check"></i><b>5.2.3</b> Last name</a></li>
+<li class="chapter" data-level="5.2.4" data-path="2_users.html"><a href="2_users.html#address"><i class="fa fa-check"></i><b>5.2.4</b> Address</a></li>
+<li class="chapter" data-level="5.2.5" data-path="2_users.html"><a href="2_users.html#place"><i class="fa fa-check"></i><b>5.2.5</b> Place</a></li>
+<li class="chapter" data-level="5.2.6" data-path="2_users.html"><a href="2_users.html#postal-code"><i class="fa fa-check"></i><b>5.2.6</b> Postal code</a></li>
+<li class="chapter" data-level="5.2.7" data-path="2_users.html"><a href="2_users.html#country"><i class="fa fa-check"></i><b>5.2.7</b> Country</a></li>
+<li class="chapter" data-level="5.2.8" data-path="2_users.html"><a href="2_users.html#user-id"><i class="fa fa-check"></i><b>5.2.8</b> User ID</a></li>
+<li class="chapter" data-level="5.2.9" data-path="2_users.html"><a href="2_users.html#user-reference"><i class="fa fa-check"></i><b>5.2.9</b> User reference</a></li>
+<li class="chapter" data-level="5.2.10" data-path="2_users.html"><a href="2_users.html#user-language"><i class="fa fa-check"></i><b>5.2.10</b> User language</a></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="2_users.html"><a href="2_users.html#create-crbirding_users"><i class="fa fa-check"></i><b>9</b> Create <code>crbirding_users</code></a></li>
-<li class="chapter" data-level="10" data-path="3_birds.html"><a href="3_birds.html"><i class="fa fa-check"></i><b>10</b> Goal</a></li>
-<li class="chapter" data-level="11" data-path="3_birds.html"><a href="3_birds.html#read-temporary-data"><i class="fa fa-check"></i><b>11</b> Read temporary data</a><ul>
-<li class="chapter" data-level="11.1" data-path="3_birds.html"><a href="3_birds.html#read-ring-data"><i class="fa fa-check"></i><b>11.1</b> Read ring data</a></li>
-<li class="chapter" data-level="11.2" data-path="3_birds.html"><a href="3_birds.html#read-observation-data"><i class="fa fa-check"></i><b>11.2</b> Read observation data</a></li>
-<li class="chapter" data-level="11.3" data-path="3_birds.html"><a href="3_birds.html#read-action-data"><i class="fa fa-check"></i><b>11.3</b> Read action data</a></li>
-<li class="chapter" data-level="11.4" data-path="3_birds.html"><a href="3_birds.html#read-user-data"><i class="fa fa-check"></i><b>11.4</b> Read user data</a></li>
+<li class="chapter" data-level="5.3" data-path="2_users.html"><a href="2_users.html#create-crbirding_users"><i class="fa fa-check"></i><b>5.3</b> Create <code>crbirding_users</code></a></li>
 </ul></li>
-<li class="chapter" data-level="12" data-path="3_birds.html"><a href="3_birds.html#map-color-ring-data"><i class="fa fa-check"></i><b>12</b> Map color ring data</a><ul>
-<li class="chapter" data-level="12.1" data-path="3_birds.html"><a href="3_birds.html#extract-action-codes"><i class="fa fa-check"></i><b>12.1</b> Extract action codes</a></li>
-<li class="chapter" data-level="12.2" data-path="3_birds.html"><a href="3_birds.html#bird-reference-bird-shorthand"><i class="fa fa-check"></i><b>12.2</b> Bird reference &amp; bird shorthand</a></li>
-<li class="chapter" data-level="12.3" data-path="3_birds.html"><a href="3_birds.html#bird-ringing-date"><i class="fa fa-check"></i><b>12.3</b> Bird ringing date</a><ul>
-<li class="chapter" data-level="12.3.1" data-path="3_birds.html"><a href="3_birds.html#date-of-applying-first-ring"><i class="fa fa-check"></i><b>12.3.1</b> Date of applying first ring</a></li>
-<li class="chapter" data-level="12.3.2" data-path="3_birds.html"><a href="3_birds.html#date-of-applying-last-ring"><i class="fa fa-check"></i><b>12.3.2</b> Date of applying last ring</a></li>
-<li class="chapter" data-level="12.3.3" data-path="3_birds.html"><a href="3_birds.html#add-intermediate-color-rings"><i class="fa fa-check"></i><b>12.3.3</b> Add intermediate color rings</a></li>
+<li class="chapter" data-level="6" data-path="3_birds.html"><a href="3_birds.html"><i class="fa fa-check"></i><b>6</b> Map ring data</a><ul>
+<li class="chapter" data-level="6.1" data-path="3_birds.html"><a href="3_birds.html#read-temporary-ring-data"><i class="fa fa-check"></i><b>6.1</b> Read temporary ring data</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="3_birds.html"><a href="3_birds.html#read-observation-data"><i class="fa fa-check"></i><b>6.1.1</b> Read observation data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="3_birds.html"><a href="3_birds.html#read-action-data"><i class="fa fa-check"></i><b>6.1.2</b> Read action data</a></li>
+<li class="chapter" data-level="6.1.3" data-path="3_birds.html"><a href="3_birds.html#read-user-data"><i class="fa fa-check"></i><b>6.1.3</b> Read user data</a></li>
 </ul></li>
-<li class="chapter" data-level="12.4" data-path="3_birds.html"><a href="3_birds.html#bird-ringing-end-date"><i class="fa fa-check"></i><b>12.4</b> Bird ringing end date</a></li>
-<li class="chapter" data-level="12.5" data-path="3_birds.html"><a href="3_birds.html#add-rows-for-metal-rings-without-color-rings"><i class="fa fa-check"></i><b>12.5</b> Add rows for metal rings without color rings</a></li>
-<li class="chapter" data-level="12.6" data-path="3_birds.html"><a href="3_birds.html#ring-number"><i class="fa fa-check"></i><b>12.6</b> Ring number</a></li>
-<li class="chapter" data-level="12.7" data-path="3_birds.html"><a href="3_birds.html#euring"><i class="fa fa-check"></i><b>12.7</b> Euring</a></li>
-<li class="chapter" data-level="12.8" data-path="3_birds.html"><a href="3_birds.html#scheme"><i class="fa fa-check"></i><b>12.8</b> Scheme</a></li>
-<li class="chapter" data-level="12.9" data-path="3_birds.html"><a href="3_birds.html#bird-sex"><i class="fa fa-check"></i><b>12.9</b> Bird sex</a></li>
-<li class="chapter" data-level="12.10" data-path="3_birds.html"><a href="3_birds.html#bird-age-ringing"><i class="fa fa-check"></i><b>12.10</b> Bird age ringing</a></li>
-<li class="chapter" data-level="12.11" data-path="3_birds.html"><a href="3_birds.html#bird-id"><i class="fa fa-check"></i><b>12.11</b> Bird ID</a></li>
-<li class="chapter" data-level="12.12" data-path="3_birds.html"><a href="3_birds.html#bird-bto"><i class="fa fa-check"></i><b>12.12</b> Bird BTO</a></li>
-<li class="chapter" data-level="12.13" data-path="3_birds.html"><a href="3_birds.html#bird-name"><i class="fa fa-check"></i><b>12.13</b> Bird name</a></li>
-<li class="chapter" data-level="12.14" data-path="3_birds.html"><a href="3_birds.html#bird-birth-year"><i class="fa fa-check"></i><b>12.14</b> Bird birth year</a></li>
+<li class="chapter" data-level="6.2" data-path="3_birds.html"><a href="3_birds.html#map-color-ring-data"><i class="fa fa-check"></i><b>6.2</b> Map color ring data</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="3_birds.html"><a href="3_birds.html#extract-action-codes"><i class="fa fa-check"></i><b>6.2.1</b> Extract action codes</a></li>
+<li class="chapter" data-level="6.2.2" data-path="3_birds.html"><a href="3_birds.html#bird-reference-bird-shorthand"><i class="fa fa-check"></i><b>6.2.2</b> Bird reference &amp; bird shorthand</a></li>
+<li class="chapter" data-level="6.2.3" data-path="3_birds.html"><a href="3_birds.html#bird-ringing-date"><i class="fa fa-check"></i><b>6.2.3</b> Bird ringing date</a></li>
+<li class="chapter" data-level="6.2.4" data-path="3_birds.html"><a href="3_birds.html#bird-ringing-end-date"><i class="fa fa-check"></i><b>6.2.4</b> Bird ringing end date</a></li>
+<li class="chapter" data-level="6.2.5" data-path="3_birds.html"><a href="3_birds.html#add-rows-for-metal-rings-without-color-rings"><i class="fa fa-check"></i><b>6.2.5</b> Add rows for metal rings without color rings</a></li>
+<li class="chapter" data-level="6.2.6" data-path="3_birds.html"><a href="3_birds.html#ring-number"><i class="fa fa-check"></i><b>6.2.6</b> Ring number</a></li>
+<li class="chapter" data-level="6.2.7" data-path="3_birds.html"><a href="3_birds.html#euring"><i class="fa fa-check"></i><b>6.2.7</b> Euring</a></li>
+<li class="chapter" data-level="6.2.8" data-path="3_birds.html"><a href="3_birds.html#scheme"><i class="fa fa-check"></i><b>6.2.8</b> Scheme</a></li>
+<li class="chapter" data-level="6.2.9" data-path="3_birds.html"><a href="3_birds.html#bird-sex"><i class="fa fa-check"></i><b>6.2.9</b> Bird sex</a></li>
+<li class="chapter" data-level="6.2.10" data-path="3_birds.html"><a href="3_birds.html#bird-age-ringing"><i class="fa fa-check"></i><b>6.2.10</b> Bird age ringing</a></li>
+<li class="chapter" data-level="6.2.11" data-path="3_birds.html"><a href="3_birds.html#bird-id"><i class="fa fa-check"></i><b>6.2.11</b> Bird ID</a></li>
+<li class="chapter" data-level="6.2.12" data-path="3_birds.html"><a href="3_birds.html#bird-bto"><i class="fa fa-check"></i><b>6.2.12</b> Bird BTO</a></li>
+<li class="chapter" data-level="6.2.13" data-path="3_birds.html"><a href="3_birds.html#bird-name"><i class="fa fa-check"></i><b>6.2.13</b> Bird name</a></li>
+<li class="chapter" data-level="6.2.14" data-path="3_birds.html"><a href="3_birds.html#bird-birth-year"><i class="fa fa-check"></i><b>6.2.14</b> Bird birth year</a></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="3_birds.html"><a href="3_birds.html#finalize-crbirding_users"><i class="fa fa-check"></i><b>13</b> Finalize <code>crbirding_users</code></a><ul>
-<li class="chapter" data-level="13.1" data-path="3_birds.html"><a href="3_birds.html#add-user-role-to-crbirding_users"><i class="fa fa-check"></i><b>13.1</b> Add user role to <code>crbirding_users</code></a></li>
+<li class="chapter" data-level="6.3" data-path="3_birds.html"><a href="3_birds.html#finalize-crbirding_users"><i class="fa fa-check"></i><b>6.3</b> Finalize <code>crbirding_users</code></a><ul>
+<li class="chapter" data-level="6.3.1" data-path="3_birds.html"><a href="3_birds.html#add-user-role-to-crbirding_users"><i class="fa fa-check"></i><b>6.3.1</b> Add user role to <code>crbirding_users</code></a></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="3_birds.html"><a href="3_birds.html#save-modified-temporary-observation-data"><i class="fa fa-check"></i><b>14</b> Save modified temporary observation data</a></li>
-<li class="chapter" data-level="15" data-path="3_birds.html"><a href="3_birds.html#save-final-user-data"><i class="fa fa-check"></i><b>15</b> Save final user data</a></li>
-<li class="chapter" data-level="16" data-path="3_birds.html"><a href="3_birds.html#save-final-ring-data"><i class="fa fa-check"></i><b>16</b> Save final ring data</a></li>
-<li class="chapter" data-level="17" data-path="4_observations.html"><a href="4_observations.html"><i class="fa fa-check"></i><b>17</b> Map observation data</a></li>
-<li class="chapter" data-level="18" data-path="4_observations.html"><a href="4_observations.html#read-data"><i class="fa fa-check"></i><b>18</b> Read data</a><ul>
-<li class="chapter" data-level="18.1" data-path="4_observations.html"><a href="4_observations.html#read-temporary-observation-data"><i class="fa fa-check"></i><b>18.1</b> Read temporary observation data</a></li>
-<li class="chapter" data-level="18.2" data-path="4_observations.html"><a href="4_observations.html#read-action-data-1"><i class="fa fa-check"></i><b>18.2</b> Read action data</a></li>
-<li class="chapter" data-level="18.3" data-path="4_observations.html"><a href="4_observations.html#read-processed-ring-data"><i class="fa fa-check"></i><b>18.3</b> Read processed ring data</a></li>
-<li class="chapter" data-level="18.4" data-path="4_observations.html"><a href="4_observations.html#read-temporary-ring-data"><i class="fa fa-check"></i><b>18.4</b> Read temporary ring data</a></li>
-<li class="chapter" data-level="18.5" data-path="4_observations.html"><a href="4_observations.html#read-processed-user-data"><i class="fa fa-check"></i><b>18.5</b> Read processed user data</a></li>
-<li class="chapter" data-level="18.6" data-path="4_observations.html"><a href="4_observations.html#read-list-workers-in-bird-shelters"><i class="fa fa-check"></i><b>18.6</b> Read list workers in bird shelters</a></li>
+<li class="chapter" data-level="6.4" data-path="3_birds.html"><a href="3_birds.html#save-modified-temporary-observation-data"><i class="fa fa-check"></i><b>6.4</b> Save modified temporary observation data</a></li>
+<li class="chapter" data-level="6.5" data-path="3_birds.html"><a href="3_birds.html#save-final-user-data"><i class="fa fa-check"></i><b>6.5</b> Save final user data</a></li>
+<li class="chapter" data-level="6.6" data-path="3_birds.html"><a href="3_birds.html#save-final-ring-data"><i class="fa fa-check"></i><b>6.6</b> Save final ring data</a></li>
 </ul></li>
-<li class="chapter" data-level="19" data-path="4_observations.html"><a href="4_observations.html#map-color-observation-data"><i class="fa fa-check"></i><b>19</b> Map color observation data</a><ul>
-<li class="chapter" data-level="19.1" data-path="4_observations.html"><a href="4_observations.html#extract-action-codes-1"><i class="fa fa-check"></i><b>19.1</b> Extract action codes</a></li>
-<li class="chapter" data-level="19.2" data-path="4_observations.html"><a href="4_observations.html#observation-id"><i class="fa fa-check"></i><b>19.2</b> Observation ID</a></li>
-<li class="chapter" data-level="19.3" data-path="4_observations.html"><a href="4_observations.html#observation-reference"><i class="fa fa-check"></i><b>19.3</b> Observation reference</a></li>
-<li class="chapter" data-level="19.4" data-path="4_observations.html"><a href="4_observations.html#observation-date"><i class="fa fa-check"></i><b>19.4</b> Observation date</a></li>
-<li class="chapter" data-level="19.5" data-path="4_observations.html"><a href="4_observations.html#observation-time"><i class="fa fa-check"></i><b>19.5</b> Observation time</a></li>
-<li class="chapter" data-level="19.6" data-path="4_observations.html"><a href="4_observations.html#observation-latitude"><i class="fa fa-check"></i><b>19.6</b> Observation latitude</a></li>
-<li class="chapter" data-level="19.7" data-path="4_observations.html"><a href="4_observations.html#observation-longitude"><i class="fa fa-check"></i><b>19.7</b> Observation longitude</a></li>
-<li class="chapter" data-level="19.8" data-path="4_observations.html"><a href="4_observations.html#observation-location"><i class="fa fa-check"></i><b>19.8</b> Observation location</a></li>
-<li class="chapter" data-level="19.9" data-path="4_observations.html"><a href="4_observations.html#check-bird"><i class="fa fa-check"></i><b>19.9</b> Check bird</a></li>
-<li class="chapter" data-level="19.10" data-path="4_observations.html"><a href="4_observations.html#user-id-1"><i class="fa fa-check"></i><b>19.10</b> User ID</a></li>
-<li class="chapter" data-level="19.11" data-path="4_observations.html"><a href="4_observations.html#user-reference-1"><i class="fa fa-check"></i><b>19.11</b> User reference</a></li>
-<li class="chapter" data-level="19.12" data-path="4_observations.html"><a href="4_observations.html#observer"><i class="fa fa-check"></i><b>19.12</b> Observer</a></li>
-<li class="chapter" data-level="19.13" data-path="4_observations.html"><a href="4_observations.html#observer-e-mail"><i class="fa fa-check"></i><b>19.13</b> Observer e-mail</a></li>
-<li class="chapter" data-level="19.14" data-path="4_observations.html"><a href="4_observations.html#reporter---ringer-number"><i class="fa fa-check"></i><b>19.14</b> Reporter - ringer number</a></li>
-<li class="chapter" data-level="19.15" data-path="4_observations.html"><a href="4_observations.html#ring-number-1"><i class="fa fa-check"></i><b>19.15</b> Ring number</a></li>
-<li class="chapter" data-level="19.16" data-path="4_observations.html"><a href="4_observations.html#observation-status"><i class="fa fa-check"></i><b>19.16</b> Observation status</a></li>
-<li class="chapter" data-level="19.17" data-path="4_observations.html"><a href="4_observations.html#condition"><i class="fa fa-check"></i><b>19.17</b> Condition</a></li>
-<li class="chapter" data-level="19.18" data-path="4_observations.html"><a href="4_observations.html#mri-metal-ring-information"><i class="fa fa-check"></i><b>19.18</b> MRI: metal ring information</a></li>
-<li class="chapter" data-level="19.19" data-path="4_observations.html"><a href="4_observations.html#mapping-of-inbo-actions-to-status-condition-and-mri"><i class="fa fa-check"></i><b>19.19</b> Mapping of INBO actions to status, condition and MRI</a></li>
-<li class="chapter" data-level="19.20" data-path="4_observations.html"><a href="4_observations.html#bird-age-ringing-1"><i class="fa fa-check"></i><b>19.20</b> Bird age ringing</a></li>
-<li class="chapter" data-level="19.21" data-path="4_observations.html"><a href="4_observations.html#bird-sex-1"><i class="fa fa-check"></i><b>19.21</b> Bird sex</a></li>
-<li class="chapter" data-level="19.22" data-path="4_observations.html"><a href="4_observations.html#capture"><i class="fa fa-check"></i><b>19.22</b> Capture</a></li>
-<li class="chapter" data-level="19.23" data-path="4_observations.html"><a href="4_observations.html#bird-id-1"><i class="fa fa-check"></i><b>19.23</b> Bird ID</a></li>
-<li class="chapter" data-level="19.24" data-path="4_observations.html"><a href="4_observations.html#observation-notes"><i class="fa fa-check"></i><b>19.24</b> Observation notes</a></li>
+<li class="chapter" data-level="7" data-path="4_observations.html"><a href="4_observations.html"><i class="fa fa-check"></i><b>7</b> Map observation data</a><ul>
+<li class="chapter" data-level="7.1" data-path="4_observations.html"><a href="4_observations.html#read-data"><i class="fa fa-check"></i><b>7.1</b> Read data</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="4_observations.html"><a href="4_observations.html#read-temporary-observation-data"><i class="fa fa-check"></i><b>7.1.1</b> Read temporary observation data</a></li>
+<li class="chapter" data-level="7.1.2" data-path="4_observations.html"><a href="4_observations.html#read-action-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Read action data</a></li>
+<li class="chapter" data-level="7.1.3" data-path="4_observations.html"><a href="4_observations.html#read-processed-ring-data"><i class="fa fa-check"></i><b>7.1.3</b> Read processed ring data</a></li>
+<li class="chapter" data-level="7.1.4" data-path="4_observations.html"><a href="4_observations.html#read-temporary-ring-data-1"><i class="fa fa-check"></i><b>7.1.4</b> Read temporary ring data</a></li>
+<li class="chapter" data-level="7.1.5" data-path="4_observations.html"><a href="4_observations.html#read-processed-user-data"><i class="fa fa-check"></i><b>7.1.5</b> Read processed user data</a></li>
+<li class="chapter" data-level="7.1.6" data-path="4_observations.html"><a href="4_observations.html#read-list-workers-in-bird-shelters"><i class="fa fa-check"></i><b>7.1.6</b> Read list workers in bird shelters</a></li>
 </ul></li>
-<li class="chapter" data-level="20" data-path="4_observations.html"><a href="4_observations.html#observation-data"><i class="fa fa-check"></i><b>20</b> Observation data</a></li>
+<li class="chapter" data-level="7.2" data-path="4_observations.html"><a href="4_observations.html#map-color-observation-data"><i class="fa fa-check"></i><b>7.2</b> Map color observation data</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="4_observations.html"><a href="4_observations.html#extract-action-codes-1"><i class="fa fa-check"></i><b>7.2.1</b> Extract action codes</a></li>
+<li class="chapter" data-level="7.2.2" data-path="4_observations.html"><a href="4_observations.html#observation-id"><i class="fa fa-check"></i><b>7.2.2</b> Observation ID</a></li>
+<li class="chapter" data-level="7.2.3" data-path="4_observations.html"><a href="4_observations.html#observation-reference"><i class="fa fa-check"></i><b>7.2.3</b> Observation reference</a></li>
+<li class="chapter" data-level="7.2.4" data-path="4_observations.html"><a href="4_observations.html#observation-date"><i class="fa fa-check"></i><b>7.2.4</b> Observation date</a></li>
+<li class="chapter" data-level="7.2.5" data-path="4_observations.html"><a href="4_observations.html#observation-time"><i class="fa fa-check"></i><b>7.2.5</b> Observation time</a></li>
+<li class="chapter" data-level="7.2.6" data-path="4_observations.html"><a href="4_observations.html#observation-latitude"><i class="fa fa-check"></i><b>7.2.6</b> Observation latitude</a></li>
+<li class="chapter" data-level="7.2.7" data-path="4_observations.html"><a href="4_observations.html#observation-longitude"><i class="fa fa-check"></i><b>7.2.7</b> Observation longitude</a></li>
+<li class="chapter" data-level="7.2.8" data-path="4_observations.html"><a href="4_observations.html#observation-location"><i class="fa fa-check"></i><b>7.2.8</b> Observation location</a></li>
+<li class="chapter" data-level="7.2.9" data-path="4_observations.html"><a href="4_observations.html#check-bird"><i class="fa fa-check"></i><b>7.2.9</b> Check bird</a></li>
+<li class="chapter" data-level="7.2.10" data-path="4_observations.html"><a href="4_observations.html#user-id-1"><i class="fa fa-check"></i><b>7.2.10</b> User ID</a></li>
+<li class="chapter" data-level="7.2.11" data-path="4_observations.html"><a href="4_observations.html#user-reference-1"><i class="fa fa-check"></i><b>7.2.11</b> User reference</a></li>
+<li class="chapter" data-level="7.2.12" data-path="4_observations.html"><a href="4_observations.html#observer"><i class="fa fa-check"></i><b>7.2.12</b> Observer</a></li>
+<li class="chapter" data-level="7.2.13" data-path="4_observations.html"><a href="4_observations.html#observer-e-mail"><i class="fa fa-check"></i><b>7.2.13</b> Observer e-mail</a></li>
+<li class="chapter" data-level="7.2.14" data-path="4_observations.html"><a href="4_observations.html#reporter---ringer-number"><i class="fa fa-check"></i><b>7.2.14</b> Reporter - ringer number</a></li>
+<li class="chapter" data-level="7.2.15" data-path="4_observations.html"><a href="4_observations.html#ring-number-1"><i class="fa fa-check"></i><b>7.2.15</b> Ring number</a></li>
+<li class="chapter" data-level="7.2.16" data-path="4_observations.html"><a href="4_observations.html#observation-status"><i class="fa fa-check"></i><b>7.2.16</b> Observation status</a></li>
+<li class="chapter" data-level="7.2.17" data-path="4_observations.html"><a href="4_observations.html#condition"><i class="fa fa-check"></i><b>7.2.17</b> Condition</a></li>
+<li class="chapter" data-level="7.2.18" data-path="4_observations.html"><a href="4_observations.html#mri-metal-ring-information"><i class="fa fa-check"></i><b>7.2.18</b> MRI: metal ring information</a></li>
+<li class="chapter" data-level="7.2.19" data-path="4_observations.html"><a href="4_observations.html#mapping-of-inbo-actions-to-status-condition-and-mri"><i class="fa fa-check"></i><b>7.2.19</b> Mapping of INBO actions to status, condition and MRI</a></li>
+<li class="chapter" data-level="7.2.20" data-path="4_observations.html"><a href="4_observations.html#bird-age-ringing-1"><i class="fa fa-check"></i><b>7.2.20</b> Bird age ringing</a></li>
+<li class="chapter" data-level="7.2.21" data-path="4_observations.html"><a href="4_observations.html#bird-sex-1"><i class="fa fa-check"></i><b>7.2.21</b> Bird sex</a></li>
+<li class="chapter" data-level="7.2.22" data-path="4_observations.html"><a href="4_observations.html#capture"><i class="fa fa-check"></i><b>7.2.22</b> Capture</a></li>
+<li class="chapter" data-level="7.2.23" data-path="4_observations.html"><a href="4_observations.html#bird-id-1"><i class="fa fa-check"></i><b>7.2.23</b> Bird ID</a></li>
+<li class="chapter" data-level="7.2.24" data-path="4_observations.html"><a href="4_observations.html#observation-notes"><i class="fa fa-check"></i><b>7.2.24</b> Observation notes</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="4_observations.html"><a href="4_observations.html#observation-data"><i class="fa fa-check"></i><b>7.3</b> Observation data</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -260,59 +257,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="map-observation-data" class="section level1">
-<h1><span class="header-section-number">17</span> Map observation data</h1>
-<p>This pipeline will map observation data.</p>
-</div>
-<div id="read-data" class="section level1">
-<h1><span class="header-section-number">18</span> Read data</h1>
-<div id="read-temporary-observation-data" class="section level2">
-<h2><span class="header-section-number">18.1</span> Read temporary observation data</h2>
+<h1><span class="header-section-number">7</span> Map observation data</h1>
+<div id="read-data" class="section level2">
+<h2><span class="header-section-number">7.1</span> Read data</h2>
+<div id="read-temporary-observation-data" class="section level3">
+<h3><span class="header-section-number">7.1.1</span> Read temporary observation data</h3>
 <p>We start from the tempoary observation data saved as TSV file in <code>data\interim</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(
   here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;interim&quot;</span>, <span class="st">&quot;obs_and_actions.tsv&quot;</span>), 
   <span class="dt">guess_max =</span> <span class="dv">500000</span>
 )</code></pre>
 </div>
-<div id="read-action-data-1" class="section level2">
-<h2><span class="header-section-number">18.2</span> Read action data</h2>
+<div id="read-action-data-1" class="section level3">
+<h3><span class="header-section-number">7.1.2</span> Read action data</h3>
 <p>Import action codes and relative meaning:</p>
 <pre class="sourceCode r"><code class="sourceCode r">actions_meaning &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;input&quot;</span>, <span class="st">&quot;actions_meaning.tsv&quot;</span>))</code></pre>
 </div>
-<div id="read-processed-ring-data" class="section level2">
-<h2><span class="header-section-number">18.3</span> Read processed ring data</h2>
+<div id="read-processed-ring-data" class="section level3">
+<h3><span class="header-section-number">7.1.3</span> Read processed ring data</h3>
 <p>We import finalized ring data from <code>./data/processed</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">crbirding_birds &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(
   here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;processed&quot;</span>, <span class="st">&quot;crbirding_birds.tsv&quot;</span>), 
   <span class="dt">guess_max =</span> <span class="dv">50000</span>
 )</code></pre>
 </div>
-<div id="read-temporary-ring-data" class="section level2">
-<h2><span class="header-section-number">18.4</span> Read temporary ring data</h2>
+<div id="read-temporary-ring-data-1" class="section level3">
+<h3><span class="header-section-number">7.1.4</span> Read temporary ring data</h3>
 <p>We will need some columns from original INBO ring data. We import the temporary ring data as well:</p>
 <pre class="sourceCode r"><code class="sourceCode r">birds &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(
   here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;interim&quot;</span>, <span class="st">&quot;birds.tsv&quot;</span>), 
   <span class="dt">guess_max =</span> <span class="dv">50000</span>
 )</code></pre>
 </div>
-<div id="read-processed-user-data" class="section level2">
-<h2><span class="header-section-number">18.5</span> Read processed user data</h2>
+<div id="read-processed-user-data" class="section level3">
+<h3><span class="header-section-number">7.1.5</span> Read processed user data</h3>
 <p>We import finalized user data from <code>./data/processed</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">crbirding_users &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(
   here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;processed&quot;</span>, <span class="st">&quot;crbirding_users.tsv&quot;</span>), 
   <span class="dt">guess_max =</span> <span class="dv">50000</span>
 )</code></pre>
 </div>
-<div id="read-list-workers-in-bird-shelters" class="section level2">
-<h2><span class="header-section-number">18.6</span> Read list workers in bird shelters</h2>
+<div id="read-list-workers-in-bird-shelters" class="section level3">
+<h3><span class="header-section-number">7.1.6</span> Read list workers in bird shelters</h3>
 <pre class="sourceCode r"><code class="sourceCode r">workers_bird_shelters &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(
   here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;input&quot;</span>, <span class="st">&quot;workers_in_bird_shelters.tsv&quot;</span>)
 )</code></pre>
 </div>
 </div>
-<div id="map-color-observation-data" class="section level1">
-<h1><span class="header-section-number">19</span> Map color observation data</h1>
-<div id="extract-action-codes-1" class="section level2">
-<h2><span class="header-section-number">19.1</span> Extract action codes</h2>
+<div id="map-color-observation-data" class="section level2">
+<h2><span class="header-section-number">7.2</span> Map color observation data</h2>
+<div id="extract-action-codes-1" class="section level3">
+<h3><span class="header-section-number">7.2.1</span> Extract action codes</h3>
 <p>Actions present in <code>obs_and_acts</code> :</p>
 <pre class="sourceCode r"><code class="sourceCode r">acts &lt;-<span class="st"> </span>actions_meaning<span class="op">$</span>Code
 acts &lt;-<span class="st"> </span>acts[acts <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(obs_and_acts)]
@@ -320,36 +315,36 @@ acts</code></pre>
 <pre><code>##  [1] &quot;rngkl&quot; &quot;rngme&quot; &quot;klgev&quot; &quot;br&quot;    &quot;vang&quot;  &quot;dood&quot;  &quot;klweg&quot; &quot;veld&quot; 
 ##  [9] &quot;meweg&quot; &quot;me&quot;    &quot;vangl&quot; &quot;ziek&quot;</code></pre>
 </div>
-<div id="observation-id" class="section level2">
-<h2><span class="header-section-number">19.2</span> Observation ID</h2>
+<div id="observation-id" class="section level3">
+<h3><span class="header-section-number">7.2.2</span> Observation ID</h3>
 <p>The field <code>sovon_observation_id</code> is left to SOVON:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_observation_id =</span> <span class="ot">NA</span>)</code></pre>
 </div>
-<div id="observation-reference" class="section level2">
-<h2><span class="header-section-number">19.3</span> Observation reference</h2>
+<div id="observation-reference" class="section level3">
+<h3><span class="header-section-number">7.2.3</span> Observation reference</h3>
 <p>The observation reference is an unique identifier assigned to each observation. This field exists already: <code>Nummer</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_observation_reference =</span> Nummer)</code></pre>
 </div>
-<div id="observation-date" class="section level2">
-<h2><span class="header-section-number">19.4</span> Observation date</h2>
+<div id="observation-date" class="section level3">
+<h3><span class="header-section-number">7.2.4</span> Observation date</h3>
 <p>The date is saved in column <code>Datum</code>. We copy it in required column <code>sovon_observation_date</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_observation_date =</span> Datum)</code></pre>
 </div>
-<div id="observation-time" class="section level2">
-<h2><span class="header-section-number">19.5</span> Observation time</h2>
+<div id="observation-time" class="section level3">
+<h3><span class="header-section-number">7.2.5</span> Observation time</h3>
 <p>There is no observation time in <code>obs_and_acts</code>. <code>NA</code> is given to <code>sovon_observation_time</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_observation_time =</span> <span class="ot">NA</span>)</code></pre>
 </div>
-<div id="observation-latitude" class="section level2">
-<h2><span class="header-section-number">19.6</span> Observation latitude</h2>
+<div id="observation-latitude" class="section level3">
+<h3><span class="header-section-number">7.2.6</span> Observation latitude</h3>
 <p>Observation latitude should be converted to decimal degrees:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
@@ -362,8 +357,8 @@ acts</code></pre>
       <span class="dt">from =</span> <span class="st">&#39;deg_min_sec&#39;</span>, <span class="dt">to =</span> <span class="st">&#39;dec_deg&#39;</span>)
 )</code></pre>
 </div>
-<div id="observation-longitude" class="section level2">
-<h2><span class="header-section-number">19.7</span> Observation longitude</h2>
+<div id="observation-longitude" class="section level3">
+<h3><span class="header-section-number">7.2.7</span> Observation longitude</h3>
 <p>Observation longitude should be converted to decimal degrees:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
@@ -376,8 +371,8 @@ acts</code></pre>
       <span class="dt">from =</span> <span class="st">&#39;deg_min_sec&#39;</span>, <span class="dt">to =</span> <span class="st">&#39;dec_deg&#39;</span>)
 )</code></pre>
 </div>
-<div id="observation-location" class="section level2">
-<h2><span class="header-section-number">19.8</span> Observation location</h2>
+<div id="observation-location" class="section level3">
+<h3><span class="header-section-number">7.2.8</span> Observation location</h3>
 <p>Aggregate information about observation location. We follow the following structure: <code>PlaatsGemeente</code> [+ <code>,</code> + <code>PlaatsToponym</code> [+ <code>:</code> + <code>PlaatsToponymDetail</code>]]:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
@@ -394,29 +389,29 @@ acts</code></pre>
                                         <span class="dt">sep =</span> <span class="st">&quot;: &quot;</span>),
                                   <span class="kw">paste</span>(sovon_observation_location)))</code></pre>
 </div>
-<div id="check-bird" class="section level2">
-<h2><span class="header-section-number">19.9</span> Check bird</h2>
+<div id="check-bird" class="section level3">
+<h3><span class="header-section-number">7.2.9</span> Check bird</h3>
 <p>The field <code>sovon_check_bird</code> is provided by SOVON. <code>NA</code> is given:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_check_bird =</span> <span class="ot">NA</span>)</code></pre>
 </div>
-<div id="user-id-1" class="section level2">
-<h2><span class="header-section-number">19.10</span> User ID</h2>
+<div id="user-id-1" class="section level3">
+<h3><span class="header-section-number">7.2.10</span> User ID</h3>
 <p>The field <code>sovon_user_id</code> is left to SOVON:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_id =</span> <span class="ot">NA</span>)</code></pre>
 </div>
-<div id="user-reference-1" class="section level2">
-<h2><span class="header-section-number">19.11</span> User reference</h2>
+<div id="user-reference-1" class="section level3">
+<h3><span class="header-section-number">7.2.11</span> User reference</h3>
 <p>The field <code>sovon_user_reference</code> links observations to users and it is equal to field <code>user_reference</code> in user data:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_reference =</span> WaarnemerNummer)</code></pre>
 </div>
-<div id="observer" class="section level2">
-<h2><span class="header-section-number">19.12</span> Observer</h2>
+<div id="observer" class="section level3">
+<h3><span class="header-section-number">7.2.12</span> Observer</h3>
 <p>The field <code>sovon_melder</code> is equal to <code>user_first_name</code> and <code>user_last_name</code> in <code>users</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
@@ -431,8 +426,8 @@ acts</code></pre>
     <span class="kw">is.na</span>(user_first_name) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.na</span>(user_last_name) <span class="op">~</span><span class="st"> </span><span class="ot">NA_character_</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(user_first_name, user_last_name))</code></pre>
 </div>
-<div id="observer-e-mail" class="section level2">
-<h2><span class="header-section-number">19.13</span> Observer e-mail</h2>
+<div id="observer-e-mail" class="section level3">
+<h3><span class="header-section-number">7.2.13</span> Observer e-mail</h3>
 <p>The field <code>sovon_melder_email</code> is equal to <code>user_email</code> in <code>users</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
@@ -442,22 +437,22 @@ acts</code></pre>
     <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;WaarnemerNummer&quot;</span> =<span class="st"> &quot;user_reference&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_melder_email =</span> user_email)</code></pre>
 </div>
-<div id="reporter---ringer-number" class="section level2">
-<h2><span class="header-section-number">19.14</span> Reporter - ringer number</h2>
+<div id="reporter---ringer-number" class="section level3">
+<h3><span class="header-section-number">7.2.14</span> Reporter - ringer number</h3>
 <p>The field <code>sovon_melder_ringersnummer</code> is left to SOVON:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_melder_ringersnummer =</span> <span class="ot">NA</span>)</code></pre>
 </div>
-<div id="ring-number-1" class="section level2">
-<h2><span class="header-section-number">19.15</span> Ring number</h2>
+<div id="ring-number-1" class="section level3">
+<h3><span class="header-section-number">7.2.15</span> Ring number</h3>
 <p>The field <code>sovon_ring_number</code> contains information about the metal ring number, in the same format as in field <code>bird_ring_number</code> of <code>crbirding_birds</code>. As explained in the mapping of field <code>bird_ring_number</code> of <code>crbirding_birds</code>, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_ring_number =</span> <span class="ot">NA_character_</span>)</code></pre>
 </div>
-<div id="observation-status" class="section level2">
-<h2><span class="header-section-number">19.16</span> Observation status</h2>
+<div id="observation-status" class="section level3">
+<h3><span class="header-section-number">7.2.16</span> Observation status</h3>
 <p>Adding the EURING status information arises by the need of mapping the observations with action code <code>br</code> and <code>vang</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">actions_meaning <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">filter</span>(Code <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;br&quot;</span>, <span class="st">&quot;vang&quot;</span>))</code></pre>
@@ -475,8 +470,8 @@ acts</code></pre>
     <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;U&quot;</span>
   ))</code></pre>
 </div>
-<div id="condition" class="section level2">
-<h2><span class="header-section-number">19.17</span> Condition</h2>
+<div id="condition" class="section level3">
+<h3><span class="header-section-number">7.2.17</span> Condition</h3>
 <p>The SOVON field <code>condition</code> is mapped following the scheme at page 22 of <a href="https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf">EURING Exchange Code 2000+</a> document. The following actions are mapped as follows in order of priority:</p>
 <ol style="list-style-type: decimal">
 <li><code>dood</code>: condition = 1</li>
@@ -524,7 +519,7 @@ condition_<span class="dv">5</span>_obs_ref &lt;-<span class="st"> </span>
 <span class="st">  </span><span class="kw">filter</span>(sovon_observation_date <span class="op">&gt;=</span><span class="st"> </span>last_sick_date <span class="op">&amp;</span><span class="st"> </span>
 <span class="st">           </span>sovon_observation_date <span class="op">&lt;</span><span class="st"> </span>dead_date) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">count</span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="co"># only one ziek action present -&gt; no obs possible if not released</span>
+<span class="st">  </span><span class="co">## only one ziek action present -&gt; no obs possible if not released</span>
 <span class="st">  </span><span class="kw">filter</span>(n <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">left_join</span>(last_sick_df,
             <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;sovon_bird_reference&quot;</span>)) <span class="op">%&gt;%</span>
@@ -554,8 +549,8 @@ condition_<span class="dv">5</span>_obs_ref &lt;-<span class="st"> </span>
   </script>
 </div>
 </div>
-<div id="mri-metal-ring-information" class="section level2">
-<h2><span class="header-section-number">19.18</span> MRI: metal ring information</h2>
+<div id="mri-metal-ring-information" class="section level3">
+<h3><span class="header-section-number">7.2.18</span> MRI: metal ring information</h3>
 <p>Metal ring information is an integer between 0 and 9. A table can be found at page 8 of <a href="https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf">EURING Exchange Code 2000+</a> document.</p>
 <p>However, SOVON uses this field to map the observations referring to the applying of any kind of ring, either color or metal, as their database is purely focussed on color rings and due to a missing field in the EURING Exchange Code 2000+ specific for color rings.</p>
 <p>Some actions are related to this field and are mapped as follows:</p>
@@ -697,8 +692,8 @@ obs_and_acts &lt;-<span class="st"> </span>
   </script>
 </div>
 </div>
-<div id="mapping-of-inbo-actions-to-status-condition-and-mri" class="section level2">
-<h2><span class="header-section-number">19.19</span> Mapping of INBO actions to status, condition and MRI</h2>
+<div id="mapping-of-inbo-actions-to-status-condition-and-mri" class="section level3">
+<h3><span class="header-section-number">7.2.19</span> Mapping of INBO actions to status, condition and MRI</h3>
 <p>The fields <code>sovon_status</code>, <code>sovon_condition</code> and <code>sovon_MRI</code> should cover all possible action combinations present in observations. Consequently, no observations should have all three fields empty:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">filter</span>(<span class="kw">is.na</span>(sovon_MRI) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.na</span>(sovon_condition) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.na</span>(sovon_status)) <span class="op">%&gt;%</span>
@@ -714,8 +709,8 @@ obs_and_acts &lt;-<span class="st"> </span>
   </script>
 </div>
 </div>
-<div id="bird-age-ringing-1" class="section level2">
-<h2><span class="header-section-number">19.20</span> Bird age ringing</h2>
+<div id="bird-age-ringing-1" class="section level3">
+<h3><span class="header-section-number">7.2.20</span> Bird age ringing</h3>
 <p>The required field <code>bird_age_ringing</code> should be filled with the age of the bird while ringing.</p>
 <p>We first add the age of ringing to observations with same date of applying a ring from <code>crbirding_birds</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_ringing &lt;-<span class="st"> </span>
@@ -767,8 +762,8 @@ obs_before_ringing <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">bind_rows</span>(obs_after_ringing, obs_before_ringing) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">arrange</span>(sovon_observation_reference)</code></pre>
 </div>
-<div id="bird-sex-1" class="section level2">
-<h2><span class="header-section-number">19.21</span> Bird sex</h2>
+<div id="bird-sex-1" class="section level3">
+<h3><span class="header-section-number">7.2.21</span> Bird sex</h3>
 <p>The field <code>sovon_bird_sex</code> is equal to the bird sex in ring data:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
@@ -777,8 +772,8 @@ obs_before_ringing <span class="op">%&gt;%</span><span class="st"> </span>
             <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;sovon_bird_reference&quot;</span> =<span class="st"> &quot;bird_reference&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">rename</span>(<span class="dt">sovon_bird_sex =</span> bird_sex)</code></pre>
 </div>
-<div id="capture" class="section level2">
-<h2><span class="header-section-number">19.22</span> Capture</h2>
+<div id="capture" class="section level3">
+<h3><span class="header-section-number">7.2.22</span> Capture</h3>
 <p>The field <code>sovon_observation_is_capture</code> can be filled by evaluating the link of observations to actions <code>vang</code> or <code>vangl</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
@@ -787,15 +782,15 @@ obs_before_ringing <span class="op">%&gt;%</span><span class="st"> </span>
   )
 )</code></pre>
 </div>
-<div id="bird-id-1" class="section level2">
-<h2><span class="header-section-number">19.23</span> Bird ID</h2>
+<div id="bird-id-1" class="section level3">
+<h3><span class="header-section-number">7.2.23</span> Bird ID</h3>
 <p>The field <code>sovon_bird_id</code> is left to SOVON:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_bird_id =</span> <span class="ot">NA</span>)</code></pre>
 </div>
-<div id="observation-notes" class="section level2">
-<h2><span class="header-section-number">19.24</span> Observation notes</h2>
+<div id="observation-notes" class="section level3">
+<h3><span class="header-section-number">7.2.24</span> Observation notes</h3>
 <p>We copy the notes in <code>Opmerking</code> to SOVON field <code>sovon_observation_notes</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span><span class="st"> </span>
@@ -866,8 +861,8 @@ obs_before_ringing <span class="op">%&gt;%</span><span class="st"> </span>
 </div>
 </div>
 </div>
-<div id="observation-data" class="section level1">
-<h1><span class="header-section-number">20</span> Observation data</h1>
+<div id="observation-data" class="section level2">
+<h2><span class="header-section-number">7.3</span> Observation data</h2>
 <p>Select the required columns, starting with prefix <code>sovon_</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">crbirding_observations &lt;-
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
@@ -907,6 +902,7 @@ obs_before_ringing <span class="op">%&gt;%</span><span class="st"> </span>
   <span class="dt">na =</span> <span class="st">&quot;&quot;</span>
 )</code></pre>
 
+</div>
 </div>
             </section>
 
