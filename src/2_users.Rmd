@@ -4,7 +4,7 @@ This pipeline will map user data.
 
 # Read temporary user data
 
-We start from the user tempoary data saved in TSV file `users.tsv` in folder `data\interim`:
+We start from the user temporary data saved in TSV file `users.tsv` in folder `data\interim`:
 
 ```{r import_temp_users}
 users <- read_tsv(here::here("data", "interim", "users.tsv"))
@@ -18,7 +18,7 @@ nrow(users)
 
 # Map user data
 
-We map the original fields to SOVON fields.
+We map the original fields to SOVON fields denoted by prefix `sovon_`.
 
 ## E-mail
 
@@ -119,7 +119,7 @@ crbirding_users <-
 Remove prefix `sovon_`:
 
 ```{r remove prefix_sovon}
-names(crbirding_users) <- str_remove_all(
+names(crbirding_users) <- str_remove(
   names(crbirding_users), 
   pattern = "sovon_"
 )
@@ -141,7 +141,7 @@ Fields still not mapped:
 cr_users_cols[which(!cr_users_cols%in% names(crbirding_users))]
 ```
 
-The field `user_role` cannot be filled ath the moment: it will be mapped at the end of `3_birds.Rmd`.
+The field `user_role` cannot be filled at the moment: it will be mapped at the end of next chapter.
 
 Set column order:
 
