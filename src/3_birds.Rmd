@@ -1102,7 +1102,7 @@ crbirding_birds <-
               select(sovon_bird_reference, MetaalringLandCode),
             by = "sovon_bird_reference") %>%
   mutate(sovon_bird_scheme = recode(MetaalringLandCode,
-                              "BE " = "BLB",
+                              "BE" = "BLB",
                               "FR" = "FRP",
                               "NL" = "NLA",
                               "PT" = "POL",
