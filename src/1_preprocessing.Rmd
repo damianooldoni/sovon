@@ -33,6 +33,9 @@ conn <- dbConnect(odbc::odbc(),
                   port = meeuwen$port,
                   trusted_connection = meeuwen$trusted_connection
 )
+conn <- dbConnect(odbc::odbc(), driver = Sys.getenv("driver"), 
+    server = Sys.getenv("server"), database = Sys.getenv("database"), 
+    port = Sys.getenv("port"), trusted_connection = Sys.getenv("tc"))
 ```
 
 ## Import data
@@ -51,6 +54,14 @@ users <-  dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemer") %>%
 ```{r get_birds_data}
 birds <- dbGetQuery(conn, "SELECT * FROM dbo.tblKleurring") %>%
   as_tibble()
+```
+
+We extract the color table in order to know the meaning of the color abbreviations in fields  `RingKleurCode` and `InscriptieKleurCode` in `birds`.
+
+```{r get_color_table}
+colors_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeKleur") %>%
+  as_tibble()
+colors_table
 ```
 
 ### Extract observation data
@@ -642,12 +653,20 @@ write_tsv(
   na = "")
 ```
 
-We save the table containing action codes and relative meaning in `./data/input` as it could be useful in following mapping steps:
+We save the tables containing action codes and colors in `./data/input` as it could be useful in following mapping steps:
 
 ```{r save_actions_meaning}
 write_tsv(
   actions_meaning, 
   path = here::here("data", "input", "actions_meaning.tsv"), 
+  na = ""
+)
+```
+
+```{r save_colors}
+write_tsv(
+  colors_table, 
+  path = here::here("data", "input", "color_table.tsv"), 
   na = ""
 )
 ```
