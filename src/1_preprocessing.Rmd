@@ -124,7 +124,7 @@ dbDisconnect(conn)
 From UVABIT repository, we copied a text file containing the mapping of GPS ids:
 
 ```{r import_GPS_names_ids}
-map_gps_path <- here::here("data", "external", "map_gps_id_to_color_ring.tsv")
+map_gps_path <- here::here("data", "input", "map_gps_id_to_color_ring.tsv")
 map_gps <- 
   read_tsv(map_gps_path) %>%
   mutate(sovon_bird_notes = "uvabits_gps_tag.")
