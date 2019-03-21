@@ -1,0 +1,9 @@
+Code	Beschrijving	BeschrijvingUK	Aktief
+D	down	down	
+LL	linker poot	left leg	FALSE
+LD	linker poot down	left leg down	TRUE
+LU	linker poot up	left leg up	TRUE
+RL	rechter poot	right leg	FALSE
+RD	rechter poot down	right leg down	TRUE
+RU	rechter poot up	right leg up	TRUE
+U	up	up	

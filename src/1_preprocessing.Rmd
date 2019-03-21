@@ -64,6 +64,14 @@ color_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeKleur") %>%
 color_table
 ```
 
+We also extract the ring places:
+
+```{r  get_ring_place_table}
+ring_place_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeRingPlaats") %>%
+  as_tibble()
+ring_place_table
+```
+
 ### Extract observation data
 
 INBO's observation data contain a text type field: `Opmerking`. Text type is deprecated and an error will be returned if we perform the standard SQL query `"SELECT * FROM dbo.tblWaarneming"`. So, we need an ad-hoc query:
@@ -653,7 +661,7 @@ write_tsv(
   na = "")
 ```
 
-We save the tables containing action codes and colors in `./data/input` as it could be useful in following mapping steps:
+We save the tables containing action codes, colors and ring places in `./data/input` as it could be useful in following mapping steps:
 
 ```{r save_actions_meaning}
 write_tsv(
@@ -667,6 +675,14 @@ write_tsv(
 write_tsv(
   color_table, 
   path = here::here("data", "input", "color_table.tsv"), 
+  na = ""
+)
+```
+
+```{r save_ring_places}
+write_tsv(
+  ring_place_table, 
+  path = here::here("data", "input", "ring_place_table.tsv"), 
   na = ""
 )
 ```
