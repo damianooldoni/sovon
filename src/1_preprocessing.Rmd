@@ -59,9 +59,9 @@ birds <- dbGetQuery(conn, "SELECT * FROM dbo.tblKleurring") %>%
 We extract the color table in order to know the meaning of the color abbreviations in fields  `RingKleurCode` and `InscriptieKleurCode` in `birds`.
 
 ```{r get_color_table}
-colors_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeKleur") %>%
+color_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeKleur") %>%
   as_tibble()
-colors_table
+color_table
 ```
 
 ### Extract observation data
@@ -665,7 +665,7 @@ write_tsv(
 
 ```{r save_colors}
 write_tsv(
-  colors_table, 
+  color_table, 
   path = here::here("data", "input", "color_table.tsv"), 
   na = ""
 )

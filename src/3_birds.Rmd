@@ -55,6 +55,14 @@ crbirding_users <- read_tsv(
 )
 ```
 
+### Read color data
+
+Import ring color codes and relative meaning:
+
+```{r import_colors}
+color_table <- read_tsv(here::here("data", "input", "color_table.tsv"))
+```
+
 ## Map color ring data
 
 ### Extract action codes
@@ -756,6 +764,119 @@ crbirding_birds %>%
            (rngme_before_rngkl %>% 
               pull(sovon_bird_reference))) %>%
   head(n = 50)
+```
+`
+### Map ring colors and add to `bird_shorthand`
+
+The color of the ring and the color of the inscription should be added, if available, to `bird_shorthand`. It's important to highlight the fact that we have this information only for the most recent color ring of each bird. Following combinations are present:
+
+```{r color_combinations_inbo_db}
+birds %>%
+  group_by(RingKleurCode, InscriptieKleurCode) %>%
+  count()
+```
+
+We first map the colors based on the official cr-birding values ( [cr-birding.org](http://www.cr-birding.org/node/112)):
+
+```{r map_colors}
+color_table <-
+  color_table %>%
+  mutate(crbirding_colors = case_when(
+    Code == "X" ~ "P",
+    Code == "Z" ~"N",
+    TRUE ~ Code)
+)
+color_table
+```
+
+We map the colors in `birds`:
+
+```{r map_colors_birds}
+birds <- 
+  birds %>% 
+  left_join(color_table %>%
+              select(Code, crbirding_colors),
+            by = c("RingKleurCode" = "Code")) %>%
+  rename(ring_color = crbirding_colors) %>%
+  left_join(color_table %>%
+              select(Code, crbirding_colors),
+            by = c("InscriptieKleurCode" = "Code")) %>%
+  rename(inscription_color = crbirding_colors)
+```
+
+Effects of the mapping:
+
+```{r result_mapping}
+birds %>%
+  distinct(ring_color, RingKleurCode, inscription_color, InscriptieKleurCode)
+```
+
+The `bird_shorthand` should be composed of:
+1. color of the ring
+2. color of the intescription
+3. inscription
+
+For example: BW(BBAP) is a color ring, with inscription text BBAP, with dark blue ring and white inscription. We add colors to `bird_shorthand`
+
+```{r add_colors_bird_shorthand}
+crbirding_birds <-
+  crbirding_birds %>%
+  left_join(birds %>%
+              unite(color_combination, c(ring_color, 
+                                          inscription_color),
+                    sep = "") %>%
+              select(sovon_bird_reference, color_combination),
+            by = "sovon_bird_reference") %>%
+  group_by(sovon_bird_reference) %>%
+  mutate(color_combination = if_else(
+    sovon_bird_date_begin == max(sovon_bird_date_begin) & 
+      color_combination != "NANA",
+    color_combination,
+    NA_character_)) %>%
+  mutate(
+    sovon_bird_shorthand_color = case_when(
+      !is.na(sovon_bird_shorthand) & 
+        !is.na(color_combination) ~paste0(color_combination, 
+                                          "(", 
+                                          sovon_bird_shorthand, 
+                                          ")"),
+    TRUE ~sovon_bird_shorthand),
+    sovon_bird_shorthand_pt_color = case_when(
+      !is.na(sovon_bird_shorthand_pt) & 
+        !is.na(color_combination) ~paste0(color_combination, 
+                                          "(", 
+                                          sovon_bird_shorthand_pt, 
+                                          ")"),
+    TRUE ~sovon_bird_shorthand_pt))
+```
+
+Some examples from birds ringed thrice:
+
+```{r show_example}
+crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  count() %>%
+  filter(n > 2) %>%
+  left_join(crbirding_birds, by = "sovon_bird_reference") %>%
+  select(sovon_bird_reference, 
+         color_combination, 
+         sovon_bird_shorthand,
+         sovon_bird_shorthand_color, 
+         sovon_bird_shorthand_pt, 
+         sovon_bird_shorthand_pt_color,
+         sovon_bird_date_begin,
+         sovon_bird_date_end)
+```
+
+If mapping is correct, we can overwrite the columns `sovon_bird_shorthand` and `sovon_bird_shorthand_pt` and remove the help columns  `sovon_bird_shorthand_color`,  `sovon_bird_shorthand_pt_color` and `color_combination`:
+
+```{r remove_cols_with_color_after_mapping}
+crbirding_birds <-
+  crbirding_birds %>%
+  mutate(sovon_bird_shorthand = sovon_bird_shorthand_color,
+         sovon_bird_shorthand_pt = sovon_bird_shorthand_pt_color) %>%
+  select(-c(ends_with("color"), 
+            starts_with("color")))
 ```
 
 ### Ring number
