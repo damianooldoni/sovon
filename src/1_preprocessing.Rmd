@@ -61,12 +61,12 @@ color_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeKleur") %>%
 color_table
 ```
 
-We also extract the ring places:
+We also extract the ring position (left or right leg) and the inscription orientation:
 
-```{r  get_ring_place_table}
-ring_place_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeRingPlaats") %>%
+```{r  get_ring_position_table}
+ring_position_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeRingPlaats") %>%
   as_tibble()
-ring_place_table
+ring_position_table
 ```
 
 ### Extract observation data
@@ -676,10 +676,10 @@ write_tsv(
 )
 ```
 
-```{r save_ring_places}
+```{r save_ring_position}
 write_tsv(
-  ring_place_table, 
-  path = here::here("data", "input", "ring_place_table.tsv"), 
+  ring_position_table, 
+  path = here::here("data", "input", "ring_position_table.tsv"), 
   na = ""
 )
 ```
