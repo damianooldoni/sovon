@@ -33,9 +33,6 @@ conn <- dbConnect(odbc::odbc(),
                   port = meeuwen$port,
                   trusted_connection = meeuwen$trusted_connection
 )
-conn <- dbConnect(odbc::odbc(), driver = Sys.getenv("driver"), 
-    server = Sys.getenv("server"), database = Sys.getenv("database"), 
-    port = Sys.getenv("port"), trusted_connection = Sys.getenv("tc"))
 ```
 
 ## Import data
