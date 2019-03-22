@@ -21,7 +21,6 @@ obs_and_acts <- read_tsv(
   here::here("data", "interim", "obs_and_actions.tsv"), 
   col_types = cols(
     .default = col_character(),
-    sovon_bird_reference = col_double(),
     Nummer = col_double(),
     Datum = col_datetime(format = ""),
     WaarnemerNummer = col_double(),
@@ -41,8 +40,16 @@ obs_and_acts <- read_tsv(
 
 Import action codes and relative meaning:
 
-```{r import_actions_meaning1}
+```{r import_actions_meaning_table}
 actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
+```
+
+### Read ring position data
+
+```{r import_ring_place_table}
+ring_position_table <- read_tsv(
+  here::here("data", "input", "ring_position_table.tsv")
+)
 ```
 
 ### Read user data
@@ -879,6 +886,107 @@ crbirding_birds <-
             starts_with("color")))
 ```
 
+### Position of the color ring and inscription orientation
+
+SOVON allows us to add two columns called `position_color_ring` and `direction_color_ring` in order to save:
+1. the position of the color ring, left or right leg
+2. the direction of the color ring's inscription, upwards or downwards 
+
+In case of birds with one color ring only, SOVON doesn't save these fields. However, INBO experts find them important as 
+> it can help a lot when identifying mistakes in reading. 
+
+For more details, see issue [here](https://github.com/inbo/cr-birding/issues/61#issuecomment-472862064).
+
+As for colors, this informations are only available for the very last ring of each bird. 
+
+Overview:
+
+```{r}
+birds %>%
+  group_by(Plaats) %>%
+  count()
+```
+
+We first map all values of ring position and inscription reading direction::
+
+```{r map_positions}
+ring_position_table <-
+  ring_position_table %>%
+  mutate(sovon_bird_position = case_when(
+    str_sub(Code, start = 1, end = 1) == "L" ~ "LL",
+    str_sub(Code, start = 1, end = 1) == "R" ~ "RL",
+    TRUE ~ NA_character_),
+    sovon_bird_direction = case_when(
+    str_sub(Code, start = -1, end = -1) == "D" ~ "D",
+    str_sub(Code, start = -1, end = -1) == "U" ~ "U",
+    TRUE ~ NA_character_)) %>%
+  select(Code, 
+         sovon_bird_position, 
+         sovon_bird_direction,
+         everything())
+ring_position_table
+```
+
+We map the ring position and direction of ring inscription in `birds`:
+
+```{r map_pos_deir_birds}
+birds <- 
+  birds %>% 
+  left_join(ring_position_table %>%
+              select(Code, sovon_bird_position),
+            by = c("Plaats" = "Code")) %>%
+  left_join(ring_position_table %>%
+              select(Code, sovon_bird_direction),
+            by = c("Plaats" = "Code"))
+```
+
+Effects of the mapping:
+
+```{r result_mapping}
+birds %>%
+  distinct(Plaats, sovon_bird_position, sovon_bird_direction)
+```
+
+Map these values from `birds` to `crbirding_birds`, taking into account that the fields `sovon_bird_position` and `sovon_bird_direction` are available for the very last ring of each bird:
+
+```{r transfer_position_direction_to_crbirding_birds}
+crbirding_birds <-
+  crbirding_birds %>%
+  left_join(birds %>%
+              select(sovon_bird_reference, 
+                     sovon_bird_position, 
+                     sovon_bird_direction),
+            by = "sovon_bird_reference") %>%
+  group_by(sovon_bird_reference) %>%
+  mutate(
+    sovon_bird_position = if_else(
+      sovon_bird_date_begin == max(sovon_bird_date_begin),
+      sovon_bird_position,
+      NA_character_),
+    sovon_bird_direction = if_else(
+      sovon_bird_date_begin == max(sovon_bird_date_begin),
+      sovon_bird_direction,
+      NA_character_)
+)
+```
+
+Some examples from birds ringed more than once:
+
+```{r show_example}
+crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  count() %>%
+  filter(n > 1) %>%
+  left_join(crbirding_birds, by = "sovon_bird_reference") %>%
+  select(sovon_bird_reference, 
+         sovon_bird_position,
+         sovon_bird_direction,
+         sovon_bird_shorthand,
+         sovon_bird_date_begin,
+         sovon_bird_date_end) %>%
+  head(n = 100)
+```
+
 ### Ring number
 
 The _ring number_, or _metal ring number_, can be found in field `MetaalringNummer`, which contains the **most recent** metal ring number. Recoverying the complete chronology of metal rings for each bird is almost impossible as it is:
@@ -1131,7 +1239,7 @@ crbirding_birds <-
   ## provide order columns
   select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt,
          sovon_bird_ring_number, sovon_bird_date_begin, sovon_bird_date_end,
-         sovon_bird_notes)
+         sovon_bird_notes, everything())
 ```
 
 Few examples where `sovon_bird_reference` 74 and 75 refer to birds which got metal ring first:
@@ -1549,7 +1657,7 @@ cr_birds_cols <- c(
   "bird_id", "bird_reference", "bird_euring", "bird_bto", 
   "bird_shorthand", "bird_scheme", "bird_ring_number", "bird_name", 
   "bird_sex", "bird_birth_year", "bird_date_begin", "bird_date_end", 
-  "bird_age_ringing", "bird_notes"
+  "bird_age_ringing", "bird_position", "bird_direction", "bird_notes"
 )
 ```
 
@@ -1571,7 +1679,7 @@ crbirding_birds <-
 Preview data:
 
 ```{r final_preview_birds}
-crbirding_birds %>% head(n = 10)
+crbirding_birds %>% head(n = 100)
 ```
 
 Save to text file (tab separated value):
