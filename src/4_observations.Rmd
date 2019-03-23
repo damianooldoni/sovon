@@ -86,7 +86,10 @@ We import finalized user data from `./data/processed`:
 ```{r import_final_user_data}
 crbirding_users <- read_tsv(
   here::here("data", "processed", "crbirding_users.tsv"), 
-  guess_max = 50000
+  col_types = cols(
+    .default = col_character(),
+    user_id = col_logical(),
+    user_reference = col_double())
 )
 ```
 
@@ -94,7 +97,11 @@ crbirding_users <- read_tsv(
 
 ```{r import_workers}
 workers_bird_shelters <- read_tsv(
-  here::here("data", "input", "workers_in_bird_shelters.tsv")
+  here::here("data", "input", "workers_in_bird_shelters.tsv"),
+    col_types = cols(
+    .default = col_character(),
+    user_id = col_logical(),
+    user_reference = col_double())
 )
 ```
 
