@@ -617,6 +617,12 @@ mapping_acts_to_MRI %>%
   filter(is.na(sovon_MRI))
 ```
 
+We save the final mapping in  `data/interim`:
+```{r save_mapping_acts_to_MRI}
+mapping_acts_to_MRI  %>%
+  write_tsv(here::here("data", "interim", "mapping_acts_to_MRI.tsv"), na = "")
+```
+
 Number of observations without MRI value left:
 
 ```{r n_obs_with_MRI}
