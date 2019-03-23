@@ -1604,6 +1604,19 @@ write_tsv(
 )
 ```
 
+## Save modified ring position and direction table
+
+We save the updated table containing color ring position and inscription direction in `data/interim`:
+
+```{r save_updated_pos_dir_table}
+write_tsv(
+  ring_position_table,
+  path = here::here("data", "interim", "ring_position_table.tsv"),
+  na = "",
+  append = FALSE
+)
+```
+
 ## Save final user data
 
 The desired order of columns in `crbirding_users`:

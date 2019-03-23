@@ -1,0 +1,9 @@
+Code	sovon_bird_position	sovon_bird_direction	Beschrijving	BeschrijvingUK	Aktief
+D		D	down	down	
+LL	LL		linker poot	left leg	FALSE
+LD	LL	D	linker poot down	left leg down	TRUE
+LU	LL	U	linker poot up	left leg up	TRUE
+RL	RL		rechter poot	right leg	FALSE
+RD	RL	D	rechter poot down	right leg down	TRUE
+RU	RL	U	rechter poot up	right leg up	TRUE
+U		U	up	up	
