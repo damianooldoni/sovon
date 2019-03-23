@@ -9,7 +9,21 @@ We start from the tempoary observation data saved as TSV file in `data\interim`:
 ```{r import_temp_observations}
 obs_and_acts <- read_tsv(
   here::here("data", "interim", "obs_and_actions.tsv"), 
-  guess_max = 500000
+  col_types = cols(
+    .default = col_character(),
+    sovon_bird_reference = col_double(),
+    Nummer = col_double(),
+    Datum = col_datetime(format = ""),
+    WaarnemerNummer = col_double(),
+    PlaatsLengtegraadGraden = col_double(),
+    PlaatsLengtegraadMinuten = col_double(),
+    PlaatsLengtegraadSeconden = col_double(),
+    PlaatsBreedtegraadGraden = col_double(),
+    PlaatsBreedtegraadMinuten = col_double(),
+    PlaatsBreedtegraadSeconden = col_double(),
+    BevestigingDatum = col_datetime(format = ""),
+    AanmaakDatum = col_datetime(format = ""),
+    WijzigDatum = col_datetime(format = ""))
 )
 ```
 
@@ -28,7 +42,14 @@ We import finalized ring data from `./data/processed`:
 ```{r import_final_ring_data}
 crbirding_birds <- read_tsv(
   here::here("data", "processed", "crbirding_birds.tsv"), 
-  guess_max = 50000
+  col_types = cols(
+    .default = col_character(),
+    bird_id = col_logical(),
+    bird_reference = col_double(),
+    bird_bto = col_logical(),
+    bird_birth_year = col_logical(),
+    bird_date_begin = col_datetime(format = ""),
+    bird_date_end = col_datetime(format = ""))
 )
 ```
 
@@ -39,7 +60,9 @@ We will need some columns from original INBO ring data. We import the temporary 
 ```{r import_birds_from_INBO_temp_data}
 birds <- read_tsv(
   here::here("data", "interim", "birds.tsv"), 
-  guess_max = 50000
+  col_types = cols(
+    .default = col_character())
+)
 )
 ```
 
