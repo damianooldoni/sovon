@@ -63,6 +63,19 @@ birds <- read_tsv(
   col_types = cols(
     .default = col_character())
 )
+```
+
+### Read ring position data
+
+We import mapping of ring position and inscription reading direction:
+
+```{r read_updated_ring_position_table}
+ring_position_table <- read_tsv(
+  here::here("data", "interim", "ring_position_table.tsv"),
+  na = "",
+  col_types = cols(
+    .default = col_character(),
+    Aktief = col_logical())
 )
 ```
 
