@@ -753,6 +753,27 @@ obs_and_acts <-
   mutate(sovon_bird_id = NA)
 ```
 
+### Bird ring position and inscription direction
+
+Similarly to the mapping in ring data, we map the ring position and inscription reading direction in observations:
+
+```{r map_pos_direction_obs}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  left_join(ring_position_table %>%
+              select(Code, sovon_bird_position),
+            by = c("KleurringPlaats" = "Code")) %>%
+  left_join(ring_position_table %>%
+              select(Code, sovon_bird_direction),
+            by = c("KleurringPlaats" = "Code"))
+```
+
+Effects of the mapping:
+
+```{r result_mapping_position_direction_obs}
+obs_and_acts %>%
+  distinct(KleurringPlaats, sovon_bird_position, sovon_bird_direction)
+```
 
 ### Observation notes
 
@@ -858,7 +879,6 @@ Remove prefix `sovon_`:
 names(crbirding_observations) <- str_remove_all(names(crbirding_observations), pattern = "sovon_")
 ```
 
-
 The desired order of columns in `crbirding_observations`:
 
 ```{r cols_order_obs}
@@ -868,7 +888,7 @@ cr_obs_cols <- c(
   "observation_lat", "observation_lng", "observation_location", 
   "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
   "melder_email", "melder_ringersnummer", "ring_number", "condition", "status", 
-  "bird_age_ringing", "bird_sex"
+  "bird_age_ringing", "bird_sex", "bird_position", "bird_direction"
 )
 ```
 
