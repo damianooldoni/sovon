@@ -907,9 +907,9 @@ birds %>%
   count()
 ```
 
-We first map all values of ring position and inscription reading direction::
+We map all values of ring position and inscription reading direction:
 
-```{r map_positions}
+```{r map_positions_and_directions}
 ring_position_table <-
   ring_position_table %>%
   mutate(sovon_bird_position = case_when(
@@ -929,7 +929,7 @@ ring_position_table
 
 We map the ring position and direction of ring inscription in `birds`:
 
-```{r map_pos_deir_birds}
+```{r map_pos_direction_birds}
 birds <- 
   birds %>% 
   left_join(ring_position_table %>%
