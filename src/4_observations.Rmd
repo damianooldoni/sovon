@@ -600,13 +600,35 @@ obs_and_acts %>%
   nrow()
 ```
 
+For having a better overview of the mapping, we update the table  `mapping_acts_to_MRI`: 
+
+```{r update_mapping_acts_to_MRI}
+mapping_acts_to_MRI <- 
+  obs_and_acts %>%
+  select(one_of(acts), sovon_MRI) %>%
+  distinct()
+mapping_acts_to_MRI
+```
+
 Action combinations without MRI:
 
 ```{r check_obs_without_MRI}
+mapping_acts_to_MRI %>%
+  filter(is.na(sovon_MRI))
+```
+
+Number of observations without MRI value left:
+
+```{r n_obs_with_MRI}
 obs_and_acts %>%
   filter(is.na(sovon_MRI)) %>%
-  select(acts) %>%
-  distinct()
+  count()
+```
+
+out of:
+
+```{r tot_n_obs}
+nrow(obs_and_acts)
 ```
 
 ### Mapping of INBO actions to status, condition and MRI
