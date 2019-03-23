@@ -117,6 +117,16 @@ acts <- acts[acts %in% names(obs_and_acts)]
 acts
 ```
 
+Combinations of actions present in observations:
+
+```{r act_combinations}
+action_combinations <- 
+  obs_and_acts %>%
+  select(acts) %>%
+  distinct()
+action_combinations
+```
+
 ### Observation ID
 
 The field `sovon_observation_id` is left to SOVON:
