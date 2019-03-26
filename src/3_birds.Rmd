@@ -820,7 +820,7 @@ birds %>%
 
 The `bird_shorthand` should be composed of:
 1. color of the ring
-2. color of the intescription
+2. color of the inscription
 3. inscription
 
 For example: BW(BBAP) is a color ring, with inscription text BBAP, with dark blue ring and white inscription. We add colors to `bird_shorthand`
@@ -859,7 +859,7 @@ crbirding_birds <-
 
 Some examples from birds ringed thrice:
 
-```{r show_example}
+```{r show_example_colors}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
   count() %>%
@@ -972,7 +972,7 @@ crbirding_birds <-
 
 Some examples from birds ringed more than once:
 
-```{r show_example}
+```{r show_example_position}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
   count() %>%

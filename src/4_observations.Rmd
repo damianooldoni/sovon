@@ -470,7 +470,7 @@ obs_and_acts <-
 
 Number of observations with MRI value:
 
-```{r n_obs_with_MRI}
+```{r n_obs_with_MRI_begin_mapping}
 obs_and_acts %>%
   filter(!is.na(sovon_MRI)) %>%
   count()
@@ -683,30 +683,25 @@ mapping_acts_to_MRI
 
 At this stage, all action combinations should have a MRI value:
 
-```{r check_obs_without_MRI_final}
+```{r check_acts_without_MRI_final}
 mapping_acts_to_MRI %>%
   filter(is.na(sovon_MRI))
 ```
+
+The same holds true for observations:
+
+```{r check_n_obs_without_MRI_final}
+obs_and_acts %>%
+  filter(is.na(sovon_MRI)) %>%
+  nrow()
+```
+
 
 We save the final mapping in  `data/interim`:
 
 ```{r save_mapping_acts_to_MRI}
 mapping_acts_to_MRI  %>%
   write_tsv(here::here("data", "interim", "mapping_acts_to_MRI.tsv"), na = "")
-```
-
-Number of observations without MRI value left:
-
-```{r n_obs_with_MRI}
-obs_and_acts %>%
-  filter(is.na(sovon_MRI)) %>%
-  count()
-```
-
-out of:
-
-```{r tot_n_obs}
-nrow(obs_and_acts)
 ```
 
 ### Mapping of INBO actions to status, condition and MRI
