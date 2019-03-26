@@ -340,8 +340,9 @@ The SOVON field `condition` is mapped following the scheme at page 22 of [EURING
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(sovon_condition = case_when(
-    !is.na(dood) ~ 1,
-    !is.na(ziek) ~ 4,
+    dood == "dood" ~ 1,
+    klgev == "klgev" ~ 1,
+    ziek == "ziek" ~ 4,
     !is.na(rngkl) | !is.na(rngme) | !is.na(vang) | !is.na(vangl)  ~ 8,
     !is.na(veld) | !is.na(me) | !is.na(meweg) | !is.na(br)  ~ 7
     )
