@@ -162,8 +162,84 @@ obs %>% head()
 
 Preview observation actions data:
 
-```{r prview_obs_actions}
+```{r preview_obs_actions}
 obs_actions %>% head()
+```
+
+## Check primary key consistency
+
+The primary key of each table shuold never be left empty and should contain unique values.
+
+### Users
+
+Primary key: column `Nummer`. Users with empty values:
+
+```{r check_primary_key_users}
+users %>%
+  filter(is.na(Nummer))
+```
+
+Users with not unique values of `Nummer`:
+
+```{r check_unicity_prkey_users}
+users %>%
+  group_by(Nummer) %>%
+  count() %>%
+  filter(n > 1)
+```
+
+### Birds
+
+Primary key: column `Nummer`. Birds with empty values:
+
+```{r check_primary_key_birds}
+birds %>%
+  filter(is.na(Nummer))
+```
+
+Birds with not unique values of `Nummer`:
+
+```{r check_unicity_prkey_birds}
+birds %>%
+  group_by(Nummer) %>%
+  count() %>%
+  filter(n > 1)
+```
+
+### Observations
+
+Primary key: column `Nummer`. Observations with empty values:
+
+```{r check_primary_key_obs}
+obs %>%
+  filter(is.na(Nummer))
+```
+
+Observations with not unique values of `Nummer`:
+
+```{r check_unicity_prkey_obs}
+obs %>%
+  group_by(Nummer) %>%
+  count() %>%
+  filter(n > 1)
+```
+
+### Actions
+
+Primary key: column `Nummer`. Actions with empty values:
+
+```{r check_primary_key_actions}
+obs_actions %>%
+  filter(is.na(Nummer))
+```
+
+Observations with not unique values of `Nummer`:
+
+```{r check_unicity_prkey_actions}
+obs_actions %>%
+  group_by(Nummer) %>%
+  count() %>%
+  filter(n > 1)
 ```
 
 ## Check spaces in `birds`
@@ -237,10 +313,11 @@ combinations_actions <- obs_actions %>%
 combinations_actions
 ```
 
-The following actions are at least once present in database:
+Actions present present in database:
 
 ```{r colnames_actions_present}
 acts <- names(combinations_actions)
+acts
 ```
 
 Actions described in `actions_meaning` never used:
@@ -316,8 +393,7 @@ There are observations judged as error. They are marked by`KleurringNummmer` equ
 
 ```{r show_FOUT_obs}
 obs_and_acts %>% 
-  filter(KleurringNummer == "FOUT") %>%
-  head(n = 10)
+  filter(KleurringNummer == "FOUT")
 ```
 
 The value `FOUT` is also present in `birds`:
@@ -589,7 +665,7 @@ birds %>%
   select(-n)
 ```
 
-Exceptions are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions, if present, should be handled separately while mapping `bird_shorthand` in document `3_birds.Rmd`.
+Exceptions, if exist, are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions, if present, should be handled separately while mapping `bird_shorthand` in document `3_birds.Rmd`.
 
 ## Check inconsistencies between users and observers
 
@@ -634,7 +710,7 @@ We remove data from `birds`:
 
 ```{r remove_common_shelduck_from_birds}
 birds <- birds %>%
-  filter(EuringCode != "01730")
+  filter(EuringCode != "01730" | is.na(EuringCode))
 ```
 
 and from `obs_and_acts`:
@@ -642,7 +718,7 @@ and from `obs_and_acts`:
 ```{r remove_common_shelduck_from_obs_and_acts}
 obs_and_acts <- 
   obs_and_acts %>%
-  filter(!KleurringNummer %in% common_shellduck_nummer)
+  filter(!KleurringNummer %in% common_shellduck_nummer | is.na(KleurringNummer))
 ```
 
 ## Save preprocessed data
@@ -671,7 +747,7 @@ write_tsv(
 ```{r save_colors}
 write_tsv(
   color_table, 
-  path = here::here("data", "input", "color_table.tsv"), 
+  path = here::here("data", "input", "color_table.tsv"),
   na = ""
 )
 ```
