@@ -441,6 +441,7 @@ Some actions are related to this field and are mapped as follows:
 9. `vangl`: MRI = 4 or 5
 10. `meweg` only or combined with actions not mapped yet: MRI = 4
 11. `klweg` only or combined with actions not mapped yet: MRI = 4
+12. `ziek` only: MRI = 4
 
 We initialize `sovon_MRI` by mapping first 6 situations:
 
@@ -451,7 +452,9 @@ mapping_acts_to_MRI <-
     rngkl == "rngkl" ~ 2,
     rngme == "rngme" & is.na(rngkl) ~ 1,
     veld == "veld" ~ 4,
-    me == "me" ~ 4
+    me == "me" ~ 4,
+    br ==  "br" ~ 4,
+    klgev == "klgev" ~ 4
   )
 )
 mapping_acts_to_MRI
@@ -473,18 +476,12 @@ obs_and_acts %>%
   count()
 ```
 
-Observations linked to action `br` ONLY get MRI 4:
+Number of observations still to map:
 
-```{r MRI_4_br_only}
-br_only_number <- 
-  obs_and_acts %>%
-  filter_at(vars(acts[acts != "br"]), all_vars(is.na(.))) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% br_only_number, 4, sovon_MRI)
-)
+```{r n_obs_without_MRI_begin}
+obs_and_acts %>%
+  filter(is.na(sovon_MRI)) %>%
+  count()
 ```
 
 Observations linked to action `dood` only, get MRI 4:
@@ -498,34 +495,6 @@ obs_and_acts <-
   obs_and_acts %>%
   mutate(sovon_MRI = if_else(
     sovon_observation_reference %in% dood_only_number, 4, sovon_MRI)
-)
-```
-
-Observations linked to action  `br` and `dood` get MRI 4:
-
-```{r MRI_4_br_dood}
-br_dood_number <- 
-  obs_and_acts %>%
-  filter_at(vars(acts[!acts %in% c("dood", "br")]), all_vars(is.na(.))) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% br_dood_number, 4, sovon_MRI)
-)
-```
-
-Observations linked to action `meweg` only get MRI 4:
-
-```{r MRI_4_meweg}
-meweg_only_number <- 
-  obs_and_acts %>%
-  filter_at(vars(acts[acts != "meweg"]), all_vars(is.na(.))) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% meweg_only_number, 4, sovon_MRI)
 )
 ```
 
@@ -612,14 +581,108 @@ mapping_acts_to_MRI <-
 mapping_acts_to_MRI
 ```
 
-Action combinations without MRI:
+Combinations of actions with  `meweg`:
 
-```{r check_obs_without_MRI}
+```{r meweg_combinations}
+mapping_acts_to_MRI %>%
+  filter(meweg == "meweg")
+```
+
+Observations linked to action `meweg` not mapped yet get MRI value 4:
+
+```{r MRI_4_meweg}
+meweg_left_number <- 
+  obs_and_acts %>%
+  filter(meweg == "meweg" & is.na(sovon_MRI)) %>%
+  pull(sovon_observation_reference)
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_MRI = if_else(
+    sovon_observation_reference %in% meweg_left_number, 4, sovon_MRI)
+)
+```
+
+Update table `mapping_acts_to_MRI`: 
+
+```{r update_mapping_acts_to_MRI_after_meweg_mapping}
+mapping_acts_to_MRI <- 
+  obs_and_acts %>%
+  select(one_of(acts), sovon_MRI) %>%
+  distinct()
+mapping_acts_to_MRI
+```
+
+Final mapping of observations with action `meweg`:
+
+```{r meweg_combinations_final}
+mapping_acts_to_MRI %>%
+  filter(meweg == "meweg")
+```
+
+Action combinations still without MRI:
+
+```{r check_obs_without_MRI_after_meweg}
 mapping_acts_to_MRI %>%
   filter(is.na(sovon_MRI))
 ```
 
+Observations with action `klweg` not yet mapped get MRI 4 as the metal ring is still present:
+
+```{r klweg_or_klweg_dood}
+klweg_left_number <- 
+  obs_and_acts %>%
+  filter(klweg == "klweg" & is.na(sovon_MRI)) %>%
+  pull(sovon_observation_reference)
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_MRI = if_else(
+    sovon_observation_reference %in% klweg_left_number, 4, sovon_MRI)
+)
+```
+
+Update table `mapping_acts_to_MRI`: 
+
+```{r update_mapping_acts_to_MRI_after_klweg_mapping}
+mapping_acts_to_MRI <- 
+  obs_and_acts %>%
+  select(one_of(acts), sovon_MRI) %>%
+  distinct()
+mapping_acts_to_MRI
+```
+
+Action combinations still without MRI:
+
+```{r check_obs_without_MRI_after_klweg}
+mapping_acts_to_MRI %>%
+  filter(is.na(sovon_MRI))
+```
+
+Observations with action `ziek` only get MRI 4 as the metal ring and/or the color ring  are present:
+
+```{r ziek_MRI}
+ziek_left_number <- 
+  obs_and_acts %>%
+  filter(ziek == "ziek" & is.na(sovon_MRI)) %>%
+  pull(sovon_observation_reference)
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_MRI = if_else(
+    sovon_observation_reference %in% ziek_left_number, 4, sovon_MRI)
+)
+```
+
+Update table `mapping_acts_to_MRI`: 
+
+```{r update_mapping_acts_to_MRI_after_ziek_mapping}
+mapping_acts_to_MRI <- 
+  obs_and_acts %>%
+  select(one_of(acts), sovon_MRI) %>%
+  distinct()
+mapping_acts_to_MRI
+```
+
 We save the final mapping in  `data/interim`:
+
 ```{r save_mapping_acts_to_MRI}
 mapping_acts_to_MRI  %>%
   write_tsv(here::here("data", "interim", "mapping_acts_to_MRI.tsv"), na = "")
