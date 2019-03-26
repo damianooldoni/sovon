@@ -434,14 +434,15 @@ Some actions are related to this field and are mapped as follows:
 2. `rngme` only: MRI = 1
 3. `veld`: MRI = 4 
 4. `me`: MRI = 4 
-5. `br` only: MRI = 4
-6. `dood` only: MRI = 4
-7. `br` and `dood`: MRI = 4
-8. `meweg` only: MRI = 4
-9. `vang`: MRI = 4 or 5
-10. `vangl`: MRI = 4 or 5
+5. `br`: MRI = 4
+6.  `klgev`: MRI = 4
+7. `dood` only: MRI = 4
+8. `vang`: MRI = 4 or 5
+9. `vangl`: MRI = 4 or 5
+10. `meweg` only or combined with actions not mapped yet: MRI = 4
+11. `klweg` only or combined with actions not mapped yet: MRI = 4
 
-We initialize `sovon_MRI` by mapping first 4 situations:
+We initialize `sovon_MRI` by mapping first 6 situations:
 
 ```{r intialize_MRI}
 mapping_acts_to_MRI <- 
