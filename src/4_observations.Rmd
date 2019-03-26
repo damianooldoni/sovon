@@ -681,6 +681,13 @@ mapping_acts_to_MRI <-
 mapping_acts_to_MRI
 ```
 
+At this stage, all action combinations should have a MRI value:
+
+```{r check_obs_without_MRI_final}
+mapping_acts_to_MRI %>%
+  filter(is.na(sovon_MRI))
+```
+
 We save the final mapping in  `data/interim`:
 
 ```{r save_mapping_acts_to_MRI}
