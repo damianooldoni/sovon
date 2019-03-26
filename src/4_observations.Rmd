@@ -729,65 +729,14 @@ obs_and_acts %>%
 
 ### Bird age ringing
 
-The required field `bird_age_ringing` should be filled with the age of the bird while ringing. 
+The required field `sovon_bird_age_ringing` should be filled with the age of the bird as mentioned by observer. This field is present in `obs_and_acts` in field `Datum`:
 
-We first add the age of ringing to observations with same date of applying a ring from  `crbirding_birds`:
-
-```{r add_bird_age_ringing_for_ringing_obs}
-obs_ringing <- 
+```{r mapping_bird_age_ringing}
+obs_and_acts <- 
   obs_and_acts %>%
-  left_join(crbirding_birds %>%
-              select(bird_reference, bird_date_begin, bird_age_ringing),
-            by = c("sovon_bird_reference" = "bird_reference",
-                   "sovon_observation_date" = "bird_date_begin")) %>%
-  filter(!is.na(bird_age_ringing)) %>%
-  select(sovon_bird_reference, 
-         sovon_observation_date,
-         bird_age_ringing) %>%
-  rename(age_ringing = bird_age_ringing,
-         date_ringing = sovon_observation_date)
+  mutate(sovon_bird_age_ringing = Datum)
 ```
 
-```{r}
-obs_ringing %>% head()
-```
-
-The age while ringing can be added to observations occurring later than the very first ringing: 
-
-```{r obs_after_ringing}
-obs_after_ringing <- 
-  obs_and_acts %>%
-  left_join(obs_ringing,
-            by = c("sovon_bird_reference")) %>%
-  group_by(sovon_bird_reference, sovon_observation_date) %>%
-  filter(sovon_observation_date >= date_ringing) %>%
-  filter(date_ringing == max(date_ringing)) %>%
-  distinct() %>%
-  ungroup() %>%
-  mutate(sovon_bird_age_ringing = age_ringing) %>%
-  select(-c(date_ringing, age_ringing))
-```
-
-Otherwise it will be left empty:
-
-```{r obs_before_ringing}
-obs_before_ringing <- 
-  obs_and_acts %>%
-  anti_join(obs_after_ringing,
-            by = names(obs_and_acts)) %>%
-  mutate(sovon_bird_age_ringing = as.POSIXct(NA))
-obs_before_ringing %>% 
-  select(sovon_bird_reference, ) %>%
-  head(n = 10)
-```
-
-Merge the two subsets back together:
-
-```{r merge_back_obs_togeheter}
-obs_and_acts <-
-  bind_rows(obs_after_ringing, obs_before_ringing) %>%
-  arrange(sovon_observation_reference)
-```
 
 ### Bird sex
 
