@@ -150,7 +150,7 @@ obs_and_acts <-
   select(sovon_bird_reference, everything())
 ```
 
-Check whether there are observation without link to any bird:
+Check whether there are observations without link to any bird:
 
 ```{r check_NA_bird_ref}
 filter(obs_and_acts, is.na(sovon_bird_reference))
