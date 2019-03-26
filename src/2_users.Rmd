@@ -5,7 +5,12 @@
 We start from the user temporary data saved in TSV file `users.tsv` in folder `data\interim`:
 
 ```{r import_temp_users}
-users <- read_tsv(here::here("data", "interim", "users.tsv"))
+users <- read_tsv(here::here("data", "interim", "users.tsv"),
+                  col_types = cols(
+                    .default = col_character(),
+                    Nummer = col_double(),
+                    Wachtwoord = col_logical())
+)
 ```
 
 Number of users:
