@@ -813,7 +813,7 @@ birds <-
 
 Effects of the mapping:
 
-```{r result_mapping}
+```{r result_mapping_colors_birds}
 birds %>%
   distinct(ring_color, RingKleurCode, inscription_color, InscriptieKleurCode)
 ```
@@ -942,7 +942,7 @@ birds <-
 
 Effects of the mapping:
 
-```{r result_mapping}
+```{r result_mapping_place}
 birds %>%
   distinct(Plaats, sovon_bird_position, sovon_bird_direction)
 ```
