@@ -47,6 +47,6 @@ library(lubridate)      # To ease working with dates
 
 The output of the data processing consists of three dataframes saved as tab separated files (`tsv`) in folder `data/processed/`:
 
-1.  `crbirding_users`: user data
+1. `crbirding_users`: user data
 2. `crbirding_birds`: ring data
-3.  `crbirding_observations`: observation data
+3. `crbirding_observations`: observation data
