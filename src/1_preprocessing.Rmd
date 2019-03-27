@@ -618,7 +618,7 @@ birds %>%
   select(Nummer)
 ```
 
-The right mapping of them is saved in `map_gps`:
+The right mapping is saved in `map_gps`:
 
 ```{r preview_map_gps}
 map_gps %>% head()
@@ -629,7 +629,7 @@ We import the color rings in new column `first_Nummer`. For all other rings will
 ```{r map_to_first_Nummer}
 birds <- 
   birds %>%
-  # create column first_Nummer with right color rings for the GPS or GP** risngs
+  # create column first_Nummer with right color rings for the GPS or GP** rings
   left_join(map_gps, by = c("Nummer" = "gps_id")) %>%
   # set first_Numer equal to Nummer in all other cases
   mutate(first_Nummer = ifelse(is.na(color_ring),
