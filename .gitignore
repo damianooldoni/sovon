@@ -43,4 +43,3 @@ rsconnect/
 data/processed/crbirding_users.tsv
 data/processed/crbirding_observations.tsv
 data/interim/users.tsv
-data/interim/obs_and_actions.tsv
