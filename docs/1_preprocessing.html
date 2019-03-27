@@ -25,7 +25,7 @@
 <meta name="author" content="Damiano Oldoni">
 
 
-<meta name="date" content="2019-03-26">
+<meta name="date" content="2019-03-27">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -834,7 +834,7 @@ duplicates_ringing_rngme</code></pre>
 {"columns":[{"label":["Nummer"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"GPS53"},{"1":"GPS47"},{"1":"GPS06"},{"1":"GPS07"},{"1":"GPS08"},{"1":"GPS09"},{"1":"GPS10"},{"1":"GPS01"},{"1":"GPS02"},{"1":"GPS03"},{"1":"GPS04"},{"1":"GPS05"},{"1":"GPS11"},{"1":"GPS12"},{"1":"GPS13"},{"1":"GPS14"},{"1":"GPS15"},{"1":"GPS16"},{"1":"GPS17"},{"1":"GPS18"},{"1":"GPS19"},{"1":"GPS20"},{"1":"GPS21"},{"1":"GPS22"},{"1":"GPS23"},{"1":"GPS24"},{"1":"GPS25"},{"1":"GPS26"},{"1":"GPS27"},{"1":"GPS30"},{"1":"GPS56"},{"1":"GPS60"},{"1":"GPS61"},{"1":"GPS62"},{"1":"GPS63"},{"1":"GPS45"},{"1":"GPS38"},{"1":"GPS32"},{"1":"GPS34"},{"1":"GPS35"},{"1":"GPS40"},{"1":"GPS39"},{"1":"GPS41"},{"1":"GPS37"},{"1":"GPS59"},{"1":"GPS44"},{"1":"GPS36"},{"1":"GPS33"},{"1":"GPS54"},{"1":"GPS55"},{"1":"GPS80"},{"1":"GPS65"},{"1":"GPS81"},{"1":"GPS66"},{"1":"GPS91"},{"1":"GPS98"},{"1":"GP100"},{"1":"GP117"},{"1":"GP118"},{"1":"GP120"},{"1":"GP122"},{"1":"GP123"},{"1":"GP138"},{"1":"GP146"},{"1":"GP137"},{"1":"GP119"},{"1":"GP135"},{"1":"GP136"},{"1":"GP147"},{"1":"GP134"},{"1":"GP148"},{"1":"GP141"},{"1":"GP124"},{"1":"GP125"},{"1":"GP165"},{"1":"GP159"},{"1":"GP164"},{"1":"GP169"},{"1":"GP160"},{"1":"GP171"},{"1":"GP158"},{"1":"GP166"},{"1":"GPS31"},{"1":"GPS28"},{"1":"GPS50"},{"1":"GPS52"},{"1":"GPS57"},{"1":"GPS49"},{"1":"GPS46"},{"1":"GPS43"},{"1":"GPS82"},{"1":"GPS42"},{"1":"GPS48"},{"1":"GPS51"},{"1":"GPS67"},{"1":"GPS68"},{"1":"GPS86"},{"1":"GPS88"},{"1":"GPS89"},{"1":"GPS90"},{"1":"GPS92"},{"1":"GPS93"},{"1":"GPS94"},{"1":"GPS95"},{"1":"GPS96"},{"1":"GPS97"},{"1":"GP121"},{"1":"GP129"},{"1":"GP132"},{"1":"GP143"},{"1":"GP128"},{"1":"GP126"},{"1":"GP127"},{"1":"GP142"},{"1":"GP139"},{"1":"GPS69"},{"1":"GP130"},{"1":"GP131"},{"1":"GP140"},{"1":"GPS29"},{"1":"GP168"},{"1":"GP170"},{"1":"GP172"},{"1":"GP175"},{"1":"GP176"},{"1":"GP179"},{"1":"GP101"},{"1":"GP133"},{"1":"GP180"},{"1":"GP195"},{"1":"GP196"},{"1":"GP197"},{"1":"GP198"},{"1":"GP199"},{"1":"GP200"},{"1":"GP201"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>The right mapping of them is saved in <code>map_gps</code>:</p>
+<p>The right mapping is saved in <code>map_gps</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">map_gps <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -844,7 +844,7 @@ duplicates_ringing_rngme</code></pre>
 <p>We import the color rings in new column <code>first_Nummer</code>. For all other rings will be <code>first_nummer = Nummer</code> as they are the very first rings:</p>
 <pre class="sourceCode r"><code class="sourceCode r">birds &lt;-<span class="st"> </span>
 <span class="st">  </span>birds <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="co"># create column first_Nummer with right color rings for the GPS or GP** risngs</span>
+<span class="st">  </span><span class="co"># create column first_Nummer with right color rings for the GPS or GP** rings</span>
 <span class="st">  </span><span class="kw">left_join</span>(map_gps, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;Nummer&quot;</span> =<span class="st"> &quot;gps_id&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="co"># set first_Numer equal to Nummer in all other cases</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">first_Nummer =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(color_ring),
