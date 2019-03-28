@@ -738,14 +738,14 @@ obs_and_acts %>%
   head()
 ```
 
-We add the note `color_ring_added.` to observations linked to action `rngkl`:
+We add the note `color_ring_added.` to observations linked to  `sovon_MRI`equal to 2 (action `rngkl` or  `vang`+`klweg`):
 
 ```{r add_note_color_ring_added}
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(
     sovon_observation_notes = if_else(
-      !is.na(rngkl),
+      sovon_MRI == 2,
       if_else(is.na(sovon_observation_notes),
               "color_ring_added.",
               paste("color_ring_added.", sovon_observation_notes, sep = " ")),
@@ -757,7 +757,31 @@ Preview:
 
 ```{r add_color_ring_example}
 obs_and_acts %>%
-  filter(!is.na(rngkl)) %>%
+  filter(sovon_MRI == 2) %>%
+  select(sovon_observation_notes) %>%
+  head()
+```
+
+We add the note `no_metal_ring.` to observations linked to action `meweg`:
+
+```{r add_note_no_metal_ring}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_notes = if_else(
+      !is.na(meweg),
+      if_else(is.na(sovon_observation_notes),
+              "no_metal_ring.",
+              paste("no_metal_ring.", sovon_observation_notes, sep = " ")),
+      sovon_observation_notes)
+)
+```
+
+Preview:
+
+```{r no_metal_ring_example}
+obs_and_acts %>%
+  filter(!is.na(meweg)) %>%
   select(sovon_observation_notes) %>%
   head()
 ```
@@ -766,7 +790,7 @@ obs_and_acts %>%
 
 Select the required columns, starting with prefix `sovon_`:
 
-```{r select_sovoin_cols}
+```{r select_sovon_cols}
 crbirding_observations <-
   obs_and_acts %>%
   select(starts_with("sovon"))

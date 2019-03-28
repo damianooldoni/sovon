@@ -889,12 +889,12 @@ mapping_acts_to_MRI</code></pre>
 {"columns":[{"label":["sovon_observation_notes"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"no_color_ring."},{"1":"no_color_ring."},{"1":"no_color_ring."},{"1":"no_color_ring. INBO original notes:  afgelezen door ECONUM = Duponcheel maar kleurring nooit gemeld (verloren!?)\\r\\nmelding komt uit bestand  KBIN."},{"1":"no_color_ring. INBO original notes:  metalen ring afgelezen."},{"1":"no_color_ring."}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>We add the note <code>color_ring_added.</code> to observations linked to action <code>rngkl</code>:</p>
+<p>We add the note <code>color_ring_added.</code> to observations linked to <code>sovon_MRI</code>equal to 2 (action <code>rngkl</code> or <code>vang</code>+<code>klweg</code>):</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
 <span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(
     <span class="dt">sovon_observation_notes =</span> <span class="kw">if_else</span>(
-      <span class="op">!</span><span class="kw">is.na</span>(rngkl),
+      sovon_MRI <span class="op">==</span><span class="st"> </span><span class="dv">2</span>,
       <span class="kw">if_else</span>(<span class="kw">is.na</span>(sovon_observation_notes),
               <span class="st">&quot;color_ring_added.&quot;</span>,
               <span class="kw">paste</span>(<span class="st">&quot;color_ring_added.&quot;</span>, sovon_observation_notes, <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>)),
@@ -902,12 +902,33 @@ mapping_acts_to_MRI</code></pre>
 )</code></pre>
 <p>Preview:</p>
 <pre class="sourceCode r"><code class="sourceCode r">obs_and_acts <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(rngkl)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(sovon_MRI <span class="op">==</span><span class="st"> </span><span class="dv">2</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(sovon_observation_notes) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">head</span>()</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["sovon_observation_notes"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"color_ring_added."},{"1":"color_ring_added."},{"1":"color_ring_added."},{"1":"color_ring_added."},{"1":"color_ring_added."},{"1":"color_ring_added."}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>We add the note <code>no_metal_ring.</code> to observations linked to action <code>meweg</code>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">obs_and_acts &lt;-<span class="st"> </span>
+<span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(
+    <span class="dt">sovon_observation_notes =</span> <span class="kw">if_else</span>(
+      <span class="op">!</span><span class="kw">is.na</span>(meweg),
+      <span class="kw">if_else</span>(<span class="kw">is.na</span>(sovon_observation_notes),
+              <span class="st">&quot;no_metal_ring.&quot;</span>,
+              <span class="kw">paste</span>(<span class="st">&quot;no_metal_ring.&quot;</span>, sovon_observation_notes, <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>)),
+      sovon_observation_notes)
+)</code></pre>
+<p>Preview:</p>
+<pre class="sourceCode r"><code class="sourceCode r">obs_and_acts <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(meweg)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(sovon_observation_notes) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">head</span>()</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["sovon_observation_notes"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"no_metal_ring."},{"1":"no_metal_ring."},{"1":"no_metal_ring."},{"1":"no_metal_ring. INBO original notes:  foto."},{"1":"no_metal_ring."},{"1":"no_metal_ring."}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
