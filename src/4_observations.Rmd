@@ -48,8 +48,8 @@ crbirding_birds <- read_tsv(
     bird_reference = col_double(),
     bird_bto = col_logical(),
     bird_birth_year = col_logical(),
-    bird_date_begin = col_datetime(format = ""),
-    bird_date_end = col_datetime(format = ""))
+    bird_date_begin = col_datetime(format = "%d-%m-%Y"),
+    bird_date_end = col_datetime(format = "%d-%m-%Y"))
 )
 ```
 
@@ -786,6 +786,16 @@ obs_and_acts %>%
 
 ## Save final observation data
 
+Transform date from ISO standard yyyy-mm-dd to SOVON's standard dd-mm-yyyy:
+
+```{r transform_date_dd-mm-yyyy_observation_date}
+obs_and_acts <- 
+  obs_and_acts %>%
+  mutate(sovon_observation_date = as.character(sovon_observation_date, 
+                                               format = "%d-%m-%Y")
+)
+```
+
 Select the required columns, starting with prefix `sovon_`:
 
 ```{r select_sovon_cols}
@@ -839,7 +849,7 @@ crbirding_observations %>%
 Save to text file (tab separated value):
 
 ```{r write_processed_obs_data}
-write_csv(
+write_tsv(
   crbirding_observations, 
   path = here::here("data", "processed", "crbirding_observations.tsv"), 
   na = ""

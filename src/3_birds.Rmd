@@ -1412,7 +1412,7 @@ We apply a recoding in order to standardize INBO's vocabulary to the EURING stan
 ```{r map_age_code}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(bird_age_obs = recode(LeeftijdCode,
+  mutate(sovon_bird_age_obs = recode(LeeftijdCode,
     "PU" = "1",
     "AD" = "A",
     "J1" = "3",
@@ -1429,12 +1429,12 @@ For mapping the bird age while applying color ring (and first metal ring) we sho
 crbirding_birds %>%
   left_join(obs_and_acts %>%
               ## remove rows with Datum equal to NA or field observations
-              filter(!is.na(bird_age_obs) & 
+              filter(!is.na(sovon_bird_age_obs) & 
                        (!is.na(vang) | !is.na(vangl) | 
                           !is.na(rngkl) | !is.na(rngme))) %>%
               distinct(sovon_bird_reference, 
                        Datum, 
-                       bird_age_obs),
+                       sovon_bird_age_obs),
             by = c("sovon_bird_reference", "sovon_bird_date_begin" = "Datum")) %>% 
   nrow() == nrow(crbirding_birds)
 ```
@@ -1446,23 +1446,23 @@ crbirding_birds <-
   crbirding_birds %>%
   left_join(obs_and_acts %>%
               ## remove rows with Datum equal to NA or field observations
-              filter(!is.na(bird_age_obs) & 
+              filter(!is.na(sovon_bird_age_obs) & 
                        (!is.na(vang) | !is.na(vangl) | 
                           !is.na(rngkl) | !is.na(rngme))) %>%
               distinct(sovon_bird_reference, 
                        Datum, 
-                       bird_age_obs),
+                       sovon_bird_age_obs),
             by = c("sovon_bird_reference", 
                    "sovon_bird_date_begin" = "Datum")
 )
 ```
 
-We rename  `bird_age_obs` to `sovon_bird_age_ringing`:
+We rename  `sovon_bird_age_obs` to `sovon_bird_age_ringing` in `crbirding_birds`:
 
-```{r remove_AktieCode}
+```{r rename_sovon_bird_age_obs}
 crbirding_birds <- 
   crbirding_birds %>%
-  rename(sovon_bird_age_ringing = bird_age_obs)
+  rename(sovon_bird_age_ringing = sovon_bird_age_obs)
 ```
 
 As examples, the bird age mapping of birds (color) ringed thrice:
@@ -1647,6 +1647,27 @@ write_tsv(crbirding_users,
 ```
 
 ## Save final ring data
+
+Transform date from ISO standard yyyy-mm-dd to SOVON's standard dd-mm-yyyy:
+
+```{r transform_date_dd-mm-yyyy_bird_date_begin_end}
+crbirding_birds <- 
+  crbirding_birds %>%
+  mutate(sovon_bird_date_begin = as.character(sovon_bird_date_begin, 
+                                               format = "%d-%m-%Y"),
+         sovon_bird_date_end = as.character(sovon_bird_date_end, 
+                                               format = "%d-%m-%Y")
+)
+```
+
+Example:
+
+```{r example_dd-mm-yyyy}
+crbirding_birds %>% 
+  filter(!is.na(sovon_bird_date_end)) %>% 
+  select(sovon_bird_date_begin, sovon_bird_date_end) %>% 
+  head()
+```
 
 SOVON is interested in color ring versions with a dot if dots are present, even if their purpose is just improving readibility. We can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
 
