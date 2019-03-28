@@ -610,14 +610,12 @@ obs_and_acts %>%
 
 ### Bird age
 
-The field `sovon_bird_age_obs` should be filled with the age of the bird as mentioned by the observer. This field is present in `obs_and_acts` in field `Datum`:
+The field `sovon_bird_age_obs` should be filled with the age of the bird as mentioned by the observer. This field has been created in previous chapter:
 
 ```{r mapping_bird_age_ringing}
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_bird_age_obs = Datum)
+obs_and_acts %>%
+  distinct(sovon_bird_age_obs)
 ```
-
 
 ### Bird sex
 
