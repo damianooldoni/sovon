@@ -334,7 +334,7 @@ The SOVON field `condition` is mapped following the scheme at page 22 of [EURING
 1. `dood`: condition = 1
 2. `ziek`: condition = 4
 3. `rngkl`, `rngme`, `vang`, `vangl`: condition = 8
-4. `veld`, `me`, `meweg`, `br`: condition = 7
+4. `veld`, `me`, `meweg`, `klweg`, `br`: condition = 7
 
 ```{r obs_condition}
 obs_and_acts <- 
@@ -344,7 +344,7 @@ obs_and_acts <-
     klgev == "klgev" ~ 1,
     ziek == "ziek" ~ 4,
     !is.na(rngkl) | !is.na(rngme) | !is.na(vang) | !is.na(vangl)  ~ 8,
-    !is.na(veld) | !is.na(me) | !is.na(meweg) | !is.na(br)  ~ 7
+    !is.na(veld) | !is.na(me) | !is.na(meweg) | !is.na(klweg) | !is.na(br)  ~ 7
     )
 )
 ```
@@ -428,22 +428,16 @@ However, SOVON uses this field to map the observations referring to the applying
 
 INBO experts explained us that all color rings are applied on tarsus, MRI: 2, while metal ring position is on tarsus or above or unknown, MRI: 1.
 
-Some actions are related to this field and are mapped as follows: 
+Actions are mapped as follows: 
 
-1. `rngkl`: MRI = 2 
-2. `rngme` only: MRI = 1
-3. `veld`: MRI = 4 
-4. `me`: MRI = 4 
-5. `br`: MRI = 4
-6.  `klgev`: MRI = 4
-7. `dood` only: MRI = 4
-8. `vang`: MRI = 4 or 5
-9. `vangl`: MRI = 4 or 5
-10. `meweg` only or combined with actions not mapped yet: MRI = 4
-11. `klweg` only or combined with actions not mapped yet: MRI = 4
-12. `ziek` only: MRI = 4
+1. default: MRI = 4 
+2. `rngkl`: MRI = 2 
+3. `rngme` only: MRI = 1
+5. other `vang`/`vangl`: MRI = 4 or 5
+6. `vang`/`vangl` + `klweg`: MRI = 2 or 4
+7. `vang`/`vangl` + `meweg`: MRI = 1 or 4
 
-We initialize `sovon_MRI` by mapping first 6 situations:
+We initialize `sovon_MRI` by mapping first three situations:
 
 ```{r intialize_MRI}
 mapping_acts_to_MRI <- 
@@ -451,51 +445,18 @@ mapping_acts_to_MRI <-
   mutate(sovon_MRI = case_when(
     rngkl == "rngkl" ~ 2,
     rngme == "rngme" & is.na(rngkl) ~ 1,
-    veld == "veld" ~ 4,
-    me == "me" ~ 4,
-    br ==  "br" ~ 4,
-    klgev == "klgev" ~ 4
+    TRUE ~ 4 # apply default value
   )
 )
 mapping_acts_to_MRI
 ```
 
-The other six conditions will be mapped directly in observations, but first we apply the provisional mapping provided by `mapping_acts_to_MRI`:
+We apply this provisional mapping as provided by `mapping_acts_to_MRI`:
 
 ```{r initialize_sovon_MRI_in_obs}
 obs_and_acts <- 
   obs_and_acts %>%
   left_join(mapping_acts_to_MRI, by = c(acts))
-```
-
-Number of observations with MRI value:
-
-```{r n_obs_with_MRI_begin_mapping}
-obs_and_acts %>%
-  filter(!is.na(sovon_MRI)) %>%
-  count()
-```
-
-Number of observations still to map:
-
-```{r n_obs_without_MRI_begin}
-obs_and_acts %>%
-  filter(is.na(sovon_MRI)) %>%
-  count()
-```
-
-Observations linked to action `dood` only, get MRI 4:
-
-```{r MRI_4_dood_only}
-dood_only_number <- 
-  obs_and_acts %>%
-  filter_at(vars(acts[acts != "dood"]), all_vars(is.na(.))) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% dood_only_number, 4, sovon_MRI)
-)
 ```
 
 The actions `vang` and  `vangl` related to a change of color ring can be found by checking the date of the observations without action `rgnkl` or `rngme` and with same date of `bird_date_begin` in `crbirding_birds`:
@@ -519,28 +480,78 @@ obs_and_acts <-
 )
 ```
 
-We can now assign value 4 to the other observations with action `vang`:
+Observations linked to `vang`/`vangl` + `klweg`: 
 
-```{r vang_without_change_color_ring}
-vang_no_change_color_ring <- 
-  obs_and_acts %>%
-  filter((!is.na(vang) | !is.na(vangl)) & is.na(rngkl) & is.na(rngme)) %>%
-  filter(!sovon_observation_reference %in% obs_ref_MRI_5) %>%
-  pull(sovon_observation_reference)
+```{r vang_vangl_+_klweg}
+obs_and_acts %>%
+  filter((!is.na(vang) | !is.na(vangl)) & klweg == "klweg") %>%
+  select(sovon_bird_reference, 
+         sovon_observation_reference, 
+         vang, 
+         vangl,
+         sovon_MRI) %>%
+  arrange(sovon_bird_reference, 
+         sovon_observation_reference)
+```
 
+In case MRI = 5 it means that the date of these observations is the same of date of applying a new ring. However, as the previous color ring was absent, MRI should be 2 (= applying a new ring) instead of 5:
+
+```{r set_2_instead_of_5_klweg}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(sovon_MRI = ifelse(
-    sovon_observation_reference %in% vang_no_change_color_ring, 4, sovon_MRI
-    )
+  mutate(sovon_MRI = case_when(
+    sovon_MRI == 5 & (vang == "vang" | vangl == "vangl") & klweg == "klweg" ~ 2,
+    TRUE ~ sovon_MRI
+  )
 )
 ```
+
+Check:
+
+```{r check_klweg_vang_of_vangl_set_to_2}
+obs_and_acts %>%
+  filter((!is.na(vang) | !is.na(vangl)) & klweg == "klweg") %>%
+  select(sovon_bird_reference, 
+         sovon_observation_reference, 
+         vang, 
+         vangl,
+         sovon_MRI) %>%
+  arrange(sovon_bird_reference, 
+         sovon_observation_reference)
+```
+
+Obesrvations linked to combinations `vang`/`vangl` and  `meweg`:
+
+```{r vang_of_vangl+meweg}
+obs_and_acts %>%
+  filter((!is.na(vang) | !is.na(vangl)) & meweg == "meweg") %>%
+  select(sovon_bird_reference, 
+         sovon_observation_reference, 
+         vang, 
+         vangl,
+         sovon_MRI) %>%
+  arrange(sovon_bird_reference, 
+         sovon_observation_reference)
+```
+
+A new metal ring has been added while the color ring has been changed, justifying the MRI value 5:
+
+```{r check_this_bird}
+crbirding_birds %>%
+  filter(bird_reference %in% 
+           (obs_and_acts %>%
+              filter((!is.na(vang) | !is.na(vangl)) & meweg == "meweg") %>%
+              pull(sovon_bird_reference))) %>%
+  select(bird_reference, bird_shorthand, bird_date_begin, bird_date_end)
+```
+
+As cr-birding and INBO databases are color oriented, we will leave MRI value 5.
 
 The mapping of MRI related to observations with action `vang` is completed:
 
 ```{r MRI_vang}
 obs_and_acts %>%
-  filter(!is.na(vang)) %>%
+  filter(vang == "vang") %>%
   select(sovon_bird_reference, 
          sovon_observation_reference, 
          sovon_MRI, 
@@ -549,7 +560,7 @@ obs_and_acts %>%
          sovon_observation_reference)
 ```
 
-Same processing for observations with actions  `vangl`:
+Same holds true for observations with actions  `vangl`:
 
 ```{r MRI_vangl}
 obs_and_acts %>%
@@ -562,15 +573,6 @@ obs_and_acts %>%
          sovon_observation_reference)
 ```
 
-Check that no observations with action `vang` or `vangl` are left without a MRI value:
-
-```{r check_mapping_MRI_vang}
-obs_and_acts %>%
-  filter(!is.na(vang) | !is.na(vangl)) %>%
-  filter(is.na(sovon_MRI)) %>%
-  nrow()
-```
-
 For having a better overview of the mapping, we update the table  `mapping_acts_to_MRI`: 
 
 ```{r update_mapping_acts_to_MRI}
@@ -580,122 +582,6 @@ mapping_acts_to_MRI <-
   distinct()
 mapping_acts_to_MRI
 ```
-
-Combinations of actions with  `meweg`:
-
-```{r meweg_combinations}
-mapping_acts_to_MRI %>%
-  filter(meweg == "meweg")
-```
-
-Observations linked to action `meweg` not mapped yet get MRI value 4:
-
-```{r MRI_4_meweg}
-meweg_left_number <- 
-  obs_and_acts %>%
-  filter(meweg == "meweg" & is.na(sovon_MRI)) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% meweg_left_number, 4, sovon_MRI)
-)
-```
-
-Update table `mapping_acts_to_MRI`: 
-
-```{r update_mapping_acts_to_MRI_after_meweg_mapping}
-mapping_acts_to_MRI <- 
-  obs_and_acts %>%
-  select(one_of(acts), sovon_MRI) %>%
-  distinct()
-mapping_acts_to_MRI
-```
-
-Final mapping of observations with action `meweg`:
-
-```{r meweg_combinations_final}
-mapping_acts_to_MRI %>%
-  filter(meweg == "meweg")
-```
-
-Action combinations still without MRI:
-
-```{r check_obs_without_MRI_after_meweg}
-mapping_acts_to_MRI %>%
-  filter(is.na(sovon_MRI))
-```
-
-Observations with action `klweg` not yet mapped get MRI 4 as the metal ring is still present:
-
-```{r klweg_or_klweg_dood}
-klweg_left_number <- 
-  obs_and_acts %>%
-  filter(klweg == "klweg" & is.na(sovon_MRI)) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% klweg_left_number, 4, sovon_MRI)
-)
-```
-
-Update table `mapping_acts_to_MRI`: 
-
-```{r update_mapping_acts_to_MRI_after_klweg_mapping}
-mapping_acts_to_MRI <- 
-  obs_and_acts %>%
-  select(one_of(acts), sovon_MRI) %>%
-  distinct()
-mapping_acts_to_MRI
-```
-
-Action combinations still without MRI:
-
-```{r check_obs_without_MRI_after_klweg}
-mapping_acts_to_MRI %>%
-  filter(is.na(sovon_MRI))
-```
-
-Observations with action `ziek` only get MRI 4 as the metal ring and/or the color ring  are present:
-
-```{r ziek_MRI}
-ziek_left_number <- 
-  obs_and_acts %>%
-  filter(ziek == "ziek" & is.na(sovon_MRI)) %>%
-  pull(sovon_observation_reference)
-obs_and_acts <- 
-  obs_and_acts %>%
-  mutate(sovon_MRI = if_else(
-    sovon_observation_reference %in% ziek_left_number, 4, sovon_MRI)
-)
-```
-
-Update table `mapping_acts_to_MRI`: 
-
-```{r update_mapping_acts_to_MRI_after_ziek_mapping}
-mapping_acts_to_MRI <- 
-  obs_and_acts %>%
-  select(one_of(acts), sovon_MRI) %>%
-  distinct()
-mapping_acts_to_MRI
-```
-
-At this stage, all action combinations should have a MRI value:
-
-```{r check_acts_without_MRI_final}
-mapping_acts_to_MRI %>%
-  filter(is.na(sovon_MRI))
-```
-
-The same holds true for observations:
-
-```{r check_n_obs_without_MRI_final}
-obs_and_acts %>%
-  filter(is.na(sovon_MRI)) %>%
-  nrow()
-```
-
 
 We save the final mapping in  `data/interim`:
 
@@ -722,39 +608,36 @@ obs_and_acts %>%
   distinct()
 ```
 
-### Bird age ringing
+### Bird age
 
-The required field `sovon_bird_age_ringing` should be filled with the age of the bird as mentioned by observer. This field is present in `obs_and_acts` in field `Datum`:
+The field `sovon_bird_age_obs` should be filled with the age of the bird as mentioned by the observer. This field is present in `obs_and_acts` in field `Datum`:
 
 ```{r mapping_bird_age_ringing}
 obs_and_acts <- 
   obs_and_acts %>%
-  mutate(sovon_bird_age_ringing = Datum)
+  mutate(sovon_bird_age_obs = Datum)
 ```
 
 
 ### Bird sex
 
-The field `sovon_bird_sex` is equal to the bird sex in ring data:
+The field `sovon_bird_sex` should be filled with the sex of the bird as mentioned by the observer. This field is not present in `obs_and_acts`, so we assign value `U` (unknown):
 
 ```{r add_sovon_bird_sex_obs}
 obs_and_acts <- 
   obs_and_acts %>%
-  left_join(crbirding_birds %>% 
-              select(bird_reference, bird_sex),
-            by = c("sovon_bird_reference" = "bird_reference")) %>%
-  rename(sovon_bird_sex = bird_sex)
+  mutate(sovon_bird_sex = "U")
 ```
 
 ### Capture
 
-The field `sovon_observation_is_capture` can be filled by evaluating the link of observations to actions `vang` or `vangl`:
+The field `sovon_observation_is_capture` can be filled by evaluating the link of observations to actions `vang`, `vangl`, `rngkl` or `rngme`:
 
 ```{r is_capture}
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(sovon_observation_is_capture = if_else(
-    !is.na(vang) | !is.na(vangl), 1, 0
+    !is.na(vang) | !is.na(vangl) | !is.na(rngkl) | !is.na(rngme), 1, 0
   )
 )
 ```
@@ -904,7 +787,7 @@ cr_obs_cols <- c(
   "observation_lat", "observation_lng", "observation_location", 
   "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
   "melder_email", "melder_ringersnummer", "ring_number", "condition", "status", 
-  "bird_age_ringing", "bird_sex", "bird_position", "bird_direction"
+  "bird_age_obs", "bird_sex", "bird_position", "bird_direction"
 )
 ```
 
