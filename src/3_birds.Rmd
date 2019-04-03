@@ -998,7 +998,9 @@ crbirding_birds %>%
 )
 ```
 
-If mapping is correct, we can overwrite the columns `sovon_bird_shorthand` and `sovon_bird_shorthand_pt` and remove the help columns  `sovon_bird_shorthand_color`,  `sovon_bird_shorthand_pt_color` and `color_combination`:
+The others rings are foreign rings: no color will be assigned to them.
+
+We can now overwrite the columns `sovon_bird_shorthand` and `sovon_bird_shorthand_pt` and remove the help columns  `sovon_bird_shorthand_color`,  `sovon_bird_shorthand_pt_color` and `color_combination`:
 
 ```{r remove_cols_with_color_after_mapping}
 crbirding_birds <-

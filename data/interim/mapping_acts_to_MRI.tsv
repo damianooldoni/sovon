@@ -20,9 +20,9 @@ rngkl												2
 	rngme			vang								1
 			br					meweg				4
 					dood			meweg				4
+						klweg						4
 					dood	klweg						4
 			br		dood							4
-						klweg						4
 			br				veld					4
 						klweg	veld					4
 rngkl	rngme										ziek	2
