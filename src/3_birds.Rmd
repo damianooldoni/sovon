@@ -220,21 +220,6 @@ crbirding_birds %>%
   select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt)
 ```
 
-Another example:
-
-```{r example_bird_ref_4531}
-birds %>%
-  filter(sovon_bird_reference == 4531) %>%
-  select(sovon_bird_reference, first_Nummer, NummerNieuw, NummerDesc)
-```
-
-
-```{r example_bird_ref_3716}
-crbirding_birds %>%
-  filter(sovon_bird_reference == 4531) %>%
-  select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt)
-```
-
 ### Bird ringing date
 
 The date of applying a ring should be mapped as `sovon_bird_date_begin`. The date of applying the first ring can be found in data frame `obs_and_acts` in the column `Datum` for actions `rngkl` (code action of applying very first color ring):
@@ -772,8 +757,8 @@ crbirding_birds %>%
               pull(sovon_bird_reference))) %>%
   head(n = 50)
 ```
-`
-### Map ring colors and add to `bird_shorthand`
+
+### Map color of rings and inscriptions
 
 The color of the ring and the color of the inscription should be added, if available, to `bird_shorthand`. It's important to highlight the fact that we have this information only for the most recent color ring of each bird. Following combinations are present:
 
@@ -854,7 +839,8 @@ crbirding_birds <-
                                           "(", 
                                           sovon_bird_shorthand_pt, 
                                           ")"),
-    TRUE ~sovon_bird_shorthand_pt))
+    TRUE ~sovon_bird_shorthand_pt)) %>%
+  ungroup()
 ```
 
 Some examples from birds ringed thrice:
@@ -875,6 +861,143 @@ crbirding_birds %>%
          sovon_bird_date_end)
 ```
 
+Based on INBO experts knowledge, we can assign color of rings and insriptions for a significant number of old, changed rings as well. All rings with a 4-letter long inscription where the third letter is an A are blue rings with white inscription (see https://github.com/inbo/cr-birding/issues/84#issuecomment-478938321).
+
+Number of rings still not mapped satisfying this condition:
+
+```{r check_n_color_old_rings_with_A_3rd_position}
+crbirding_birds %>%
+  filter(
+    !str_detect(sovon_bird_shorthand_color, "\\(") &
+        str_detect(sovon_bird_shorthand, "[A-Z]") &
+        str_length(sovon_bird_shorthand) == 4 &
+        str_sub(sovon_bird_shorthand, 3, 3) == "A") %>%
+  nrow()
+```
+
+```{r assign_color_old_rings}
+crbirding_birds <- 
+  crbirding_birds %>%
+  mutate(
+    sovon_bird_shorthand_color = if_else(
+      !str_detect(sovon_bird_shorthand_color, "\\(") & # ring is not yet mapped
+        str_detect(sovon_bird_shorthand_color, "[A-Z]") & # letters only
+        str_length(sovon_bird_shorthand_color) == 4 & # 4 characters
+        str_sub(sovon_bird_shorthand_color, 3, 3) == "A", # 3rd character is an A
+      paste0("BW(", sovon_bird_shorthand_color, ")"),
+      sovon_bird_shorthand_color),
+    sovon_bird_shorthand_pt_color = if_else(
+      !str_detect(sovon_bird_shorthand_pt_color, "\\(") & # ring is not yet mapped
+        str_detect(sovon_bird_shorthand_pt_color, "[A-Z]") & # letters only
+        str_length(sovon_bird_shorthand_pt_color) == 4 & # 4 characters
+        str_sub(sovon_bird_shorthand_pt_color, 3, 3) == "A", # 3rd character is an A
+      paste0("BW(", sovon_bird_shorthand_pt_color, ")"),
+      sovon_bird_shorthand_pt_color))
+```
+
+Some examples from birds ringed thrice:
+
+```{r show_example_colors_old_rings}
+crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  count() %>%
+  filter(n > 2) %>%
+  left_join(crbirding_birds, by = "sovon_bird_reference") %>%
+  select(sovon_bird_reference, 
+         color_combination, 
+         sovon_bird_shorthand,
+         sovon_bird_shorthand_color, 
+         sovon_bird_shorthand_pt, 
+         sovon_bird_shorthand_pt_color,
+         sovon_bird_date_begin,
+         sovon_bird_date_end)
+```
+
+Rings still without color:
+
+```{r old_rings_without_color}
+rings_color_still_unknown <- 
+  crbirding_birds %>%
+  filter(!str_detect(sovon_bird_shorthand_color, "\\)"))
+rings_color_still_unknown
+```
+
+The majority of these rings either contain numbers: 
+
+```{r not_coloured_rings_numbers}
+rings_color_still_unknown_with_number <- 
+  rings_color_still_unknown %>%
+  filter(str_detect(sovon_bird_shorthand, "[0-9]"))
+rings_color_still_unknown_with_number
+```
+
+or have a B at third position:
+
+```{r not_coloured_rings_B}
+rings_color_still_unknown_with_B_third_pos <- 
+  rings_color_still_unknown %>%
+  filter(str_sub(sovon_bird_shorthand, 3, 3) == "B")
+rings_color_still_unknown_with_B_third_pos
+```
+
+Rings not satsfying these two conditions:
+
+```{r not_coloured_rings_others}
+rings_color_still_unknown_left <- 
+  rings_color_still_unknown %>%
+  filter(!sovon_bird_shorthand %in% 
+           rings_color_still_unknown_with_number$sovon_bird_shorthand & 
+           !sovon_bird_shorthand %in% 
+           rings_color_still_unknown_with_B_third_pos$sovon_bird_shorthand)
+rings_color_still_unknown_left
+```
+
+INBO experts explained us that the rings containing a `B` at third position are *virtual* rings. We assign them blue as ring color, white as inscription color and add note `virtual_ring.`:
+
+```{r solve_virtual_rings}
+crbirding_birds <- 
+  crbirding_birds %>%
+  mutate(
+    sovon_bird_notes = case_when(
+      (!str_detect(sovon_bird_shorthand_pt_color, "\\(") & # ring is not yet mapped
+         str_detect(sovon_bird_shorthand, "[A-Z]") & # letters only
+         str_length(sovon_bird_shorthand_color) == 4 & # 4 characters
+         str_sub(sovon_bird_shorthand_color, 3, 3) == "B") # 3rd char is B or O
+      ~ ifelse(is.na(sovon_bird_notes),
+               "virtual_color_ring.",
+               str_c(sovon_bird_notes, "virtual_color_ring.", sep = " ")),
+     TRUE ~ sovon_bird_notes),
+    sovon_bird_shorthand_color = if_else(
+      !str_detect(sovon_bird_shorthand_color, "\\(") & # ring is not yet mapped
+        str_detect(sovon_bird_shorthand_color, "[A-Z]") & # letters only
+        str_length(sovon_bird_shorthand_color) == 4 & # 4 characters
+        str_sub(sovon_bird_shorthand_color, 3, 3) == "B", # 3rd char is a B
+      paste0("BW(", sovon_bird_shorthand_color, ")"),
+      sovon_bird_shorthand_color),
+    sovon_bird_shorthand_pt_color = if_else(
+      !str_detect(sovon_bird_shorthand_pt_color, "\\(") & # ring is not yet mapped
+        str_detect(sovon_bird_shorthand_pt_color, "[A-Z]") & # letters only
+        str_length(sovon_bird_shorthand_pt_color) == 4 & # 4 characters
+        str_sub(sovon_bird_shorthand_pt_color, 3, 3) == "B", # 3rd char is a B
+      paste0("BW(", sovon_bird_shorthand_pt_color, ")"),
+      sovon_bird_shorthand_pt_color)
+)
+```
+
+After mapping:
+
+```{r show_changes}
+crbirding_birds %>%
+  filter(sovon_bird_reference %in% 
+           rings_color_still_unknown_with_B_third_pos$sovon_bird_reference) %>%
+  select(sovon_bird_reference, 
+         sovon_bird_shorthand, 
+         sovon_bird_shorthand_color, 
+         sovon_bird_shorthand_pt_color, 
+         sovon_bird_notes
+)
+```
+
 If mapping is correct, we can overwrite the columns `sovon_bird_shorthand` and `sovon_bird_shorthand_pt` and remove the help columns  `sovon_bird_shorthand_color`,  `sovon_bird_shorthand_pt_color` and `color_combination`:
 
 ```{r remove_cols_with_color_after_mapping}
@@ -893,6 +1016,7 @@ SOVON allows us to add two columns called `position_color_ring` and `direction_c
 2. the direction of the color ring's inscription, upwards or downwards 
 
 In case of birds with one color ring only, SOVON doesn't save these fields. However, INBO experts find them important as 
+
 > it can help a lot when identifying mistakes in reading. 
 
 For more details, see issue [here](https://github.com/inbo/cr-birding/issues/61#issuecomment-472862064).
