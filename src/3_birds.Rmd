@@ -1433,7 +1433,7 @@ crbirding_birds <-
                               "5920" = "05920",
                               "5910" = "05910",
                               "5926" = "05926",
-                              "5922" = "05922",
+                              "5922" = "06009", # 5922 used for hybrid gulls
                               "zz" = NA_character_,
                               "zzz" = NA_character_)) %>%
   ungroup()
