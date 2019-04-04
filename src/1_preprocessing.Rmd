@@ -242,6 +242,16 @@ obs_actions %>%
   filter(n > 1)
 ```
 
+## Check presence of hard returns or tabs in `users`
+
+Remove hard returns `\r\n` in `users`:
+
+```{r remove_hard_return_tabs}
+users <- 
+  users %>%
+  mutate_if(is.character, ~str_replace_all(., "[\\r\\n]" , ""))
+```
+
 ## Check spaces in `birds`
 
 No spaces should be present in any column of `birds`:
