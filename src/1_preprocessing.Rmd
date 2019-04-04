@@ -242,13 +242,35 @@ obs_actions %>%
   filter(n > 1)
 ```
 
-## Check presence of hard returns or tabs in `users`
+## Remove hard returns
+
+### Remove hard returns in `users`
 
 Remove hard returns `\r\n` in `users`:
 
-```{r remove_hard_return_tabs}
+```{r remove_hard_return_users}
 users <- 
   users %>%
+  mutate_if(is.character, ~str_replace_all(., "[\\r\\n]" , ""))
+```
+
+### Remove hard returns in `birds`
+
+Remove hard returns `\r\n` in `users`:
+
+```{r remove_hard_return_tabs_birds}
+birds <- 
+  birds %>%
+  mutate_if(is.character, ~str_replace_all(., "[\\r\\n]" , ""))
+```
+
+### Remove hard returns in `observations`
+
+Remove hard returns `\r\n` in `observations`:
+
+```{r remove_hard_return_obs}
+obs <- 
+  obs %>%
   mutate_if(is.character, ~str_replace_all(., "[\\r\\n]" , ""))
 ```
 
