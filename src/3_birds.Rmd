@@ -1082,20 +1082,22 @@ We map all values of ring position and inscription reading direction:
 ```{r map_positions_and_directions}
 ring_position_table <-
   ring_position_table %>%
-  mutate(sovon_bird_position = case_when(
-    str_sub(Code, start = 1, end = 1) == "L" ~ "LL",
-    str_sub(Code, start = 1, end = 1) == "R" ~ "RL",
+  mutate(sovon_bird_ring_position = case_when(
+    str_sub(Code, start = 1, end = 1) == "L" ~ "LB",
+    str_sub(Code, start = 1, end = 1) == "R" ~ "RB",
     TRUE ~ NA_character_),
     sovon_bird_direction = case_when(
     str_sub(Code, start = -1, end = -1) == "D" ~ "D",
     str_sub(Code, start = -1, end = -1) == "U" ~ "U",
     TRUE ~ NA_character_)) %>%
   select(Code, 
-         sovon_bird_position, 
+         sovon_bird_ring_position, 
          sovon_bird_direction,
          everything())
 ring_position_table
 ```
+
+where `LB` and  `RB` stay for _left tarsus_ and _right tarsus_ respectively.
 
 We map the ring position and direction of ring inscription in `birds`:
 
@@ -1103,7 +1105,7 @@ We map the ring position and direction of ring inscription in `birds`:
 birds <- 
   birds %>% 
   left_join(ring_position_table %>%
-              select(Code, sovon_bird_position),
+              select(Code, sovon_bird_ring_position),
             by = c("Plaats" = "Code")) %>%
   left_join(ring_position_table %>%
               select(Code, sovon_bird_direction),
@@ -1114,24 +1116,24 @@ Effects of the mapping:
 
 ```{r result_mapping_place}
 birds %>%
-  distinct(Plaats, sovon_bird_position, sovon_bird_direction)
+  distinct(Plaats, sovon_bird_ring_position, sovon_bird_direction)
 ```
 
-Map these values from `birds` to `crbirding_birds`, taking into account that the fields `sovon_bird_position` and `sovon_bird_direction` are available for the very last ring of each bird:
+Map these values from `birds` to `crbirding_birds`, taking into account that the fields `sovon_bird_ring_position` and `sovon_bird_direction` are available for the very last ring of each bird:
 
 ```{r transfer_position_direction_to_crbirding_birds}
 crbirding_birds <-
   crbirding_birds %>%
   left_join(birds %>%
               select(sovon_bird_reference, 
-                     sovon_bird_position, 
+                     sovon_bird_ring_position, 
                      sovon_bird_direction),
             by = "sovon_bird_reference") %>%
   group_by(sovon_bird_reference) %>%
   mutate(
-    sovon_bird_position = if_else(
+    sovon_bird_ring_position = if_else(
       sovon_bird_date_begin == max(sovon_bird_date_begin),
-      sovon_bird_position,
+      sovon_bird_ring_position,
       NA_character_),
     sovon_bird_direction = if_else(
       sovon_bird_date_begin == max(sovon_bird_date_begin),
@@ -1149,7 +1151,7 @@ crbirding_birds %>%
   filter(n > 1) %>%
   left_join(crbirding_birds, by = "sovon_bird_reference") %>%
   select(sovon_bird_reference, 
-         sovon_bird_position,
+         sovon_bird_ring_position,
          sovon_bird_direction,
          sovon_bird_shorthand,
          sovon_bird_date_begin,
