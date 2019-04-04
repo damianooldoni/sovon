@@ -635,7 +635,7 @@ The field `sovon_observation_is_capture` can be filled by evaluating the link of
 obs_and_acts <- 
   obs_and_acts %>%
   mutate(sovon_observation_is_capture = if_else(
-    !is.na(vang) | !is.na(vangl) | !is.na(rngkl) | !is.na(rngme), 1, 0
+    !is.na(vang) | !is.na(vangl) | !is.na(rngkl) | !is.na(rngme), Y, N
   )
 )
 ```
