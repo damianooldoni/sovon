@@ -846,12 +846,12 @@ crbirding_observations %>%
   head(n = 10)
 ```
 
-Save to text file (tab separated value):
+Save to text file (comma separated value):
 
 ```{r write_processed_obs_data}
 write_tsv(
   crbirding_observations, 
-  path = here::here("data", "processed", "crbirding_observations.tsv"), 
+  path = here::here("data", "processed", "crbirding_observations.csv"), 
   na = ""
 )
 ```

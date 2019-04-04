@@ -57,7 +57,7 @@ ring_position_table <- read_tsv(
 Import user data as we have still to map  field `user_role`:
 
 ```{r import_temp_user_data}
-crbirding_users <- read_tsv(
+crbirding_users <- read_csv(
   here::here("data", "processed", "crbirding_users.tsv")
 )
 ```
@@ -1807,11 +1807,11 @@ all(cr_users_cols %in% names(crbirding_users)) &
   length(cr_users_cols) == ncol(crbirding_users)
 ```
 
-We overwrite `crbirding_users.tsv` with added information:
+We overwrite `crbirding_users.csv` with added information:
 
 ```{r overwrite_crbirding_users}
 write_tsv(crbirding_users,
-          path = here::here("data", "processed", "crbirding_users.tsv"),
+          path = here::here("data", "processed", "crbirding_users.csv"),
           na = "",
           append = FALSE
 )
@@ -1887,12 +1887,12 @@ Preview data:
 crbirding_birds %>% head(n = 100)
 ```
 
-Save to text file (tab separated value):
+Save to text file (comma separated value):
 
 ```{r write_bird_data_txt}
 write_tsv(
   crbirding_birds, 
-  path = here::here("data", "processed", "crbirding_birds.tsv"), 
+  path = here::here("data", "processed", "crbirding_birds.csv"), 
   na = ""
 )
 ```
