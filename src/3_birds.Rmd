@@ -1590,7 +1590,7 @@ obs_and_acts <-
     "I3" = "7",
     "I2" = "9",
     "I5" = "B",
-    .missing = "O"))
+    .missing = NA_character_))
 ```
 
 For mapping the bird age while applying color ring (and first metal ring) we should not only take into account observations with actions `rngkl` (applying very first color ring) but also actions `vang` and `vangl` as applying a new color ring is linked to one of this two actions (see section [bird shorthand](#bird-shorthand)). The age can be added to `crbirding_birds` by matching `sovon_bird_date_begin` of `crbirding_birds` and `Datum` of `obs_and_acts` for each `sovon_bird_reference`. First we check that this strategy ends up with an one-to-one relation:
