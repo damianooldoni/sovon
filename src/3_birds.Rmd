@@ -58,7 +58,7 @@ Import user data as we have still to map  field `user_role`:
 
 ```{r import_temp_user_data}
 crbirding_users <- read_csv(
-  here::here("data", "processed", "crbirding_users.tsv")
+  here::here("data", "processed", "crbirding_users.csv")
 )
 ```
 
