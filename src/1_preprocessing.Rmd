@@ -753,6 +753,51 @@ obs_and_acts <-
   filter(!KleurringNummer %in% common_shellduck_nummer | is.na(KleurringNummer))
 ```
 
+### Check date of `dood`
+
+Observations with action `dood` should be the very last for each observation sequence containing this action:
+
+```{r obs_after_death}
+obs_after_death <- 
+  obs_and_acts %>%
+  filter(dood == "dood") %>%
+  select(KleurringNummer, Datum) %>%
+  rename(dood_datum = Datum) %>%
+  left_join(obs_and_acts, by = "KleurringNummer") %>%
+  filter(dood_datum < Datum) %>%
+  select(Nummer, KleurringNummer, Datum, dood_datum, acts, everything()) %>%
+  arrange(KleurringNummer, Datum)
+obs_after_death
+```
+
+Observation after `dood` are removed:
+
+```{r remove_obs_after_death}
+obs_and_acts <- 
+  obs_and_acts %>%
+  filter(! Nummer %in% obs_after_death$Nummer)
+```
+
+Same holds true for observation after `klgev`:
+
+```{r obs_after_klgev}
+obs_after_klgev <-
+  obs_and_acts %>%
+  filter(klgev == "klgev") %>%
+  select(KleurringNummer, Datum) %>%
+  rename(klgev_datum = Datum) %>%
+  left_join(obs_and_acts, by = "KleurringNummer") %>%
+  filter(klgev_datum < Datum) %>%
+  select(Nummer, KleurringNummer, Datum, klgev_datum, acts, everything()) %>%
+  arrange(KleurringNummer, Datum)
+```
+
+```{r remove_obs_after_klgev}
+obs_and_acts<- 
+  obs_and_acts %>%
+  filter(!Nummer %in% obs_after_klgev$Nummer)
+```
+
 ## Save preprocessed data
 
 After data cleaning we save the data as TSVs in `.data/interim`:
