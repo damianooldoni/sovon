@@ -798,6 +798,16 @@ obs_and_acts<-
   filter(!Nummer %in% obs_after_klgev$Nummer)
 ```
 
+Finally, we perform a last check: a ring should not be linked to two observations, one with action  `dood` and one with action `klgev`:
+
+```{r check_dood_klgev}
+obs_and_acts %>%
+  filter(dood == "dood" | klgev ==  "klgev") %>%
+  group_by(KleurringNummer) %>%
+  count() %>%
+  filter(n > 1)
+```
+
 ## Save preprocessed data
 
 After data cleaning we save the data as TSVs in `.data/interim`:
