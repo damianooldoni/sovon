@@ -778,26 +778,6 @@ obs_and_acts <-
   filter(! Nummer %in% obs_after_death$Nummer)
 ```
 
-Same holds true for observation after `klgev`:
-
-```{r obs_after_klgev}
-obs_after_klgev <-
-  obs_and_acts %>%
-  filter(klgev == "klgev") %>%
-  select(KleurringNummer, Datum) %>%
-  rename(klgev_datum = Datum) %>%
-  left_join(obs_and_acts, by = "KleurringNummer") %>%
-  filter(klgev_datum < Datum) %>%
-  select(Nummer, KleurringNummer, Datum, klgev_datum, acts, everything()) %>%
-  arrange(KleurringNummer, Datum)
-```
-
-```{r remove_obs_after_klgev}
-obs_and_acts<- 
-  obs_and_acts %>%
-  filter(!Nummer %in% obs_after_klgev$Nummer)
-```
-
 Finally, we perform a last check: a ring should not be linked to two observations, one with action  `dood` and one with action `klgev`:
 
 ```{r check_dood_klgev}
