@@ -559,6 +559,48 @@ duplicates_ringing_rngme <-
 duplicates_ringing_rngme
 ```
 
+## Add `rngme` if not present
+
+Some metal rings are not linked to an observation with action `rngme`, so we have no date for them:
+
+```{r check_apply_rngme}
+no_rngme <- 
+  birds %>%
+  filter(!is.na(MetaalringNummer)) %>%
+  left_join(obs_and_acts %>%
+              filter(!is.na(rngme)) %>%
+              select(KleurringNummer, Datum),
+            by = c("Nummer" = "KleurringNummer")) %>%
+  filter(is.na(Datum)) %>%
+  select(Nummer, MetaalringNummer) %>%
+  rename(KleurringNummer = Nummer) %>%
+  arrange(KleurringNummer)
+no_rngme
+```
+
+Experts are sure that these metal rings have been applied while applying the color ring (see [comment on issue #33](https://github.com/inbo/sovon/issues/33#issuecomment-451876667)). So, we can add action `rngme` to observations coupled to action `rngkl` for these rings:
+
+```{r add_rngme_to_obs_with_rngkl}
+obs_and_acts <-
+  obs_and_acts %>%
+  left_join(no_rngme %>%
+              select(KleurringNummer) %>%
+              mutate(add_rngme = TRUE),
+            by = "KleurringNummer") %>%
+  mutate(rngme = case_when(
+    rngkl == "rngkl" & add_rngme == TRUE ~ "rngme",
+    TRUE ~ rngme)) %>%
+  select(-add_rngme)
+```
+
+Be sure this solution provides a date for all metal rings:
+
+```{r check_date_for_all_metal_rings}
+obs_and_acts %>%
+  filter(rngme == "rngme") %>%
+  nrow() == nrow(birds)
+```
+
 ## Check age while applying rings
 
 For each bird, observations with same date should refer to same bird age. Exceptions:

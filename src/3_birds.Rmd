@@ -1329,51 +1329,6 @@ no_rngme <-
 no_rngme
 ```
 
-Experts are sure that these metal rings have been applied while applying the color ring (see [comment on issue #33](https://github.com/inbo/sovon/issues/33#issuecomment-451876667)). So, we can use the information for rows with action `rngkl` to create similar new observations/actions with action ``rngme`:
-
-```{r add_date_to_metal_ring_number_exceptions}
-no_rngme_info <- 
-  no_rngme %>%
-  left_join(obs_and_acts %>%
-              filter(!is.na(rngkl)) %>%
-              select(-acts),
-            by = c("sovon_bird_reference", "KleurringNummer")) %>%
-  mutate(rngme = "rngme")
-no_rngme_info %>%
-  select(sovon_bird_reference, KleurringNummer, MetaalringNummer, rngme)
-```
-
-Be sure this solution provides a date for all metal rings:
-
-```{r check_date_for_all_metal_rings}
-no_rngme_info %>%
-  filter(!is.na(Datum)) %>%
-  nrow() == nrow(no_rngme_info)
-```
-
-We add these observations to `obs_and_acts`:
-
-```{r add_absent_rngme}
-obs_and_acts <- 
-  obs_and_acts %>%
-  bind_rows(no_rngme_info)
-```
-
-and check that all birds (`sovon_bird_reference`) with a valid metal ring are linked to one and only one `rngme` action. Exceptions:
-
-```{r check_no_ambiguity_rngkl}
-birds %>%
-  filter(!is.na(sovon_bird_ring_number)) %>%
-  distinct(sovon_bird_reference) %>%
-  anti_join(
-    obs_and_acts %>%
-      filter(!is.na(rngme)) %>%
-      group_by(sovon_bird_reference) %>%
-      count() %>%
-      filter(n == 1),
-    by = "sovon_bird_reference")
-```
-
 If no exceptions arise, then we can proceed to add the field `sovon_bird_ring_number` to `crbirding_birds` based on:
 
 1. `sovon_bird_reference` 
