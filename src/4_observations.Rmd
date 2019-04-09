@@ -409,15 +409,28 @@ obs_and_acts <-
 )
 ```
 
-Preview:
+Observations with `sovon_condition`= 5:
 
-```{r preview}
+```{r show_condition_5}
 obs_and_acts %>%
   filter(sovon_condition == 5) %>%
   select(sovon_observation_reference, 
          sovon_bird_reference, 
          sovon_observation_date,
+         sovon_condition,
          acts)
+```
+
+Mapping of `sovon_condition`: 
+
+```{r preview}
+obs_and_acts %>%
+  select(sovon_observation_reference, 
+         sovon_bird_reference, 
+         sovon_observation_date,
+         sovon_condition,
+         acts) %>%
+  head(n = 100)
 ```
 
 ### MRI: metal ring information
@@ -457,11 +470,24 @@ obs_and_acts <-
   ungroup()
 ```
 
+Preview:
+
+```{r preview_MRI_1}
+obs_and_acts %>%
+  filter(sovon_MRI == 1) %>%
+  select(sovon_observation_reference, 
+         sovon_bird_reference, 
+         sovon_observation_date,
+         sovon_MRI,
+         acts) %>%
+  select_if(function(x) any(!is.na(x))) %>%
+  head(n = 100)
+```
+
 Adding a color ring while metal ring is alrady present is mapped as 4, which is the default value. Same for adding a metal ring while color ring already present.
 
-
-Based on `crbirding_birds` MRI is 5 if previous **`bird_shorthand` is not empty and different from actual `bird_shorthand`**.
-As said in previous chapter while mapping ring data, we don't have track of changing metal rings, only loosing it (actions `meweg`).  We then assume to add a new one. So, MRI value 5 depends only on value of `bird_shorthand` as only color rings can be changed in our mapping.
+Based on `crbirding_birds` MRI is 5 if previous **`bird_shorthand` is not empty and different from actual `bird_shorthand` and no `klweg` action is coupled to the observation**.
+As said in previous chapter while mapping ring data, we don't have track of changing metal rings, only loosing it (actions `meweg`).  We then assume to add a new one at next cathcing action. But adding a metal ring while not changing color ring mean MRI equal to 4, default value, if color ring is changed then it is 5: this demonstrates that MRI value 5 depends only on value of `bird_shorthand` as only color rings can be changed in our mapping. If the ringer, while catching, realizes the absence of color ring (`klweg`), then the color ring is added, not changed, i.e. MRI equal 4 as metal ring is still present.If metal ring is absent as well, then it would be imposible to identify the bird and it would count as a new bird with an obseration coupled to `rngkl` +  `rngme` actions.
 
 ```{r map_5_change_color_rings}
 MRI_5_bird_ref_and_dates <- 
@@ -478,8 +504,23 @@ obs_and_acts <-
   left_join(MRI_5_bird_ref_and_dates,
             by = c("sovon_bird_reference" = "bird_reference", 
                    "Datum" = "bird_date_begin")) %>%
-  mutate(sovon_MRI = if_else(!is.na(set_MRI_5), set_MRI_5, sovon_MRI))
+  mutate(sovon_MRI = if_else(!is.na(set_MRI_5) & is.na(klweg) & is.na(veld), set_MRI_5, sovon_MRI))
 ```
+
+Preview changes:
+
+```{r preview_sovon_MRI_5}
+obs_and_acts %>%
+  filter(sovon_MRI == 5) %>%
+  select(sovon_observation_reference, 
+         sovon_bird_reference, 
+         sovon_observation_date,
+         sovon_MRI,
+         acts) %>%
+  select_if(function(x) any(!is.na(x)))
+```
+
+The presence of action `ziek` in combination with `sovon_MRI` 5 is due to the three rings discussed in previous chapter: `FHOV`, `YCAF`, `FAAG`. 
 
 ### Bird age
 
