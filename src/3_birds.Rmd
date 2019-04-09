@@ -2742,10 +2742,9 @@ all(cr_users_cols %in% names(crbirding_users)) &
 We overwrite `crbirding_users.csv` with added information:
 
 ```{r overwrite_crbirding_users}
-write_tsv(crbirding_users,
+write_csv(crbirding_users,
           path = here::here("data", "processed", "crbirding_users.csv"),
-          na = "",
-          append = FALSE
+          na = ""
 )
 ```
 
