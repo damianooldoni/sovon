@@ -84,7 +84,7 @@ ring_position_table <- read_tsv(
 We import finalized user data from `./data/processed`:
 
 ```{r import_final_user_data}
-crbirding_users <- read_tsv(
+crbirding_users <- read_csv(
   here::here("data", "processed", "crbirding_users.csv"), 
   col_types = cols(
     .default = col_character(),
