@@ -668,7 +668,7 @@ cr_obs_cols <- c(
   "observation_lat", "observation_lng", "observation_location", 
   "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
   "melder_email", "melder_ringersnummer", "ring_number", "condition", "status", 
-  "bird_age_obs", "bird_sex", "bird_position", "bird_direction"
+  "bird_age_obs", "bird_sex", "bird_ring_position", "bird_ring_direction"
 )
 ```
 
