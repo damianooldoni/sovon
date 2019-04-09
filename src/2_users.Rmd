@@ -101,12 +101,12 @@ users <-
 
 ### User language
 
-This field is not present in `users`. However, all accounts have been made by INBO in Dutch:
+This field is not present in `users`. We leave it empty:
 
 ```{r user_language}
 users <- 
   users %>%
-  mutate(sovon_user_language  = "Dutch")
+  mutate(sovon_user_language  = NA_character_)
 ```
 
 ## Save user data
@@ -141,7 +141,7 @@ cr_users_cols <- c(
 Fields still not mapped:
 
 ```{r users_fields_not_yet_mapped}
-cr_users_cols[which(!cr_users_cols%in% names(crbirding_users))]
+cr_users_cols[which(!cr_users_cols %in% names(crbirding_users))]
 ```
 
 The field `user_role` cannot be filled at the moment: it will be mapped at the end of next chapter.
