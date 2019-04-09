@@ -486,7 +486,7 @@ crbirding_birds %>%
   filter(!date_is_present)
 ```
 
-Based on spreadsheet and observation data, we found that the dates of applying the rings FAAG and YCAF are linked to actions `ziek`, i.e. the ring has been applied while taking care of the birds. 
+Based on spreadsheet and observation data, we found that the dates of applying the rings FAAG, YCAF and FHOV are linked to actions `ziek`, i.e. the ring has been applied while taking care of the birds. 
 
 The date of applying FAAG:
 
@@ -1015,7 +1015,7 @@ crbirding_birds %>%
   head(n = 50)
 ```
 
-### Add rows for metal rings applied after color rings
+### Add rows for first metal ring applied after color rings
 
 Sometimes metal rings have been applied **after** color rings. We can detect these situtations by using `sovon_bird_rings_changed` value 1 (`rngkl` only) to identify the birds, observations with action `rngme` to get date of applying metal rings:
 
@@ -1725,6 +1725,15 @@ rings_without_sovon_bird_rings_changed <-
                         metal_ring_missing)),
              by = c("sovon_bird_reference",
                     "sovon_bird_date_begin")) %>%
+  select(names(crbirding_birds)) %>%
+  left_join(obs_and_acts %>%
+              filter((vang == "vang" | vangl == "vangl") & meweg == "meweg") %>%
+              select(sovon_bird_reference, Datum, meweg),
+            by = c("sovon_bird_reference", 
+                   "sovon_bird_date_begin" = "Datum")) %>%
+  mutate(sovon_bird_rings_changed = case_when(
+     sovon_bird_rings_changed == 1 & meweg == "meweg" ~ 2,
+     TRUE  ~ sovon_bird_rings_changed))  %>%
   select(names(crbirding_birds))
 rings_without_sovon_bird_rings_changed
 ```
