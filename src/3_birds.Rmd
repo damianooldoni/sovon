@@ -1436,8 +1436,9 @@ crbirding_birds <-
                               "5926" = "05926",
                               "5922" = "06009", # 5922 used for hybrid gulls
                               "05922" = "06009", # 05922 used for hybrid gulls
-                              "zz" = NA_character_,
-                              "zzz" = NA_character_)) %>%
+                              "zz" = "04560", # pied avocets
+                              "zzz" = "00720" # great cormorants
+                              )) %>%
   ungroup()
 ```
 
