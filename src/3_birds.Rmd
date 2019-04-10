@@ -2835,7 +2835,7 @@ crbirding_birds %>% head(n = 100)
 Save to text file (comma separated value):
 
 ```{r write_bird_data_txt}
-write_tsv(
+write_csv(
   crbirding_birds, 
   path = here::here("data", "processed", "crbirding_birds.csv"), 
   na = ""
