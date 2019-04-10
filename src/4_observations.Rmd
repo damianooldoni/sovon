@@ -40,7 +40,7 @@ actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
 We import finalized ring data from `./data/processed`:
 
 ```{r import_final_ring_data}
-crbirding_birds <- read_tsv(
+crbirding_birds <- read_csv(
   here::here("data", "processed", "crbirding_birds.csv"), 
   col_types = cols(
     .default = col_character(),
