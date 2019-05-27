@@ -40,9 +40,9 @@ rsconnect/
 .Rproj.user
 
 # text file with users data (privacy reasons!)
-data/processed/crbirding_users.tsv
 data/processed/crbirding_users.csv
-data/processed/crbirding_observations.tsv
+data/processed/crbirding_users_20190410.csv
 data/processed/crbirding_observations.csv
+data/processed/crbirding_observations_20190410.csv
 data/interim/users.tsv
 data/interim/users.csv
