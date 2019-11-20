@@ -33,12 +33,9 @@ Load libraries:
 ```{r load_libraries}
 library(DBI)            # To connect to database
 library(odbc)           # To connect to database
-library(stringr)        # To perform string operations
+library(tidyverse)      # To do datascience
 library(stringi)        # To perform string operations
-library(readr)          # To read and write txt files
-library(dplyr)          # To transform data
-library(tidyr)          # To transform data
-library(purrr)          # To transform data via functions
+library(tidylog)        # To provide feedback on dplyr functions
 library(tidyselect)     # To select columns smartly
 library(measurements)   # To convert measurement units
 library(here)           # To find files
