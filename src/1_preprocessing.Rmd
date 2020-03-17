@@ -596,22 +596,33 @@ obs_and_acts %>%
 For each bird, observations with same date should refer to same bird age. Exceptions:
 
 ```{r check_anomalies_age_ringing}
-obs_and_acts %>%
+exceptions_age <- 
+  obs_and_acts %>%
   filter(!is.na(LeeftijdCode)) %>%
-  filter(!is.na(rngkl) | !is.na(rngme)) %>%
-  distinct(KleurringNummer, Datum, LeeftijdCode)  %>%
-  group_by(KleurringNummer, Datum) %>%
+  # filter(!is.na(rngkl) | !is.na(rngme)) %>%
+  distinct(KleurringNummer, Datum, LeeftijdCode, WaarnemerNummer)  %>%
+  group_by(KleurringNummer, Datum, WaarnemerNummer) %>%
   count() %>%
   filter(n > 1) %>%
   left_join(obs_and_acts %>%
               filter(!is.na(LeeftijdCode)) %>%
-              select(Nummer, KleurringNummer, Datum, 
-                     LeeftijdCode, rngkl, rngme)) %>%
+              select(Nummer, KleurringNummer, Datum, WaarnemerNummer,
+                     LeeftijdCode, one_of(actions_meaning$Code))) %>%
   select(-n) %>%
   select(Nummer, KleurringNummer, Datum, 
-         LeeftijdCode, rngkl, rngme
-)
+         LeeftijdCode, WaarnemerNummer, one_of(actions_meaning$Code))
+exceptions_age
 ```
+
+Are these exceptions field observations (`veld` action)? 
+
+```{r exceptions_all_field_obs}
+exceptions_age %>%
+  filter(veld == "veld") %>%
+  nrow == nrow(exceptions_age)
+```
+
+If yes, then we leave them as they are related to age estimations as given by observers.
 
 ## Check bird sex inconsistencies
 
