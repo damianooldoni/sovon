@@ -287,7 +287,7 @@ Remove all spaces:
 
 ```{r remove_spaces}
 birds <- birds %>% 
-  mutate_all(funs(str_replace(., " ", "")))
+  mutate_all(list(~ str_replace_all(., " ", "")))
 ```
 
 ## Check duplicates `WaarnemingNummer`-`AktieCode`
@@ -330,7 +330,7 @@ Then we *spread* action codes to columns:
 ```{r spread_action_codes}
 obs_actions <- 
   obs_actions %>%
-  spread(AktieCode, AktieCode)
+  pivot_wider(names_from = AktieCode, values_from = AktieCode)
 ```
 
 The following combinations occurr:
