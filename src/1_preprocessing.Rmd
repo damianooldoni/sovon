@@ -256,7 +256,7 @@ users <-
 
 ### Remove hard returns in `birds`
 
-Remove hard returns `\r\n` in `users`:
+Remove hard returns `\r\n` in `birds`:
 
 ```{r remove_hard_return_tabs_birds}
 birds <- 
@@ -330,7 +330,7 @@ obs_actions <-
 
 Then we *spread* action codes to columns:
 
-```{r }
+```{r spread_action_codes}
 obs_actions <- 
   obs_actions %>%
   spread(AktieCode, AktieCode)
@@ -345,7 +345,7 @@ combinations_actions <- obs_actions %>%
 combinations_actions
 ```
 
-Actions present present in database:
+Actions present in database:
 
 ```{r colnames_actions_present}
 acts <- names(combinations_actions)
@@ -359,7 +359,7 @@ actions_meaning %>%
   filter(!Code %in% acts)
 ```
 
-We add action code columns to observations in order to have a unique dataframe:
+We add action code columns to observations in order to have a unique dataframe for observations:
 
 ```{r merge_obs_with_acts}
 obs_and_acts <- 
@@ -388,7 +388,7 @@ map_dfr(obs_and_acts %>%
   arrange(Nummer)
 ```
 
-Remove spaces:
+Remove spaces if present:
 
 ```{r remove_spaces_from_obs_and_acts}
 obs_and_acts <- 
@@ -717,7 +717,7 @@ Check whether not corrected rings (`GP***` or `GPS***`) are still present:
 ```{r check_presence_GP_GPS_in_birds}
 birds %>%
   filter(str_detect(first_Nummer, pattern = "(^(GP)\\d+)|(^(GPS)\\d+)")) %>%
-  select(first_Nummer)
+  select(first_Nummer, NummerNieuw)
 ```
 
 Mapping example: the bird with `Nummer` equal to `GP130` is mapped as follows:
@@ -849,7 +849,7 @@ Observation after `dood` are removed:
 ```{r remove_obs_after_death}
 obs_and_acts <- 
   obs_and_acts %>%
-  filter(! Nummer %in% obs_after_death$Nummer)
+  filter(!Nummer %in% obs_after_death$Nummer)
 ```
 
 Finally, we perform a last check: a ring should not be linked to two observations, one with action  `dood` and one with action `klgev`:
@@ -866,7 +866,7 @@ obs_and_acts %>%
 
 After data cleaning we save the data as TSVs in `.data/interim`:
 
-```{r}
+```{r save_preprocessed_data}
 write_tsv(users, path = here::here("data", "interim", "users.tsv"), na = "")
 write_tsv(birds, path = here::here("data", "interim", "birds.tsv"), na = "")
 write_tsv(
@@ -878,22 +878,21 @@ write_tsv(
 We save the tables containing action codes, colors and ring places in `./data/input` as it could be useful in following mapping steps:
 
 ```{r save_actions_meaning}
+# Save action codes
 write_tsv(
   actions_meaning, 
   path = here::here("data", "input", "actions_meaning.tsv"), 
   na = ""
 )
-```
 
-```{r save_colors}
+# Save colors
 write_tsv(
   color_table, 
   path = here::here("data", "input", "color_table.tsv"),
   na = ""
 )
-```
 
-```{r save_ring_position}
+# Save ring position
 write_tsv(
   ring_position_table, 
   path = here::here("data", "input", "ring_position_table.tsv"), 
