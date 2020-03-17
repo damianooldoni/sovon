@@ -587,8 +587,8 @@ Be sure this solution provides a date for all metal rings:
 
 ```{r check_date_for_all_metal_rings}
 obs_and_acts %>%
-  filter(rngme == "rngme") %>%
-  nrow() == nrow(birds)
+  filter(is.na(rngme) | rngme == "rngme") %>%
+  nrow() == nrow(obs_and_acts)
 ```
 
 ## Check age while applying rings
