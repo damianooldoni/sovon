@@ -298,13 +298,10 @@ No duplicates `WaarnemingNummer`-`AktieCode` should exist:
 
 ```{r show_duplicates_actions}
 obs_actions %>% 
-  filter(WaarnemingNummer %in% 
-           (obs_actions %>% 
-              group_by(WaarnemingNummer, AktieCode) %>% 
-              count() %>%
-              filter(n > 1) %>%
-              pull(WaarnemingNummer))
-)
+  group_by(WaarnemingNummer, AktieCode) %>% 
+  add_tally() %>%
+  ungroup() %>%
+  filter(n > 1)
 ```
 
 Otherwise they should be removed:
@@ -531,14 +528,10 @@ Detect duplicates in date of applying (the very first) color ring (action code `
 duplicates_ringing_rngkl <- 
   obs_and_acts %>%
   filter(!is.na(rngkl)) %>%
-  distinct(KleurringNummer, Datum, rngkl)  %>%
   group_by(KleurringNummer, Datum, rngkl) %>%
-  count() %>%
-  filter(n > 1) %>%
-  select(-n) %>%
-  left_join(obs_and_acts,
-            by = c("KleurringNummer", "Datum", "rngkl")) %>%
-  select(Nummer, everything())
+  add_tally() %>%
+  ungroup() %>%
+  filter(n > 1)
 duplicates_ringing_rngkl
 ```
 
@@ -548,14 +541,10 @@ and metal ring (action code `rngme`):
 duplicates_ringing_rngme <- 
   obs_and_acts %>%
   filter(!is.na(rngkl)) %>%
-  distinct(KleurringNummer, Datum, rngme)  %>%
   group_by(KleurringNummer, Datum, rngme) %>%
-  count() %>%
-  filter(n > 1) %>%
-  select(-n) %>%
-  left_join(obs_and_acts,
-            by = c("KleurringNummer", "Datum", "rngme")) %>%
-  select(Nummer, everything())
+  add_tally() %>%
+  ungroup() %>%
+  filter(n > 1)
 duplicates_ringing_rngme
 ```
 
@@ -733,9 +722,9 @@ Column `first_Nummer` should contain unique elements. Check for exceptions:
 ```{r check_uniqueness_first_Nummer}
 birds %>%
   group_by(first_Nummer) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1) %>%
-  left_join(birds) %>%
   select(-n)
 ```
 
@@ -858,7 +847,8 @@ Finally, we perform a last check: a ring should not be linked to two observation
 obs_and_acts %>%
   filter(dood == "dood" | klgev ==  "klgev") %>%
   group_by(KleurringNummer) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1)
 ```
 
