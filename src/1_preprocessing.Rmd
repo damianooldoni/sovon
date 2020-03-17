@@ -456,7 +456,8 @@ Bird color rings codes are uppercase. Exceptions:
 ```{r show_rings_lowercase}
 birds %>%
   filter(Nummer != toupper(Nummer) | 
-           NummerNieuw != toupper(NummerNieuw))
+           NummerNieuw != toupper(NummerNieuw) |
+           NummerDesc != toupper(NummerDesc))
 ```
 
 are converted to uppercase:
