@@ -54,7 +54,7 @@ ring_position_table <- read_tsv(
 
 ### Read user data
 
-Import user data as we have still to map  field `user_role`:
+Import user data as we have still to map the field `user_role`:
 
 ```{r import_temp_user_data}
 crbirding_users <- read_csv(
@@ -76,7 +76,7 @@ color_table <- read_tsv(here::here("data", "input", "color_table.tsv"))
 
 Actions present in `obs_and_acts` :
 
-```{r}
+```{r get_actions_in_obs_and_acts}
 acts <- actions_meaning$Code
 acts <- acts[acts %in% names(obs_and_acts)]
 acts
@@ -100,16 +100,14 @@ Birds with lack of unicity of `sovon_bird_reference`:
 ```{r issues_shorthand}
 birds %>%
   group_by(first_Nummer) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1) %>%
-  left_join(birds %>%
-              select(sovon_bird_reference, 
-                     first_Nummer, 
-                     NummerNieuw, 
-                     NummerDesc, 
-                     Nummer),
-            by = "first_Nummer") %>%
-  select(-n)
+  select(sovon_bird_reference, 
+         first_Nummer, 
+         NummerNieuw, 
+         NummerDesc, 
+         Nummer)
 ```
 
 In such cases we assign the lower `sovon_bird_reference`:
@@ -127,17 +125,14 @@ Check:
 ```{r check_solution_unicity_shorthand}
 birds %>%
   group_by(first_Nummer) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1) %>%
-  left_join(
-    birds %>%
-    select(sovon_bird_reference, 
+  select(sovon_bird_reference, 
            first_Nummer, 
            NummerNieuw, 
            NummerDesc, 
-           Nummer),
-    by = "first_Nummer") %>%
-  select(-n)
+           Nummer)
 ```
 
 We add column `sovon_bird_reference` to `obs_and_acts` as it will be needed to map the dates of ringing. The link is made by the columns `Nummer` (birds data) and  `KleurringNummer` (observation data):
@@ -169,7 +164,7 @@ obs_and_acts <-
 )
 ```
 
-The reconstruction of the series of color rings for each bird is made by using columns `first_Nummer` (very first color ring), `NummerNieuw` (very last color ring) and the information from spreadsheets of experts. We will collect the needed information in a new dataframe, called `crbirding_birds` which will grow up to become the end product containing the ring data.
+The reconstruction of the series of color rings for each bird is made by using columns `first_Nummer` (very first color ring), `NummerNieuw` (very last color ring) and the information from spreadsheets of experts. We will collect the needed information in a new dataframe, called `crbirding_birds` which will grow up to become the end product containing the ring data to deliver to SOVON.
 
 First step is to *gather* `first_Nummer`  and `NummerNieuw` in new column `sovon_bird_shorthand`:
 
@@ -178,9 +173,9 @@ crbirding_birds <-
   birds %>%
   select(sovon_bird_reference, first_Nummer, 
          NummerNieuw, NummerDesc, sovon_bird_notes) %>%
-  gather(key = col_nummer,
-         value = sovon_bird_shorthand,
-         first_Nummer, NummerNieuw) %>%
+  pivot_longer(cols = c(first_Nummer, NummerNieuw), 
+               names_to = "col_nummer",
+               values_to = "sovon_bird_shorthand") %>%
   select(-col_nummer) %>%
   select(sovon_bird_reference, sovon_bird_shorthand, NummerDesc, sovon_bird_notes)
 ```
@@ -191,7 +186,8 @@ We can also assign the color ring version with point (`sovon_bird_shorthand_pt`)
 crbirding_birds <-
   crbirding_birds %>%
   mutate(sovon_bird_shorthand_pt = ifelse(
-    str_remove_all(string = NummerDesc, pattern = "\\.") == sovon_bird_shorthand,
+    str_remove_all(string = NummerDesc,
+                   pattern = "\\.") == sovon_bird_shorthand,
     NummerDesc,
     sovon_bird_shorthand)
     ) %>%
@@ -240,22 +236,20 @@ We can add automatically the date of the very first ring for each bird (`sovon_b
 exceptions_one_bird_one_rngkl <- 
   obs_and_acts %>%
   filter(!is.na(rngkl)) %>%
-  select(sovon_bird_reference, Datum) %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1) %>%
-  left_join(obs_and_acts,
-            by = "sovon_bird_reference") %>%
   filter(!is.na(rngkl)) %>%
   left_join(crbirding_birds %>%
-              select(sovon_bird_reference, sovon_bird_shorthand),
+              select(sovon_bird_reference,sovon_bird_shorthand),
             by = "sovon_bird_reference") %>%
-  distinct() %>%
+  # distinct() %>%
   select(-n)
 exceptions_one_bird_one_rngkl
 ```
 
-In case exceptions are present, we will manage them later.
+In case exceptions are present, they should best be solved at database level. In any case, we will manage them later. 
 
 Assign the date of first ringing:
 
@@ -270,16 +264,19 @@ crbirding_birds <-
              by = c("sovon_bird_reference", 
                     "first_Nummer" = "sovon_bird_shorthand")) %>%
   rename(sovon_bird_shorthand = first_Nummer) %>%
-  select(sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt, 
-         sovon_bird_date_begin, sovon_bird_notes) %>%
+  select(sovon_bird_reference, 
+         sovon_bird_shorthand,
+         sovon_bird_shorthand_pt,
+         sovon_bird_date_begin,
+         sovon_bird_notes) %>%
   ungroup()
 ```
 
-Some examples (birds with `sovon_bird_reference` 1, 14 and 4543):
+Some examples (birds with `sovon_bird_reference` 1, 14 and 4107):
 
 ```{r examples_date_ringing}
 crbirding_birds %>%
-  filter(sovon_bird_reference %in% c(1, 14, 4543)) %>%
+  filter(sovon_bird_reference %in% c(1, 14, 4107)) %>%
   arrange(sovon_bird_reference, sovon_bird_date_begin)
 ```
 
@@ -287,7 +284,6 @@ Check date of birds in exceptions:
 
 ```{r check_date_of_exceptions_double_rngkl}
 crbirding_birds %>%
-  ## filter(sovon_bird_shorthand %in% c("MKAU", "CZOZ"))
   filter(sovon_bird_shorthand %in% exceptions_one_bird_one_rngkl$sovon_bird_shorthand)
 ```
 
@@ -323,18 +319,20 @@ The rings without date are the rings of birds ringed more than once.
 birds_multiple_rings <- 
   crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1)
 birds_multiple_rings
 ```
 
-Not only, the structure of our database limits to 2 the maximum number of rings linked to the same bird, as two are the columns containing such information (`Nummer` and `NummerNieuw`):
+Not only, the structure of our database limits to 2 the maximum number of rings linked to the same bird, as two are the columns containing such information (`Nummer` and `NummerNieuw`). Check:
 
 ```{r check_max_rings_is_2}
 birds_two_rings <- 
   crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n == 2)
 all(birds_two_rings$sovon_bird_reference == 
       birds_multiple_rings$sovon_bird_reference)
@@ -342,7 +340,7 @@ all(birds_two_rings$sovon_bird_reference ==
 
 Experts explained us that the very first and the very last ring are mapped in `birds`. By consulting the spreadsheet of the experts we will later fill the gap by adding _intermediate rings_.
 
-We can try to retrieve the date of applying last ring based on observations/actions with code `vang` (caught at the nest) or `vangl` (caught otherwise). Birds ringed twice and linked to one `vang`/`vangl` action:
+We can try to retrieve the date of applying last ring based on observations/actions with code `vang` (caught at the nest) or `vangl` (caught otherwise). Birds ringed twice and linked to **one** `vang`/`vangl` action only:
 
 ```{r birds_two_rings_one_vang}
 bird_one_vang <- 
@@ -350,14 +348,10 @@ bird_one_vang <-
   filter(sovon_bird_reference %in% 
            birds_multiple_rings$sovon_bird_reference & 
            (!is.na(vang) | !is.na(vangl))) %>%
-  select(sovon_bird_reference, Datum) %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n == 1) %>%
-  left_join(obs_and_acts %>%
-              select(sovon_bird_reference, Datum, acts),
-            by = "sovon_bird_reference") %>%
-  filter(!is.na(vang) | !is.na(vangl)) %>%
   rename(sovon_bird_date_begin = Datum) %>%
   select(-n) %>%
   arrange(sovon_bird_reference)
@@ -375,10 +369,10 @@ bird_one_vang_with_date <-
   group_by(sovon_bird_reference) %>%
   filter(is.na(sovon_bird_date_begin)) %>%
   select(-sovon_bird_date_begin) %>%
+  ungroup() %>%
   left_join(bird_one_vang, 
-            by = c("sovon_bird_reference")
-  ) %>%
-  select(-acts)
+            by = c("sovon_bird_reference")) %>%
+  select(names(crbirding_birds))
 
 crbirding_birds <- 
   crbirding_birds %>%
@@ -402,14 +396,10 @@ bird_two_vang <-
   obs_and_acts %>%
   filter(sovon_bird_reference %in% birds_two_rings$sovon_bird_reference &
          (!is.na(vang) | !is.na(vangl))) %>%
-  select(sovon_bird_reference, Datum) %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n == 2) %>%
-  left_join(obs_and_acts %>%
-              select(sovon_bird_reference, Datum, acts),
-            by = "sovon_bird_reference") %>%
-  filter(!is.na(vang) | !is.na(vangl)) %>%
   rename(sovon_bird_date_begin = Datum) %>%
   select(-n) %>%
   arrange(sovon_bird_reference)
@@ -447,12 +437,13 @@ bird_exceptions <-
 
 We set `sovon_bird_date_begin` equal to the date of the earliest `vang`/`vangl` action:
 
-```{r}
+```{r set_date_to_earliest_vang}
 bird_two_vang_get_date <- 
   bird_two_vang %>%
   filter(sovon_bird_reference %in% bird_exceptions$sovon_bird_reference) %>%
   group_by(sovon_bird_reference) %>%
   filter(sovon_bird_date_begin == min(sovon_bird_date_begin)) %>%
+  ungroup() %>%
   left_join(bird_exceptions %>%
               select(-sovon_bird_date_begin), by = "sovon_bird_reference") %>%
   select(names(bird_two_vang_get_date)) %>%
@@ -466,7 +457,7 @@ bird_two_vang_get_date
 
 Add this information to `crbirding_birds`:
 
-```{r}
+```{r add_date_birds_with_two_vang}
 crbirding_birds <- 
   crbirding_birds %>%
   anti_join(bird_two_vang_get_date,
@@ -496,8 +487,7 @@ info_faag <-
   filter(sovon_bird_shorthand == "FAAG") %>%
   mutate(sovon_bird_date_begin = 
            obs_and_acts %>%
-           filter(sovon_bird_reference == 176, 
-                  first_Nummer == "ALAU",
+           filter(first_Nummer == "ALAU",
                   !is.na(ziek)) %>%
            ## get the second "ziek" action (2006-07-07)
            filter(Datum == max(Datum)) %>%
@@ -515,7 +505,7 @@ info_ycaf <-
            obs_and_acts %>%
            filter(first_Nummer == "PLAB",
                   !is.na(ziek)) %>%
-           ## there is just one "ziek" action
+           ## there is just one "ziek" action (2013-07-22)
            pull(Datum))
 info_ycaf
 ```
@@ -530,7 +520,7 @@ info_fhov <-
            obs_and_acts %>%
            filter(first_Nummer == "SUAV",
                   !is.na(ziek)) %>%
-           ## there is just one "ziek" action
+           ## there is just one "ziek" action (2018-04-26)
            pull(Datum))
 info_fhov
 ```
@@ -695,16 +685,11 @@ crbirding_birds <-
 As example, we show the chronology of color rings for birds ringed thrice:
 
 ```{r examples_bird_date_end}
-bird_reference_triplet <- 
-  crbirding_birds %>%
-  group_by(sovon_bird_reference) %>%
-  count() %>%
-  filter(n == 3) %>%
-  distinct(sovon_bird_reference) %>%
-  pull()
-
 crbirding_birds %>%
-  filter(sovon_bird_reference %in% bird_reference_triplet) %>%
+  group_by(sovon_bird_reference) %>%
+  add_tally() %>%
+  ungroup() %>%
+  filter(n == 3) %>%
   select(sovon_bird_reference, 
          sovon_bird_shorthand, 
          sovon_bird_date_begin, 
@@ -739,6 +724,7 @@ crbirding_birds %>%
   filter(sovon_bird_date_begin == max(sovon_bird_date_begin) & 
            !is.na(sovon_bird_date_end)) %>%
   select(sovon_bird_reference) %>%
+  ungroup() %>%
   left_join(crbirding_birds, by = "sovon_bird_reference") %>%
   select(sovon_bird_reference, 
          sovon_bird_shorthand, 
@@ -794,7 +780,7 @@ crbirding_birds <-
 
 A preview:
 
-```{r}
+```{r preview_rngme_before_rngkl}
 crbirding_birds %>%
   filter(sovon_bird_reference %in% 
            (rngme_before_rngkl %>% 
@@ -868,7 +854,7 @@ birds_others %>%
   select(sovon_bird_ring_number)
 ```
 
-We remove the asteriks:
+We remove the asterisks:
 
 ```{r remove_*_in_ring_number}
 birds_others <- 
@@ -876,9 +862,17 @@ birds_others <-
   mutate(sovon_bird_ring_number = gsub("\\*", "", sovon_bird_ring_number))
 ```
 
+Preview:
+
+```{r preview_remove_asterisks}
+birds_others %>%
+  select(sovon_bird_ring_number) %>%
+  head(n = 50)
+```
+
 Add points `.` where needed:
 
-```{r add_._in_ring_number}
+```{r add_points_in_ring_number}
 birds_others <- 
   birds_others %>%
   mutate(reversed = stri_reverse(str = sovon_bird_ring_number))
@@ -904,7 +898,7 @@ Merge the two data frames together:
 birds <- bind_rows(birds_others, birds_special_values)
 ```
 
-Effects of mapping (part of it):
+Preivew of the effects the mapping:
 
 ```{r show_effect_mapping_example}
 birds %>% 
@@ -916,19 +910,17 @@ We have to be sure that no multiple metal rings are assigned to the same bird (`
 
 ```{r multiple_metal_rings_bird_reference}
 birds %>%
-  select(sovon_bird_reference, sovon_bird_ring_number) %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
-  filter(n > 1) %>%
-  left_join(birds, by = "sovon_bird_reference") %>%
-  select(-n)
+  add_tally() %>%
+  ungroup() %>%
+  filter(n > 1)
 ```
 
 Later we will add value `sovon_bird_ring_number` to `crbirding_birds` where metal ring is present.
 
 ### Initialize `sovon_bird_rings_changed` column for very first ring
 
-In order to better follow the mapping of metal AND color rings, SOVON suggested to add a column called `sovon_bird_rings_changed`, as shown in this [GitHub comment #47](https://github.com/inbo/cr-birding/issues/47#issuecomment-469256635).
+In order to better follow the mapping of metal AND color rings, SOVON suggested to add a column called `sovon_bird_rings_changed`, as shown in this [GitHub comment](https://github.com/inbo/cr-birding/issues/47#issuecomment-469256635).
 
 We initialize the column `sovon_bird_rings_changed` for the **very first** ringing by assigning:
 
@@ -949,7 +941,7 @@ crbirding_birds <-
   ungroup()
 ```
 
-We proceed now by mapping values 1 (action `rngkl` only) and 2 (action `rngkl` and  `rngme` together):
+We proceed now by mapping values 1 (action `rngkl` only) and 2 (action `rngkl` and `rngme` together):
 
 ```{r bird_rings_changed_1_or_2}
 crbirding_birds <- 
@@ -995,7 +987,9 @@ We initialize it as `FALSE` except for very first metal rings only (`sovon_bird_
 crbirding_birds <- 
   crbirding_birds %>%
   mutate(metal_ring_missing = if_else(
-    sovon_bird_rings_changed != 1 | is.na(sovon_bird_rings_changed), FALSE, TRUE)
+    sovon_bird_rings_changed != 1 | is.na(sovon_bird_rings_changed), 
+    FALSE,
+    TRUE)
 )
 ```
 
@@ -1029,8 +1023,6 @@ rngme_after_rngkl <-
               select(sovon_bird_reference, Datum),
             by = "sovon_bird_reference") %>%
   select(sovon_bird_reference, Datum) %>%
-  # remove birds never ringed with metal ring
-  filter(!is.na(Datum)) %>%
   rename(sovon_bird_date_begin = Datum)
 rngme_after_rngkl
 ```
@@ -1080,7 +1072,8 @@ rngme_after_rngkl %>%
   mutate(sovon_bird_rings_changed = 0,
          metal_ring_missing = FALSE,
          sovon_bird_date_begin = rngme_date) %>%
-  select(names(crbirding_birds))
+  select(names(crbirding_birds)) %>%
+  ungroup()
 rngme_without_change_rngkl
 ```
 
@@ -1120,7 +1113,6 @@ crbirding_birds <-
       !is.na(sovon_bird_shorthand) ~ 1,
     TRUE ~ sovon_bird_rings_changed))
 ```
-
 
 ### Add rows for loosing color or metal rings: `klweg`,  `meweg`
 
@@ -1183,9 +1175,9 @@ bird_ref_multiple_meweg <-
   obs_and_acts %>%
   filter(meweg == "meweg") %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
-  filter(n > 1) %>%
-  left_join(obs_and_acts, by = "sovon_bird_reference")
+  add_tally() %>%
+  ungroup() %>%
+  filter(n > 1)
 bird_ref_multiple_meweg
 ```
 
@@ -1196,14 +1188,9 @@ bird_ref_multiple_klweg <-
   obs_and_acts %>%
   filter(klweg == "klweg") %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1)
-bird_ref_multiple_klweg %>%
-  select(-n) %>%
-  left_join(obs_and_acts, by = "sovon_bird_reference") %>%
-  filter(klweg == "klweg") %>%
-  select(sovon_bird_reference, Datum, acts) %>%
-  select_if(function(x) any(!is.na(x)))
 ```
 
 If `meweg`/`klweg` occur not in combination with `dood` or `vang`/ `vangl`, then a new row should be added to `crbirding_birds` as the ring situation changed. 
@@ -1251,7 +1238,8 @@ crbirding_birds <-
 and setting `sovon_bird_rings_changed` = 2 for the next ring, if exists:
 
 ```{r set_sovon_bird_rings_changed_2_for_next_ring}
-rings_to_update <- rings_to_add_meweg %>%
+rings_to_update <- 
+  rings_to_add_meweg %>%
   filter(!is.na(sovon_bird_date_end)) %>%
   left_join(
     obs_and_acts %>%
@@ -1411,7 +1399,8 @@ if ("megev" %in% acts) {
 `klgev` should never occur with other *active* actions like `vang`, `vangl` or action `dood`:
 
 ```{r check_acts_with_klgev}
-acts_with_klgev <- obs_and_acts %>%
+acts_with_klgev <- 
+  obs_and_acts %>%
   filter(klgev == "klgev") %>%
   select(acts) %>%
   distinct() %>%
@@ -1428,7 +1417,8 @@ Same for `megev`:
 
 ```{r check_acts_with_megev}
 if ("megev" %in% acts) {
-  acts_with_megev <- obs_and_acts %>%
+  acts_with_megev <- 
+    obs_and_acts %>%
     filter(megev == "megev") %>%
     select(acts) %>%
     distinct() %>%
@@ -1482,9 +1472,9 @@ if ("megev" %in% acts) {
     obs_and_acts %>%
     filter(megev == "megev") %>%
     group_by(sovon_bird_reference) %>%
-    count() %>%
-    filter(n > 1) %>%
-    left_join(obs_and_acts, by = "sovon_bird_reference")
+    add_tally() %>%
+    ungroup() %>%
+    filter(n > 1)
   bird_ref_multiple_megev
 } else {
   print("'megev' is not present.")
@@ -1498,17 +1488,13 @@ bird_ref_multiple_klgev <-
   obs_and_acts %>%
   filter(klgev == "klgev") %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 1)
-bird_ref_multiple_klgev %>%
-  select(-n) %>%
-  left_join(obs_and_acts, by = "sovon_bird_reference") %>%
-  filter(klgev == "klgev") %>%
-  select(sovon_bird_reference, Datum, acts) %>%
-  select_if(function(x) any(!is.na(x)))
+bird_ref_multiple_klgev
 ```
 
-We add a new row to `crbirding_birds` as the ring situation changed. 
+We add new rows to `crbirding_birds` as the ring situation changed at each of these observations/actions. 
 
 We create first new rows based on action `megev`. We set `sovon_bird_rings_changed` = 0 and `metal_ring_missing` = `TRUE`:
 
@@ -1687,14 +1673,13 @@ crbirding_birds <-
     TRUE ~ sovon_bird_rings_changed))
 ```
 
-
-The combination of `vang` + `klweg` doesn't change anything in the mapping, as noticing the absence of color ring happens at same time of applying a new one. We can assess whether the metal ring is still present by checking the value of `metal_ring_missing` for the very previous ring. We make now **two important assumptions**:
+The combination of `vang` + `klweg` doesn't change anything in the mapping, as noticing the absence of color ring happens at the same time of applying a new one. We can assess whether the metal ring is still present by checking the value of `metal_ring_missing` for the very previous ring. We make now **two important assumptions**:
 
 1. the ringer applies always a new metal ring if missing
 2. the ringer doesn't change a metal ring if present
 
 
-So, `vang` after a `meweg` or `vang` together with `meweg` are interpreted as applying a new metal ring, therefore `sovon_bird_rings_changed` = 2. The informations about the change of metal rings is not coded by any action, only inserted in the notes.
+So, `vang` after a `meweg` or `vang` together with `meweg` are interpreted as applying a new metal ring, therefore `sovon_bird_rings_changed` = 2. Again, this is a consequence of the fact that the change of a metal ring is not coded by any action, but only described in informative notes.
 
 Effects of this mapping:
 
@@ -1755,7 +1740,7 @@ crbirding_birds <-
 
 Rings still without `sovon_bird_rings_changed`:
 
-```{r}
+```{r check_n_rings_without_sovon_bird_rings_changed}
 crbirding_birds %>%
   filter(is.na(sovon_bird_rings_changed))
 ```
@@ -1792,16 +1777,17 @@ crbirding_birds %>%
 
 We show a final overview. 
 
-Birds ringed at one moment:
+Birds getting color and metal ring at the same time and never ringed twice:
 
 ```{r final_overview_crbiridng_birds_n_1}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
+  filter(sovon_bird_rings_changed == 2) %>%
   filter(n == 1) %>%
   select(-n) %>%
-  head(n = 50) %>%
-  left_join(crbirding_birds, by = "sovon_bird_reference")
+  head(n = 50)
 ```
 
 Birds ringed in two different moments:
@@ -1809,11 +1795,11 @@ Birds ringed in two different moments:
 ```{r final_overview_crbiridng_birds_n_2}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n == 2) %>%
   select(-n) %>%
-  head(n = 50) %>%
-  left_join(crbirding_birds, by = "sovon_bird_reference")
+  head(n = 50)
 ```
 
 Birds ringed at three different moments:
@@ -1821,11 +1807,11 @@ Birds ringed at three different moments:
 ```{r final_overview_crbiridng_birds_n_3}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n == 3) %>%
   select(-n) %>%
-  head(n = 50) %>%
-  left_join(crbirding_birds, by = "sovon_bird_reference")
+  head(n = 50)
 ```
 
 Birds ringed at four different moments:
@@ -1833,11 +1819,10 @@ Birds ringed at four different moments:
 ```{r final_overview_crbiridng_birds_n_4}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
   filter(n == 4) %>%
   select(-n) %>%
-  head(n = 50) %>%
-  left_join(crbirding_birds, by = "sovon_bird_reference")
+  head(n = 50)
 ```
 
 ### Map color of rings and inscriptions
@@ -1930,9 +1915,9 @@ Some examples from birds ringed thrice or more:
 ```{r show_example_colors}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 2) %>%
-  left_join(crbirding_birds, by = "sovon_bird_reference") %>%
   select(sovon_bird_reference, 
          color_combination, 
          sovon_bird_shorthand,
@@ -2000,10 +1985,9 @@ Some examples from birds ringed thrice or more:
 ```{r show_example_colors_old_rings}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
+  ungroup() %>%
   filter(n > 2) %>%
-  select(-n) %>%
-  left_join(crbirding_birds, by = "sovon_bird_reference") %>%
   select(sovon_bird_reference, 
          color_combination, 
          sovon_bird_shorthand,
@@ -2065,7 +2049,7 @@ crbirding_birds <-
   arrange(sovon_bird_reference, sovon_bird_date_begin)
 ```
 
-We assign them color blue as ring color, color white as inscription color and add note `virtual_ring.` to `sovon_bird_notes` as decided [here](https://github.com/inbo/cr-birding/issues/81#issuecomment-479365880)
+We assign them color blue as ring color, color white as inscription color and add note `virtual_ring.` to `sovon_bird_notes` as decided [here](https://github.com/inbo/cr-birding/issues/81#issuecomment-479365880):
 
 ```{r solve_virtual_rings}
 crbirding_birds <- 
@@ -2239,7 +2223,7 @@ birds %>%
   distinct(Plaats, sovon_bird_ring_position, sovon_bird_ring_direction)
 ```
 
-Map these values from `birds` to `crbirding_birds`, taking into account that the fields `sovon_bird_ring_position` and `sovon_bird_ring_direction` are available for the very last color ring of each bird:
+Map these values from `birds` to `crbirding_birds`, taking into account that the fields `sovon_bird_ring_position` and `sovon_bird_ring_direction` are available only for the very last color ring of each bird:
 
 ```{r transfer_position_direction_to_crbirding_birds}
 crbirding_birds <- 
@@ -2271,10 +2255,8 @@ Some examples from birds ringed more than twice:
 ```{r show_example_position}
 crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
-  count() %>%
+  add_tally() %>%
   filter(n > 2) %>%
-  left_join(crbirding_birds, 
-            by = "sovon_bird_reference") %>%
   select(sovon_bird_reference, 
          sovon_bird_ring_position,
          sovon_bird_ring_direction,
@@ -2287,7 +2269,7 @@ crbirding_birds %>%
 
 ### Mapping of `sovon_bird_ring_number`
 
-We can now use `metal_ring_missing`in order to add the metal ring number as `sovon_bird_ring_number`. Still, note that **only the very last metal ring number is saved in our color-oriented database**. We will use it in place of older metal rings. We could improve it in crbirding database later.
+We can now use `metal_ring_missing` in order to add the metal ring number as `sovon_bird_ring_number`. Still, note that **only the very last metal ring number is saved in our color-oriented database**. We will use it in place of older metal rings. We could improve it in crbirding database later.
 
 ```{r add_sovon_bird_ring_number_to_crbirding_birds}
 crbirding_birds <- 
@@ -2519,7 +2501,8 @@ crbirding_birds %>%
                           !is.na(meweg) | 
                           !is.na(ziek) # for FHOV,YCAF,FAAG
                         )),
-            by = c("sovon_bird_reference", "sovon_bird_date_begin" = "Datum")) %>% 
+            by = c("sovon_bird_reference",
+                   "sovon_bird_date_begin" = "Datum")) %>% 
   nrow() == nrow(crbirding_birds)
 ```
 
@@ -2552,9 +2535,16 @@ crbirding_birds <-
   rename(sovon_bird_age_ringing = sovon_bird_age_obs)
 ```
 
-As examples, the bird age mapping of birds (color) ringed thrice:
+As examples, the bird age mapping of birds (color) ringed thrice or more:
 
 ```{r show_example_bird_age_birds_ringed_thrice}
+bird_reference_triplet <- 
+  crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  count() %>%
+  filter(n >= 3) %>%
+  pull(sovon_bird_reference)
+
 crbirding_birds %>%
   select(sovon_bird_reference, 
          sovon_bird_shorthand, 
@@ -2630,7 +2620,7 @@ crbirding_birds <-
 
 Examples:
 
-```{r}
+```{r example_bird_names}
 crbirding_birds %>%
   filter(!is.na(sovon_bird_name)) %>%
   select(sovon_bird_reference, sovon_bird_name, sovon_bird_shorthand)
@@ -2795,7 +2785,8 @@ crbirding_birds <-
 Remove prefix `sovon_`:
 
 ```{r remove prefix_sovon_birds}
-names(crbirding_birds) <- str_remove_all(names(crbirding_birds), pattern = "sovon_")
+names(crbirding_birds) <- str_remove_all(names(crbirding_birds), 
+                                         pattern = "sovon_")
 names(crbirding_birds)
 ```
 
@@ -2823,7 +2814,7 @@ Set column order:
 ```{r get_right_order_cols_birds}
 crbirding_birds <-
   crbirding_birds %>%
-  select(cr_birds_cols)
+  select(all_of(cr_birds_cols))
 ```
 
 Preview data:

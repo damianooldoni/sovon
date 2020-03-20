@@ -73,6 +73,13 @@ users <-
 
 ### Country
 
+Countries present:
+
+```{r countries_in_users}
+users %>%
+  distinct(LandCode)
+```
+
 ```{r country}
 users <- 
   users %>%
@@ -144,7 +151,7 @@ Fields still not mapped:
 cr_users_cols[which(!cr_users_cols %in% names(crbirding_users))]
 ```
 
-The field `user_role` cannot be filled at the moment: it will be mapped at the end of next chapter.
+The field `user_role` cannot be filled at the moment: it will be mapped at the end of the next chapter.
 
 Set column order:
 
@@ -162,7 +169,7 @@ crbirding_users %>%
   head(n = 10)
 ```
 
-Save to csv file `crbirding_users.csv` in `./data/processed/` as SOVON prefers working with comma separated files than tab separated files:
+Save to csv file `crbirding_users.csv` in `./data/processed/` as asked by SOVON:
 
 ```{r write_user_data_txt}
 crbirding_users %>%
