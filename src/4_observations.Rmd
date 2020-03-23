@@ -195,11 +195,11 @@ obs_missing_latitude_longitude <-
     PlaatsGemeente,
     PlaatsToponym
   )
-obs_missing_latitude_longitude %>%
-  write_csv("missing_latitude_longitude_info.txt",
-    na = "",
-    quote_escape = "double"
-  )
+# obs_missing_latitude_longitude %>%
+#   write_csv("missing_latitude_longitude_info.txt",
+#     na = "",
+#     quote_escape = "double"
+#   )
 obs_missing_latitude_longitude
 ```
 
