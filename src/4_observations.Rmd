@@ -29,7 +29,7 @@ obs_and_acts <- read_tsv(
 
 ### Read action data
 
-Import action codes and relative meaning:
+Import action codes and meaning:
 
 ```{r import_actions_meaning2}
 actions_meaning <- read_tsv(here::here("data", "input", "actions_meaning.tsv"))
@@ -169,36 +169,167 @@ obs_and_acts <-
 
 ### Observation latitude
 
-Observation latitude should be converted to decimal degrees:
+Observations with missing or partially missing latitude information:
+
+```{r nas_breedte_fields}
+obs_missing_latitude_longitude <- 
+  obs_and_acts %>%
+  filter(is.na(PlaatsBreedtegraadGraden) | 
+           is.na(PlaatsBreedtegraadMinuten) | 
+           is.na(PlaatsBreedtegraadSeconden) |
+           is.na(PlaatsLengtegraadGraden) | 
+           is.na(PlaatsLengtegraadMinuten) |
+           is.na(PlaatsLengtegraadSeconden)) %>%
+  select(Nummer,
+         KleurringNummer,
+         Datum,
+         starts_with("PlaatsBreedtegraad"),
+         starts_with("PlaatsLengtegraad"),
+         PlaatsGemeente,
+         PlaatsToponym)
+obs_missing_latitude_longitude %>%
+  write_csv("missing_latitude_longitude_info.txt", na = "", 
+            quote_escape = "double")
+obs_missing_latitude_longitude
+```
+
+The absolute observation latitude should be converted to decimal degrees:
 
 ```{r obs_latitude}
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    sovon_observation_lat = conv_unit(
-      str_c(PlaatsBreedtegraadGraden,
-            PlaatsBreedtegraadMinuten,
-            PlaatsBreedtegraadSeconden, 
-            sep = " "), 
-      from = 'deg_min_sec', to = 'dec_deg')
+    sovon_observation_lat = case_when(
+      !is.na(PlaatsBreedtegraadGraden) & 
+        !is.na(PlaatsBreedtegraadMinuten) &
+        !is.na(PlaatsBreedtegraadSeconden) ~ conv_unit(
+          str_c(PlaatsBreedtegraadGraden,
+                PlaatsBreedtegraadMinuten,
+                PlaatsBreedtegraadSeconden, 
+                sep = " "),
+          from = 'deg_min_sec',
+          to = 'dec_deg'),
+      !is.na(PlaatsBreedtegraadGraden) & 
+        !is.na(PlaatsBreedtegraadMinuten) & 
+        is.na(PlaatsBreedtegraadSeconden) ~ conv_unit(
+          str_c(PlaatsBreedtegraadGraden,
+                PlaatsBreedtegraadMinuten,
+                0,
+                sep = " "),
+          from = 'deg_min_sec',
+          to = 'dec_deg'),
+      !is.na(PlaatsBreedtegraadGraden) & 
+        is.na(PlaatsBreedtegraadMinuten) & 
+        is.na(PlaatsBreedtegraadSeconden) ~ conv_unit(
+          str_c(PlaatsBreedtegraadGraden, 0, 0, sep = " "),
+          from = 'deg_min_sec',
+          to = 'dec_deg'),
+      TRUE  ~ NA_character_
+    )
 )
+```
+
+By field `PlaatsBreedtegraadRichtingCode` we can know whether the observation took place in the northern or southern emisphere. In case of southern emisphere, the latitude value should be negative.
+
+Values of `PlaatsBreedtegraadRichtingCode` and number of observations:
+
+```{r values_of_PlaatsBreedtegraadRichtingCode}
+obs_and_acts %>%
+  group_by(PlaatsBreedtegraadRichtingCode) %>%
+  count()
+```
+
+If present, the observations with valid `PlaatsBreedtegraadGraden` but without `PlaatsBreedtegraadRichtingCode` should be further evaluated:
+
+```{r obs_without_N_or_Z}
+obs_and_acts %>%
+  filter(is.na(PlaatsBreedtegraadRichtingCode) & 
+           !is.na(PlaatsBreedtegraadGraden)) %>%
+  select(Nummer, starts_with("PlaatsBreedte"), PlaatsGemeente, PlaatsToponym)
+```
+
+Assign negative latitude if `PlaatsBreedtegraadRichtingCode` is equal to `S`:
+
+```{r map_N_Z}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(
+    sovon_observation_lat = case_when(
+      PlaatsBreedtegraadRichtingCode == "N" ~ sovon_observation_lat,
+      PlaatsBreedtegraadRichtingCode == "S" &  !is.na(sovon_observation_lat) ~
+        paste0("-",sovon_observation_lat),
+      TRUE ~ sovon_observation_lat)
+  )
 ```
 
 ### Observation longitude
 
-Observation longitude should be converted to decimal degrees:
+Absolute value of the observation longitude should be converted to decimal degrees:
 
 ```{r obs_longitude}
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
-    sovon_observation_lng = conv_unit(
-      str_c(PlaatsLengtegraadGraden,
-            PlaatsLengtegraadMinuten,
-            PlaatsLengtegraadSeconden, 
-            sep = " "), 
-      from = 'deg_min_sec', to = 'dec_deg')
+    sovon_observation_lng = case_when(
+      !is.na(PlaatsLengtegraadGraden) & 
+        !is.na(PlaatsLengtegraadMinuten) &
+        !is.na(PlaatsLengtegraadSeconden) ~ conv_unit(
+          str_c(PlaatsLengtegraadGraden,
+                PlaatsLengtegraadMinuten,
+                PlaatsLengtegraadSeconden, 
+                sep = " "),
+          from = 'deg_min_sec',
+          to = 'dec_deg'),
+      !is.na(PlaatsLengtegraadGraden) & 
+        !is.na(PlaatsLengtegraadMinuten) & 
+        is.na(PlaatsLengtegraadSeconden) ~ conv_unit(
+          str_c(PlaatsLengtegraadGraden,
+                PlaatsLengtegraadMinuten,
+                0,
+                sep = " "),
+          from = 'deg_min_sec',
+          to = 'dec_deg'),
+      !is.na(PlaatsLengtegraadGraden) & 
+        is.na(PlaatsLengtegraadMinuten) & 
+        is.na(PlaatsLengtegraadSeconden) ~ conv_unit(
+          str_c(PlaatsLengtegraadGraden, 0, 0, sep = " "),
+          from = 'deg_min_sec',
+          to = 'dec_deg'),
+      TRUE  ~ NA_character_
+    )
 )
+```
+
+By field `PlaatsLengtegraadRichtingCode` we can know whether the observation took place in the western or eastern emisphere. In case of western emisphere, the longitude value should be negative.
+
+Values of `PlaatsLengtegraadRichtingCode` and number of observations:
+
+```{r values_of_PlaatsLengtegraadRichtingCode}
+obs_and_acts %>%
+  group_by(PlaatsLengtegraadRichtingCode) %>%
+  count()
+```
+
+If present, the observations with valid `PlaatsLengtegraadRichtingCode` but without `PlaatsLengtegraadRichtingCode` should be further evaluated:
+
+```{r obs_without_E_or_W}
+obs_and_acts %>%
+  filter(is.na(PlaatsLengtegraadRichtingCode) & 
+           !is.na(PlaatsLengtegraadGraden)) %>%
+  select(Nummer, starts_with("PlaatsLengte"),  PlaatsGemeente, PlaatsToponym)
+```
+
+Assign negative longitude if `PlaatsLengtegraadRichtingCode` is equal to `W`:
+
+```{r map_N_Z}
+obs_and_acts <- 
+  obs_and_acts %>% 
+  mutate(
+    sovon_observation_lng2 = case_when(
+      PlaatsLengtegraadRichtingCode == "E" ~ sovon_observation_lng,
+      PlaatsLengtegraadRichtingCode == "W" & is.na(sovon_observation_lng) ~ paste0("-",sovon_observation_lng),
+      TRUE ~ sovon_observation_lng)
+  )
 ```
 
 ### Observation location
