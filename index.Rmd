@@ -31,15 +31,15 @@ This document contains and describes all the steps in mapping INBO color ring da
 Load libraries:
 
 ```{r load_libraries}
-library(DBI)            # To connect to database
-library(odbc)           # To connect to database
-library(tidyverse)      # To do datascience
-library(stringi)        # To perform string operations
-library(tidylog)        # To provide feedback on dplyr functions
-library(tidyselect)     # To select columns smartly
-library(measurements)   # To convert measurement units
-library(here)           # To find files
-library(lubridate)      # To ease working with dates
+library(DBI) # To connect to database
+library(odbc) # To connect to database
+library(tidyverse) # To do datascience
+library(stringi) # To perform string operations
+library(tidylog) # To provide feedback on dplyr functions
+library(tidyselect) # To select columns smartly
+library(measurements) # To convert measurement units
+library(here) # To find files
+library(lubridate) # To ease working with dates
 ```
 
 The output of the data processing consists of three dataframes saved as comma separated files (`csv`) in folder `data/processed/`:

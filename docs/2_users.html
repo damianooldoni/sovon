@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4 Map user data | Mapping INBO color ring data to SOVON format</title>
-  <meta name="description" content="4 Map user data | Mapping INBO color ring data to SOVON format">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="4 Map user data | Mapping INBO color ring data to SOVON format" />
+  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4 Map user data | Mapping INBO color ring data to SOVON format" />
   <meta property="og:type" content="book" />
@@ -22,18 +21,18 @@
   
   
 
-<meta name="author" content="Damiano Oldoni">
+<meta name="author" content="Damiano Oldoni" />
 
 
-<meta name="date" content="2019-04-10">
+<meta name="date" content="2020-03-23" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="1_preprocessing.html">
-<link rel="next" href="3_birds.html">
+<link rel="prev" href="1_preprocessing.html"/>
+<link rel="next" href="3_birds.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -41,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -58,7 +60,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -288,123 +289,132 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="read-temporary-user-data" class="section level2">
 <h2><span class="header-section-number">4.1</span> Read temporary user data</h2>
 <p>We start from the user temporary data saved in TSV file <code>users.tsv</code> in folder <code>data\interim</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;interim&quot;</span>, <span class="st">&quot;users.tsv&quot;</span>),
-                  <span class="dt">col_types =</span> <span class="kw">cols</span>(
-                    <span class="dt">.default =</span> <span class="kw">col_character</span>(),
-                    <span class="dt">Nummer =</span> <span class="kw">col_double</span>(),
-                    <span class="dt">Wachtwoord =</span> <span class="kw">col_logical</span>())
-)</code></pre>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">users &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;interim&quot;</span>, <span class="st">&quot;users.tsv&quot;</span>),</a>
+<a class="sourceLine" id="cb98-2" data-line-number="2">  <span class="dt">col_types =</span> <span class="kw">cols</span>(</a>
+<a class="sourceLine" id="cb98-3" data-line-number="3">    <span class="dt">.default =</span> <span class="kw">col_character</span>(),</a>
+<a class="sourceLine" id="cb98-4" data-line-number="4">    <span class="dt">Nummer =</span> <span class="kw">col_double</span>(),</a>
+<a class="sourceLine" id="cb98-5" data-line-number="5">    <span class="dt">Wachtwoord =</span> <span class="kw">col_logical</span>()</a>
+<a class="sourceLine" id="cb98-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb98-7" data-line-number="7">)</a></code></pre></div>
 <p>Number of users:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nrow</span>(users)</code></pre>
-<pre><code>## [1] 1862</code></pre>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1"><span class="kw">nrow</span>(users)</a></code></pre></div>
+<pre><code>## [1] 1980</code></pre>
 </div>
 <div id="map-user-data-1" class="section level2">
 <h2><span class="header-section-number">4.2</span> Map user data</h2>
 <p>We map the original fields to SOVON fields denoted by prefix <code>sovon_</code>.</p>
 <div id="e-mail" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> E-mail</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_email =</span> Email)</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb101-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb101-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_email =</span> Email)</a></code></pre></div>
 </div>
 <div id="first-name" class="section level3">
 <h3><span class="header-section-number">4.2.2</span> First name</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_first_name =</span> Voornaam)</code></pre>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb102-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb102-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_first_name =</span> Voornaam)</a></code></pre></div>
 </div>
 <div id="last-name" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> Last name</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_last_name =</span> Familienaam)</code></pre>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb103-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb103-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_last_name =</span> Familienaam)</a></code></pre></div>
 </div>
 <div id="address" class="section level3">
 <h3><span class="header-section-number">4.2.4</span> Address</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_address =</span> Adres)</code></pre>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb104-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb104-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_address =</span> Adres)</a></code></pre></div>
 </div>
 <div id="place" class="section level3">
 <h3><span class="header-section-number">4.2.5</span> Place</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_place =</span> Gemeente)</code></pre>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb105-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb105-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_place =</span> Gemeente)</a></code></pre></div>
 </div>
 <div id="postal-code" class="section level3">
 <h3><span class="header-section-number">4.2.6</span> Postal code</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_postal_code =</span> Postcode)</code></pre>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb106-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb106-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_postal_code =</span> Postcode)</a></code></pre></div>
 </div>
 <div id="country" class="section level3">
 <h3><span class="header-section-number">4.2.7</span> Country</h3>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_country =</span> LandCode)</code></pre>
+<p>Countries present:</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1">users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb107-2" data-line-number="2"><span class="st">  </span><span class="kw">distinct</span>(LandCode)</a></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["LandCode"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"ES"},{"1":"NA"},{"1":"UK"},{"1":"BE"},{"1":"NL"},{"1":"PT"},{"1":"FR"},{"1":"DE"},{"1":"IT"},{"1":"NO"},{"1":"MA"},{"1":"HU"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb108-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb108-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_country =</span> LandCode)</a></code></pre></div>
 </div>
 <div id="user-id" class="section level3">
 <h3><span class="header-section-number">4.2.8</span> User ID</h3>
 <p>User identifiers are provided by SOVON. <code>NA</code> is given.</p>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_id  =</span> <span class="ot">NA</span>)</code></pre>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb109-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb109-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_id =</span> <span class="ot">NA</span>)</a></code></pre></div>
 </div>
 <div id="user-reference" class="section level3">
 <h3><span class="header-section-number">4.2.9</span> User reference</h3>
 <p>We use the unique ID in <code>Nummer</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_reference  =</span> Nummer)</code></pre>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb110-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb110-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_reference =</span> Nummer)</a></code></pre></div>
 </div>
 <div id="user-language" class="section level3">
 <h3><span class="header-section-number">4.2.10</span> User language</h3>
 <p>This field is not present in <code>users</code>. We leave it empty:</p>
-<pre class="sourceCode r"><code class="sourceCode r">users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_language  =</span> <span class="ot">NA_character_</span>)</code></pre>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1">users &lt;-</a>
+<a class="sourceLine" id="cb111-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb111-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_language =</span> <span class="ot">NA_character_</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="save-user-data" class="section level2">
 <h2><span class="header-section-number">4.3</span> Save user data</h2>
 <p>Export the SOVON fields to <code>crbirding_users</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">crbirding_users &lt;-<span class="st"> </span>
-<span class="st">  </span>users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(<span class="kw">starts_with</span>(<span class="st">&quot;sovon_&quot;</span>))</code></pre>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1">crbirding_users &lt;-</a>
+<a class="sourceLine" id="cb112-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb112-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="kw">starts_with</span>(<span class="st">&quot;sovon_&quot;</span>))</a></code></pre></div>
 <p>Remove prefix <code>sovon_</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(crbirding_users) &lt;-<span class="st"> </span><span class="kw">str_remove</span>(
-  <span class="kw">names</span>(crbirding_users), 
-  <span class="dt">pattern =</span> <span class="st">&quot;sovon_&quot;</span>
-)</code></pre>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="kw">names</span>(crbirding_users) &lt;-<span class="st"> </span><span class="kw">str_remove</span>(</a>
+<a class="sourceLine" id="cb113-2" data-line-number="2">  <span class="kw">names</span>(crbirding_users),</a>
+<a class="sourceLine" id="cb113-3" data-line-number="3">  <span class="dt">pattern =</span> <span class="st">&quot;sovon_&quot;</span></a>
+<a class="sourceLine" id="cb113-4" data-line-number="4">)</a></code></pre></div>
 <p>The desired order of columns in <code>crbirding_users</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">cr_users_cols &lt;-<span class="st"> </span><span class="kw">c</span>(
-  <span class="st">&quot;user_id&quot;</span>, <span class="st">&quot;user_reference&quot;</span>, <span class="st">&quot;user_email&quot;</span>, <span class="st">&quot;user_first_name&quot;</span>,
-  <span class="st">&quot;user_last_name&quot;</span>, <span class="st">&quot;user_address&quot;</span>, <span class="st">&quot;user_postal_code&quot;</span>, <span class="st">&quot;user_place&quot;</span>,
-  <span class="st">&quot;user_country&quot;</span>, <span class="st">&quot;user_language&quot;</span>, <span class="st">&quot;user_role&quot;</span>
-)</code></pre>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1">cr_users_cols &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb114-2" data-line-number="2">  <span class="st">&quot;user_id&quot;</span>, <span class="st">&quot;user_reference&quot;</span>, <span class="st">&quot;user_email&quot;</span>, <span class="st">&quot;user_first_name&quot;</span>,</a>
+<a class="sourceLine" id="cb114-3" data-line-number="3">  <span class="st">&quot;user_last_name&quot;</span>, <span class="st">&quot;user_address&quot;</span>, <span class="st">&quot;user_postal_code&quot;</span>, <span class="st">&quot;user_place&quot;</span>,</a>
+<a class="sourceLine" id="cb114-4" data-line-number="4">  <span class="st">&quot;user_country&quot;</span>, <span class="st">&quot;user_language&quot;</span>, <span class="st">&quot;user_role&quot;</span></a>
+<a class="sourceLine" id="cb114-5" data-line-number="5">)</a></code></pre></div>
 <p>Fields still not mapped:</p>
-<pre class="sourceCode r"><code class="sourceCode r">cr_users_cols[<span class="kw">which</span>(<span class="op">!</span>cr_users_cols <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(crbirding_users))]</code></pre>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1">cr_users_cols[<span class="kw">which</span>(<span class="op">!</span>cr_users_cols <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(crbirding_users))]</a></code></pre></div>
 <pre><code>## [1] &quot;user_role&quot;</code></pre>
-<p>The field <code>user_role</code> cannot be filled at the moment: it will be mapped at the end of next chapter.</p>
+<p>The field <code>user_role</code> cannot be filled at the moment: it will be mapped at the end of the next chapter.</p>
 <p>Set column order:</p>
-<pre class="sourceCode r"><code class="sourceCode r">crbirding_users &lt;-
-<span class="st">  </span>crbirding_users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(cr_users_cols[cr_users_cols <span class="op">!=</span><span class="st"> &quot;user_role&quot;</span>])</code></pre>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">crbirding_users &lt;-</a>
+<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="st">  </span>crbirding_users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb117-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(cr_users_cols[cr_users_cols <span class="op">!=</span><span class="st"> &quot;user_role&quot;</span>])</a></code></pre></div>
 <p>Preview data (e-mail, first and last names removed for privacy reasons):</p>
-<pre class="sourceCode r"><code class="sourceCode r">crbirding_users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(user_email, user_first_name, user_last_name)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">10</span>)</code></pre>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">crbirding_users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb118-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(user_email, user_first_name, user_last_name)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">10</span>)</a></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["user_id"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["user_reference"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["user_address"],"name":[3],"type":["chr"],"align":["left"]},{"label":["user_postal_code"],"name":[4],"type":["chr"],"align":["left"]},{"label":["user_place"],"name":[5],"type":["chr"],"align":["left"]},{"label":["user_country"],"name":[6],"type":["chr"],"align":["left"]},{"label":["user_language"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"NA","2":"2009","3":"NA","4":"NA","5":"NA","6":"ES","7":"NA"},{"1":"NA","2":"758","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1900","3":"NA","4":"NA","5":"NA","6":"UK","7":"NA"},{"1":"NA","2":"1834","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"421","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1776","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1989","3":"NA","4":"NA","5":"NA","6":"NL","7":"NA"},{"1":"NA","2":"1331","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1655","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"749","3":"NA","4":"NA","5":"NA","6":"ES","7":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["user_id"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["user_reference"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["user_address"],"name":[3],"type":["chr"],"align":["left"]},{"label":["user_postal_code"],"name":[4],"type":["chr"],"align":["left"]},{"label":["user_place"],"name":[5],"type":["chr"],"align":["left"]},{"label":["user_country"],"name":[6],"type":["chr"],"align":["left"]},{"label":["user_language"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"NA","2":"2009","3":"NA","4":"NA","5":"NA","6":"ES","7":"NA"},{"1":"NA","2":"758","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1900","3":"NA","4":"NA","5":"NA","6":"UK","7":"NA"},{"1":"NA","2":"1834","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"421","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1776","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"2057","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1989","3":"NA","4":"NA","5":"NA","6":"NL","7":"NA"},{"1":"NA","2":"1331","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1655","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>Save to csv file <code>crbirding_users.csv</code> in <code>./data/processed/</code> as SOVON prefers working with comma separated files than tab separated files:</p>
-<pre class="sourceCode r"><code class="sourceCode r">crbirding_users <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">write_csv</span>(
-    <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;processed&quot;</span>, <span class="st">&quot;crbirding_users.csv&quot;</span>), 
-    <span class="dt">na =</span> <span class="st">&quot;&quot;</span>
-)</code></pre>
+<p>Save to csv file <code>crbirding_users.csv</code> in <code>./data/processed/</code> as asked by SOVON:</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">crbirding_users <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb119-2" data-line-number="2"><span class="st">  </span><span class="kw">write_csv</span>(</a>
+<a class="sourceLine" id="cb119-3" data-line-number="3">    <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;processed&quot;</span>, <span class="st">&quot;crbirding_users.csv&quot;</span>),</a>
+<a class="sourceLine" id="cb119-4" data-line-number="4">    <span class="dt">na =</span> <span class="st">&quot;&quot;</span></a>
+<a class="sourceLine" id="cb119-5" data-line-number="5">  )</a></code></pre></div>
 
 </div>
 </div>
@@ -419,11 +429,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -444,7 +456,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/inbo/sovon/blob/master/src/src/2_users.Rmd",
+"link": "https://github.com/inbo/cr-birding/blob/master/src/src/2_users.Rmd",
 "text": "Edit"
 },
 "history": {

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Mapping INBO color ring data to SOVON format</title>
-  <meta name="description" content="Mapping INBO color ring data to SOVON format">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="Mapping INBO color ring data to SOVON format" />
+  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Mapping INBO color ring data to SOVON format" />
   <meta property="og:type" content="book" />
@@ -22,18 +21,18 @@
   
   
 
-<meta name="author" content="Damiano Oldoni">
+<meta name="author" content="Damiano Oldoni" />
 
 
-<meta name="date" content="2019-04-10">
+<meta name="date" content="2020-03-23" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
 
-<link rel="next" href="1_preprocessing.html">
+<link rel="next" href="1_preprocessing.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -41,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -58,7 +60,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -286,25 +287,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">Mapping INBO color ring data to SOVON format</h1>
 <p class="author"><em>Damiano Oldoni</em></p>
-<p class="date"><em>2019-04-10</em></p>
+<p class="date"><em>2020-03-23</em></p>
 </div>
 <div id="intro" class="section level1">
 <h1><span class="header-section-number">1</span> Intro</h1>
 <p>This document contains and describes all the steps in mapping INBO color ring data to SOVON format. By running this document in R, it will create all the necessary data files. Settings to access INBO database are necessary.</p>
 <p>Load libraries:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DBI)            <span class="co"># To connect to database</span>
-<span class="kw">library</span>(odbc)           <span class="co"># To connect to database</span>
-<span class="kw">library</span>(stringr)        <span class="co"># To perform string operations</span>
-<span class="kw">library</span>(stringi)        <span class="co"># To perform string operations</span>
-<span class="kw">library</span>(readr)          <span class="co"># To read and write txt files</span>
-<span class="kw">library</span>(dplyr)          <span class="co"># To transform data</span>
-<span class="kw">library</span>(tidyr)          <span class="co"># To transform data</span>
-<span class="kw">library</span>(purrr)          <span class="co"># To transform data via functions</span>
-<span class="kw">library</span>(tidyselect)     <span class="co"># To select columns smartly</span>
-<span class="kw">library</span>(measurements)   <span class="co"># To convert measurement units</span>
-<span class="kw">library</span>(here)           <span class="co"># To find files</span>
-<span class="kw">library</span>(lubridate)      <span class="co"># To ease working with dates</span></code></pre>
-<p>The output of the data processing consists of three dataframes saved as tab separated files (<code>tsv</code>) in folder <code>data/processed/</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(DBI) <span class="co"># To connect to database</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(odbc) <span class="co"># To connect to database</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">library</span>(tidyverse) <span class="co"># To do datascience</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">library</span>(stringi) <span class="co"># To perform string operations</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw">library</span>(tidylog) <span class="co"># To provide feedback on dplyr functions</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw">library</span>(tidyselect) <span class="co"># To select columns smartly</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw">library</span>(measurements) <span class="co"># To convert measurement units</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="kw">library</span>(here) <span class="co"># To find files</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="kw">library</span>(lubridate) <span class="co"># To ease working with dates</span></a></code></pre></div>
+<p>The output of the data processing consists of three dataframes saved as comma separated files (<code>csv</code>) in folder <code>data/processed/</code>:</p>
 <ol style="list-style-type: decimal">
 <li><code>crbirding_users</code>: user data</li>
 <li><code>crbirding_birds</code>: ring data</li>
@@ -323,11 +321,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -348,7 +348,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/inbo/sovon/blob/master/src/index.Rmd",
+"link": "https://github.com/inbo/cr-birding/blob/master/src/index.Rmd",
 "text": "Edit"
 },
 "history": {

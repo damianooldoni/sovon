@@ -6,10 +6,11 @@ We start from the user temporary data saved in TSV file `users.tsv` in folder `d
 
 ```{r import_temp_users}
 users <- read_tsv(here::here("data", "interim", "users.tsv"),
-                  col_types = cols(
-                    .default = col_character(),
-                    Nummer = col_double(),
-                    Wachtwoord = col_logical())
+  col_types = cols(
+    .default = col_character(),
+    Nummer = col_double(),
+    Wachtwoord = col_logical()
+  )
 )
 ```
 
@@ -26,7 +27,7 @@ We map the original fields to SOVON fields denoted by prefix `sovon_`.
 ### E-mail
 
 ```{r e-mail}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_email = Email)
 ```
@@ -34,7 +35,7 @@ users <-
 ### First name
 
 ```{r first_name}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_first_name = Voornaam)
 ```
@@ -42,7 +43,7 @@ users <-
 ### Last name
 
 ```{r last_name}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_last_name = Familienaam)
 ```
@@ -50,7 +51,7 @@ users <-
 ### Address
 
 ```{r address}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_address = Adres)
 ```
@@ -58,7 +59,7 @@ users <-
 ### Place
 
 ```{r place}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_place = Gemeente)
 ```
@@ -66,7 +67,7 @@ users <-
 ### Postal code
 
 ```{r postal_code}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_postal_code = Postcode)
 ```
@@ -81,7 +82,7 @@ users %>%
 ```
 
 ```{r country}
-users <- 
+users <-
   users %>%
   mutate(sovon_user_country = LandCode)
 ```
@@ -91,9 +92,9 @@ users <-
 User identifiers are provided by SOVON. `NA` is given.
 
 ```{r userID}
-users <- 
+users <-
   users %>%
-  mutate(sovon_user_id  = NA)
+  mutate(sovon_user_id = NA)
 ```
 
 ### User reference
@@ -101,9 +102,9 @@ users <-
 We use the unique ID in `Nummer`:
 
 ```{r user_ref}
-users <- 
+users <-
   users %>%
-  mutate(sovon_user_reference  = Nummer)
+  mutate(sovon_user_reference = Nummer)
 ```
 
 ### User language
@@ -111,9 +112,9 @@ users <-
 This field is not present in `users`. We leave it empty:
 
 ```{r user_language}
-users <- 
+users <-
   users %>%
-  mutate(sovon_user_language  = NA_character_)
+  mutate(sovon_user_language = NA_character_)
 ```
 
 ## Save user data
@@ -121,7 +122,7 @@ users <-
 Export the SOVON fields to `crbirding_users`:
 
 ```{r make_crbirding_users}
-crbirding_users <- 
+crbirding_users <-
   users %>%
   select(starts_with("sovon_"))
 ```
@@ -130,7 +131,7 @@ Remove prefix `sovon_`:
 
 ```{r remove prefix_sovon_users}
 names(crbirding_users) <- str_remove(
-  names(crbirding_users), 
+  names(crbirding_users),
   pattern = "sovon_"
 )
 ```
@@ -174,7 +175,7 @@ Save to csv file `crbirding_users.csv` in `./data/processed/` as asked by SOVON:
 ```{r write_user_data_txt}
 crbirding_users %>%
   write_csv(
-    path = here::here("data", "processed", "crbirding_users.csv"), 
+    path = here::here("data", "processed", "crbirding_users.csv"),
     na = ""
-)
+  )
 ```
