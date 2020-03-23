@@ -42,7 +42,7 @@ library(here)           # To find files
 library(lubridate)      # To ease working with dates
 ```
 
-The output of the data processing consists of three dataframes saved as tab separated files (`tsv`) in folder `data/processed/`:
+The output of the data processing consists of three dataframes saved as comma separated files (`csv`) in folder `data/processed/`:
 
 1. `crbirding_users`: user data
 2. `crbirding_birds`: ring data
