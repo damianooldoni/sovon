@@ -637,7 +637,9 @@ obs_and_acts <-
   left_join(MRI_5_bird_ref_and_dates,
             by = c("sovon_bird_reference" = "bird_reference", 
                    "Datum" = "bird_date_begin")) %>%
-  mutate(sovon_MRI = if_else(!is.na(set_MRI_5) & is.na(klweg) & is.na(veld), set_MRI_5, sovon_MRI))
+  mutate(sovon_MRI = if_else(!is.na(set_MRI_5) & is.na(klweg) & is.na(veld),
+                             set_MRI_5,
+                             sovon_MRI))
 ```
 
 Preview changes:
@@ -731,7 +733,7 @@ obs_and_acts <-
 
 We add a dot at the end of the notes if not present already:
 
-```{r}
+```{r add_final_dot}
 obs_and_acts <- 
   obs_and_acts %>% 
   mutate(
@@ -753,7 +755,8 @@ obs_and_acts <-
   mutate(
     sovon_observation_notes = 
       if_else(
-        !is.na(sovon_observation_notes) & str_length(sovon_observation_notes) > 0,
+        !is.na(sovon_observation_notes) & 
+          str_length(sovon_observation_notes) > 0,
         str_c("INBO original notes: ", sovon_observation_notes, sep = " "),
         sovon_observation_notes)
 )
@@ -804,6 +807,7 @@ Preview:
 obs_and_acts %>%
   filter(!is.na(meweg)) %>%
   select(sovon_observation_notes) %>%
+  distinct() %>%
   head()
 ```
 
@@ -858,7 +862,7 @@ Set column order:
 ```{r get_right_order_cols_obs}
 crbirding_observations <-
   crbirding_observations %>%
-  select(cr_obs_cols)
+  select(all_of(cr_obs_cols))
 ```
 
 Preview data (without personal observer data for privcay reasons):
