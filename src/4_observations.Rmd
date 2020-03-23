@@ -480,14 +480,14 @@ obs_and_acts <-
 )
 ```
 
-The observations of sick birds not anymore released should get condition equal to 5. These observations are linked to the very last `ziek` action and followed by an observation with action `dood`. Not only, but the observer should be a worker of a bird shelter, in `workers_bird_shelters`.
+The observations of sick birds not anymore released should get condition equal to 5. These observations are linked to the very last `ziek` action and followed by an observation with action `dood`. Not only, the observer should be a worker of a bird shelter, in `workers_bird_shelters`.
 
 Reference number of observations with condition 5:
 
 ```{r get_obs_cond_5}
 last_sick_df <- 
   obs_and_acts %>%
-  filter(sovon_melder_ringersnummer %in% workers_bird_shelters$user_reference) %>%
+  filter(sovon_user_reference %in% workers_bird_shelters$user_reference) %>%
   filter(ziek == "ziek") %>%
   group_by(sovon_bird_reference) %>%
   filter(sovon_observation_date == max(sovon_observation_date)) %>%
@@ -500,15 +500,17 @@ dead_df <-
   filter(dood == "dood") %>%
   select(sovon_bird_reference, sovon_observation_date) %>%
   rename(dead_date = sovon_observation_date)
-last_sick_df <- 
+
+last_sick_before_dead_df <- 
   last_sick_df %>%
   filter(sovon_bird_reference %in% dead_df$sovon_bird_reference) %>%
   left_join(dead_df, by = "sovon_bird_reference")
 
 condition_5_obs_ref <- 
   obs_and_acts %>%
-  filter(sovon_bird_reference %in% last_sick_df$sovon_bird_reference) %>%
-  left_join(last_sick_df,
+  filter(sovon_bird_reference %in% 
+           last_sick_before_dead_df$sovon_bird_reference) %>%
+  left_join(last_sick_before_dead_df,
             by = "sovon_bird_reference") %>%
   group_by(sovon_bird_reference) %>%
   filter(sovon_observation_date >= last_sick_date & 
@@ -516,7 +518,7 @@ condition_5_obs_ref <-
   count() %>%
   ## only one ziek action present -> no obs possible if not released
   filter(n == 1) %>%
-  left_join(last_sick_df,
+  left_join(last_sick_before_dead_df,
             by = c("sovon_bird_reference")) %>%
   pull(obs_ref)
 ```
