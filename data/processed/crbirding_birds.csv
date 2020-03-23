@@ -2564,7 +2564,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,2172,05920,,BW(YK.AB),BLB,H...903603,,U,,30-06-2014,,2,1,LB,D,
 ,2173,05920,,BW(YH.AJ),BLB,H...903602,,U,,30-06-2014,,2,1,LB,U,
 ,2174,05910,,BW(RB.AM),BLB,L...915986,,U,,11-07-2014,01-08-2014,2,1,RB,U,
-,2175,05920,,BW(YX.AF),BLB,H...903626,,U,,11-07-2014,,2,1,RB,U,
+,2175,05920,,BW(YX.AF),BLB,H...903626,,M,,11-07-2014,,2,1,LB,U,
 ,2176,05920,,BW(ZUA.V),BLB,H...902058,,U,,11-07-2014,,2,1,RB,U,
 ,2177,05920,,BW(ZV.AM),BLB,H...902059,,U,,11-07-2014,,2,1,RB,U,
 ,2178,05920,,BW(Z.TAH),BLB,H...902052,,U,,11-07-2014,,2,1,RB,U,
@@ -3440,7 +3440,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,2990,05910,,BW(A.TOP),BLB,L...925866,,U,,13-07-2016,,2,1,LB,U,
 ,2991,05910,,BW(AT.OR),BLB,L...920639,,U,,13-07-2016,,2,1,RB,U,
 ,2992,05910,,BW(AW.OM),BLB,L...915961,,U,,15-07-2016,,2,1,RB,U,
-,2993,05910,,BW(A.VOA),BLB,L...925854,,U,,13-07-2016,,2,1,LB,U,
+,2993,05910,,BW(A.VOA),BLB,L...925854,,F,,13-07-2016,,2,1,LB,U,
 ,2994,05910,,BW(AV.OF),BLB,L...925893,,U,,13-07-2016,,2,1,RB,U,
 ,2995,05920,,BW(ZWA.V),BLB,H...905417,,U,,19-06-2016,,2,1,LB,U,
 ,2996,05910,,BW(RU.AM),BLB,L...922942,,U,,19-06-2016,,2,A,,,
@@ -3829,7 +3829,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,3365,05920,,BW(MFA.R),BLB,H...900731,,M,,25-06-2010,,1,1,,,
 ,3366,05920,,BW(ML.AK),,,,M,,25-06-2010,28-06-2010,1,1,,,
 ,3366,05920,,BW(ML.AK),BLB,H...900910,,M,,28-06-2010,,0,1,RB,U,
-,3366,05920,,BW(ML.AK),BLB,H...900910,,M,,28-06-2010,,0,1,RB,U,
 ,3367,05920,,,BLB,H...152680,,U,,07-06-2010,22-06-2010,0,1,,,sovon_bird_shorthand not available.
 ,3367,05920,,BW(MUA.M),BLB,H...152680,,U,,22-06-2010,,1,1,,,
 ,3368,05920,,BW(M.VAZ),BLB,H...900765,,U,,05-07-2010,,2,1,RB,U,
@@ -3951,7 +3950,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,3475,05920,,BW(MD.AK),BLB,H...900711,,M,,25-06-2010,,1,1,,,
 ,3476,05920,,BW(M.DAM),,,,M,,28-06-2010,23-07-2010,1,1,,,
 ,3476,05920,,BW(M.DAM),BLB,H...900913,,M,,23-07-2010,,0,1,RB,U,
-,3476,05920,,BW(M.DAM),BLB,H...900913,,M,,23-07-2010,,0,1,RB,U,
 ,3477,05920,,BW(MLA.A),BLB,H...900870,,M,,21-05-2010,,2,A,RB,U,
 ,3478,05920,,BW(M.LAB),BLB,H...900869,,U,,21-05-2010,,2,A,RB,U,
 ,3479,05920,,BW(M.LAM),BLB,H...900872,,U,,21-05-2010,,2,A,RB,U,
@@ -4035,7 +4033,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,3553,05910,,BW(P.DAM),BLB,L...912983,,U,,02-07-2010,,2,1,RB,U,
 ,3554,05910,,BW(PD.AN),BLB,L...912984,,U,,02-07-2010,,2,1,RB,U,
 ,3555,05920,,BW(PKA.Y),,,,M,,29-06-2010,23-07-2010,1,1,,,
-,3555,05920,,BW(PKA.Y),BLB,H...900924,,M,,23-07-2010,,0,1,,,
 ,3555,05920,,BW(PKA.Y),BLB,H...900924,,M,,23-07-2010,,0,1,,,
 ,3556,05910,,BW(GMA.P),BLB,L...102972,,U,,18-08-2007,10-04-2013,2,A,RB,U,
 ,3557,05920,,BW(LZA.B),BLB,H...900805,,U,,04-06-2010,,2,A,RB,U,
@@ -5474,7 +5471,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,4913,05910,,BW(A.XOL),BLB,L...925880,,U,,13-07-2016,,2,1,RB,U,
 ,4914,05910,,BW(AL.OJ),BLB,L...925026,,U,,28-06-2016,,2,1,LB,D,
 ,4915,05910,,BW(RV.AB),BLB,L...925130,,U,,03-07-2016,,2,1,LB,U,
-,4916,05910,,BW(RT.AX),BLB,L...923148,,U,,05-06-2016,,2,A,LB,D,
+,4916,05910,,BW(RT.AX),BLB,L...923148,,M,,05-06-2016,,2,A,LB,D,
 ,4917,05920,,BW(ZXA.Y),BLB,H...905430,,U,,03-07-2016,,2,1,LB,U,
 ,4918,05920,,BW(ZYA.V),BLB,H...903999,,U,,03-07-2016,,2,1,LB,U,
 ,4919,05920,,BW(ZY.AB),BLB,H...903981,,U,,12-07-2016,,2,1,LB,U,
@@ -5955,7 +5952,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,5337,05910,,BW(L.GAM),BLB,L...911705,,F,,05-06-2009,,2,A,RB,U,
 ,5338,05910,,,BLB,L...904211,,U,,16-07-2005,05-06-2009,0,1,,,sovon_bird_shorthand not available.
 ,5338,05910,,BW(LGA.P),BLB,L...904211,,U,,05-06-2009,,1,A,LB,U,
-,5339,05910,,BW(L.GAR),BLB,L...911702,,U,,05-06-2009,,2,A,RB,U,
+,5339,05910,,BW(L.GAR),BLB,L...911702,,F,,05-06-2009,,2,A,RB,U,
 ,5340,05910,,BW(E523),,,,M,,01-07-2001,05-06-2009,1,1,,,foreign_color_ring.
 ,5340,05910,,BW(LG.AS),BLB,L...911716,,M,,05-06-2009,,2,A,RB,U,
 ,5341,05910,,BW(LGA.T),BLB,L...911704,,U,,05-06-2009,,2,A,RB,U,
@@ -7570,7 +7567,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,6819,05920,,BW(MFA.M),BLB,H...900718,,M,,24-06-2010,,1,1,,,
 ,6820,05920,,BW(MF.AP),,,,F,,29-06-2010,15-07-2010,1,1,,,
 ,6820,05920,,BW(MF.AP),BLB,H...900947,,F,,15-07-2010,03-08-2010,0,1,,,
-,6820,05920,,BW(MF.AP),BLB,H...900947,,F,,15-07-2010,03-08-2010,0,1,,,
 ,6821,05920,,,BLB,H...900744,,F,,21-06-2010,29-06-2010,0,1,,,sovon_bird_shorthand not available.
 ,6821,05920,,BW(MF.AT),BLB,H...900744,,F,,29-06-2010,,1,1,,,
 ,6822,05920,,,BLB,H...900717,,M,,12-06-2010,24-06-2010,0,1,,,sovon_bird_shorthand not available.
@@ -7727,7 +7723,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,6923,05920,,,BLB,H...900736,,M,,20-06-2010,28-06-2010,0,1,,,sovon_bird_shorthand not available.
 ,6923,05920,,BW(M.ZAJ),BLB,H...900736,,M,,28-06-2010,,1,1,RB,U,
 ,6924,05920,,BW(MZA.Z),,,,M,,25-06-2010,28-06-2010,1,1,,,
-,6924,05920,,BW(MZA.Z),BLB,H...900928,,M,,28-06-2010,,0,1,,,
 ,6924,05920,,BW(MZA.Z),BLB,H...900928,,M,,28-06-2010,,0,1,,,
 ,6925,05910,,BW(NB.AC),BLB,L...912870,,U,,09-07-2010,,2,1,RB,U,
 ,6926,05910,,BW(NBA.D),BLB,L...912871,,U,,09-07-2010,,2,1,RB,U,
@@ -8873,7 +8868,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,7928,05910,,BW(DYA.Y),,,,U,,17-07-2006,,2,1,RB,U,bird_ring_number not present.
 ,7929,05910,,BW(D.YAZ),,,,U,,17-07-2006,13-06-2008,1,1,,,
 ,7929,05910,,BW(D.YAZ),NLA,...4049634,,U,,13-06-2008,,0,,RB,U,
-,7929,05910,,BW(D.YAZ),NLA,...4049634,,U,,13-06-2008,,0,,RB,U,
 ,7930,05910,,BW(D.ZAB),BLB,L...906047,,U,,16-07-2006,,2,1,RB,U,
 ,7931,05910,,BW(DZ.AG),BLB,L...906103,,U,,16-07-2006,,2,1,RB,U,
 ,7932,05910,,BW(D.ZAJ),BLB,L...906109,,U,,16-07-2006,,2,1,RB,U,
@@ -9103,7 +9097,6 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,8132,05920,,BW(FJA.H),BLB,H...145918,,U,,10-07-2006,,2,1,RB,U,
 ,8133,05920,,BW(F.JAJ),BLB,H...145811,,M,,24-05-2007,,2,A,RB,U,
 ,8134,05920,,BW(FJ.AK),,,,F,,01-07-2006,15-12-2007,1,1,,,
-,8134,05920,,BW(FJ.AK),FRP,EA..674658,,F,,15-12-2007,,0,9,RB,U,
 ,8134,05920,,BW(FJ.AK),FRP,EA..674658,,F,,15-12-2007,,0,9,RB,U,
 ,8135,05920,,BW(FJA.L),BLB,H...146346,,U,,07-07-2006,08-09-2016,2,1,,,
 ,8135,05920,,BW(FJA.L),,,,U,,08-09-2016,,0,,RB,U,
@@ -10317,7 +10310,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,9157,05910,,BW(D.ZOD),BLB,L...927729,,U,,20-05-2019,,2,A,RB,U,
 ,9158,05910,,BW(D.DOL),BLB,L...927728,,U,,20-05-2019,,2,A,RB,U,
 ,9159,05910,,BW(D.SOT),BLB,L...927730,,U,,20-05-2019,,2,A,RB,U,
-,9160,05910,,BW(D.WOH),BLB,L...927731,,U,,20-05-2019,,2,A,RB,U,
+,9160,05910,,BW(D.WOH),BLB,L...927731,,F,,20-05-2019,,2,A,RB,U,
 ,9161,05910,,BW(GAO.G),BLB,L...927732,,U,,22-05-2019,,2,A,RB,D,
 ,9162,05910,,,BLB,L...909901,,U,,29-05-2009,31-05-2019,0,A,,,sovon_bird_shorthand not available.
 ,9162,05910,,BW(GCO.K),BLB,L...909901,,U,,31-05-2019,,1,A,RB,U,
@@ -10449,7 +10442,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,9272,05920,,BW(H.JOH),BLB,H...909963,,U,,24-07-2019,,2,1,RB,U,
 ,9273,05910,,BW(GF.OU),BLB,L...918848,,U,,24-07-2019,,2,1,RB,U,
 ,9274,05910,,BW(B.TOD),BLB,L...929607,,U,,05-08-2019,,2,3,RB,U,
-,9275,05910,,BW(DCO.K),BLB,L...929606,,U,,05-08-2019,01-09-2020,2,3,RB,U,
+,9275,05910,,BW(DCO.K),BLB,L...929606,,U,,05-08-2019,01-09-2019,2,3,RB,U,
 ,9276,05910,,BW(DFO.N),BLB,L...929604,,U,,05-08-2019,,2,1,RB,U,
 ,9277,05920,,BW(F.COD),BLB,H...908879,,U,,05-08-2019,,2,3,RB,U,
 ,9278,05910,,BW(ABBU),BLB,L...929793,,U,,29-07-2019,02-08-2019,2,3,,,virtual_color_ring.
@@ -11768,7 +11761,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,10542,05910,,BW(DZ.OM),BLB,L...927714,,U,,09-07-2018,,2,1,LB,U,
 ,10543,05920,,BW(F.COL),BLB,H...907805,,U,,09-07-2018,,2,1,RB,U,
 ,10544,05920,,BW(F.HOD),BLB,H...907808,,U,,09-07-2018,,2,1,,,
-,10545,05910,,BW(DFO.K),BLB,L...926201,,U,,13-06-2018,,2,A,RB,U,
+,10545,05910,,BW(DFO.K),BLB,L...926201,,F,,13-06-2018,,2,A,RB,U,
 ,10546,05920,,BW(F.ROW),BLB,H...904498,,U,,16-07-2018,,2,1,LB,U,
 ,10547,05910,,BW(ABBF),BLB,L...926249,,U,,27-06-2018,16-07-2018,2,1,,,virtual_color_ring.
 ,10548,05910,,BW(DWO.V),BLB,L...925352,,U,,02-06-2018,,2,A,LB,U,
