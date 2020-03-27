@@ -818,7 +818,7 @@ obs_and_acts <-
   filter(!KleurringNummer %in% common_shellduck_nummer | is.na(KleurringNummer))
 ```
 
-## Remove rings `BGAH` and `BRAB`
+## Remove rings `BGAH`, `BRAB` and `EAU`
 
 The rings `BGAH` and `BRAB` should be removed, as explained in [this comment on issue 89](https://github.com/inbo/cr-birding/issues/89#issuecomment-481195862). No information about EURING code can be found:
 
@@ -827,19 +827,21 @@ birds %>%
   filter(Nummer %in% c("BGAH", "BRAB"))
 ```
 
-We remove them from `birds`:
+We also remove the ring `EAU` as it is not valid and the INBO experts agree on removing it (see [issue #102](https://github.com/inbo/cr-birding/issues/102)).
 
-```{r remove_BGAH_BRAB_from_birds}
+We remove these rings from `birds`:
+
+```{r remove_BGAH_BRAB_EAU_from_birds}
 birds <-
   birds %>%
-  filter(!Nummer %in% c("BGAH", "BRAB"))
+  filter(!Nummer %in% c("BGAH", "BRAB", "EAU"))
 ```
 
 Observations related to these two rings:
 
 ```{r show_obs_BGAH_BRAB}
 obs_and_acts %>%
-  filter(KleurringNummer %in% c("BGAH", "BRAB"))
+  filter(KleurringNummer %in% c("BGAH", "BRAB", "EAU"))
 ```
 
 will be also removed:
@@ -847,7 +849,7 @@ will be also removed:
 ```{r remove_obs_of_BGAH_BRAB}
 obs_and_acts <-
   obs_and_acts %>%
-  filter(!KleurringNummer %in% c("BGAH", "BRAB"))
+  filter(!KleurringNummer %in% c("BGAH", "BRAB", "EAU"))
 ```
 
 ## Check date of `dood`
