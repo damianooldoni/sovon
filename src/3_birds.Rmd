@@ -2728,7 +2728,6 @@ crbirding_birds %>%
   left_join(obs_and_acts %>%
     ## remove rows with Datum equal to NA or field observations
     filter(!is.na(sovon_bird_age_obs) &
-      is.na(veld) & is.na(dood) & is.na(br) &
       (!is.na(vang) | !is.na(vangl) |
         !is.na(rngkl) | !is.na(rngme) |
         !is.na(klgev) | !is.na(klweg) |
@@ -2742,15 +2741,14 @@ crbirding_birds %>%
   nrow() == nrow(crbirding_birds)
 ```
 
-If TRUE, then we proceed with the mapping:
+Apply mapping:
 
 ```{r apply_mapping_bird_age_ringing}
 crbirding_birds <-
   crbirding_birds %>%
   left_join(obs_and_acts %>%
     ## remove rows with Datum equal to NA or field observations
-    filter(!is.na(sovon_bird_age_obs) &
-      is.na(veld) & is.na(dood) & is.na(br) &
+    filter(!is.na(sovon_bird_age_obs) & 
       (!is.na(vang) | !is.na(vangl) |
         !is.na(rngkl) | !is.na(rngme) |
         !is.na(klgev) | !is.na(klweg) |
@@ -2762,6 +2760,39 @@ crbirding_birds <-
     "sovon_bird_date_begin" = "Datum"
   )
   )
+```
+
+It can happen that there are birds without age while ringing. This happens typically while changing a ring, i.e. birds with more than one ring:
+
+```{r n_rings_of_birds_without_ring}
+crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  add_tally() %>%
+  ungroup() %>%
+  filter(sovon_bird_reference %in% 
+           (crbirding_birds %>%
+           filter(is.na(sovon_bird_age_obs)) %>%
+           pull(sovon_bird_reference))) %>%
+  rename(n_rings = n) %>%
+  group_by(n_rings) %>%
+  count()
+```
+
+This is considered not a problem by SOVON ITer (see [113#issuecomment-605295649](https://github.com/inbo/cr-birding/issues/113#issuecomment-605295649)).
+
+Birds without `sovon_bird_age_obs` while ringing once should be checked:
+
+```{r birds_ringed_once_without_sovon_bird_age_obs}
+crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  add_tally() %>%
+  ungroup() %>%
+  filter(sovon_bird_reference %in% 
+           (crbirding_birds %>%
+              filter(is.na(sovon_bird_age_obs)) %>%
+              pull(sovon_bird_reference))) %>%
+  rename(n_rings = n) %>%
+  filter(n_rings == 1)
 ```
 
 We rename  `sovon_bird_age_obs` to `sovon_bird_age_ringing` in `crbirding_birds`:
