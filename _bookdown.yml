@@ -13,7 +13,8 @@ rmd_files: [
   src/1_preprocessing.Rmd,
   src/2_users.Rmd,
   src/3_birds.Rmd,
-  src/4_observations.Rmd
+  src/4_observations.Rmd,
+  src/5_map_to_previous_output.Rmd
 ]
 
 # Where Rmd files are kept:
