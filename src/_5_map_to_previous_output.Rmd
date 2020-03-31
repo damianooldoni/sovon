@@ -52,6 +52,54 @@ crbirding_observations_2019 <- read_csv(here::here(
   na = "")
 ```
 
+We read also the data we mapped just now.
+
+```{r read_data_now}
+crbirding_users <- read_csv(here::here("data",
+                                       "processed",
+                                       "crbirding_users.csv"),
+                            col_types = cols(
+                              .default = col_character(),
+                              user_id = col_logical(),
+                              user_reference = col_number()),
+                            na = "")
+crbirding_birds <- read_csv(here::here("data",
+                                       "processed",
+                                       "crbirding_birds.csv"),
+                            col_types = cols(
+                              .default = col_character(),
+                              bird_id = col_logical(),
+                              bird_reference = col_number(),
+                              bird_bto = col_logical(),
+                              bird_birth_year = col_logical(),
+                              bird_date_begin = col_datetime(
+                                format = "%d-%m-%Y"),
+                              bird_date_end = col_datetime(
+                                format = "%d-%m-%Y")),
+                            na = "")
+crbirding_observations <- read_csv(here::here(
+  "data",
+  "processed",
+  "crbirding_observations.csv"),
+  col_types = cols(
+    .default = col_character(),
+    user_id = col_logical(),
+    user_reference = col_number(),
+    bird_id = col_logical(),
+    bird_reference = col_number(),
+    observation_id = col_logical(),
+    observation_reference = col_number(),
+    observation_date = col_datetime(
+      format = "%d-%m-%Y"),
+    observation_time = col_logical(),
+    check_bird = col_logical(),
+    MRI = col_number(),
+    melder_ringersnummer = col_logical(),
+    condition = col_number()
+  ),
+  na = "")
+```
+
 ## Users
 
 Number of new users based on new `user_reference` (email and other private info not shown):
@@ -156,8 +204,8 @@ We add  `bird_reference_2019` to  `crbirding_birds`:
 ```{r add_bird_ref_2019}
 crbirding_birds <- 
   crbirding_birds %>%
-  left_join(crbirding_birds_mapping_bird_reference %>%
-              select(bird_reference, bird_reference_2019),
+  left_join((crbirding_birds_mapping_bird_reference %>%
+              select(bird_reference, bird_reference_2019)),
             by = "bird_reference") %>%
   select(bird_id, bird_reference, bird_reference_2019, everything())
 ```
@@ -222,7 +270,7 @@ crbirding_birds %>%
 
 Values of `bird_shorthand` in  `crbirding_birds_2019`:
 
-```{r}
+```{r bird_shorthand_in_2019}
 crbirding_birds_2019 %>%
   filter(bird_reference %in% bird_ref_changed_shorthand$bird_reference_2019) %>%
   select(bird_reference,
@@ -291,6 +339,99 @@ changed_bird_ring_number <-
 changed_bird_ring_number
 ```
 
+## Changed `bird_name`
+
+Rings with changed `bird_name`:
+
+```{r changed_bird_name}
+changed_bird_name <- 
+  crbirding_birds %>%
+  filter(!is.na(bird_reference_2019)) %>%
+  anti_join(crbirding_birds_2019,
+            by = c("bird_reference_2019" = "bird_reference",
+                   "bird_name")) %>%
+  select(bird_reference, 
+         bird_reference_2019, 
+         bird_name, 
+         bird_date_begin,
+         bird_date_end) %>%
+  left_join(crbirding_birds_2019 %>%
+              rename(bird_name_2019 = bird_name) %>%
+              select(bird_reference,
+                     bird_name_2019,
+                     bird_date_begin,
+                     bird_date_end),
+            by = (c("bird_reference_2019" = "bird_reference",
+                    "bird_date_begin", "bird_date_end"))) %>%
+  filter(!is.na(bird_name_2019) | !is.na(bird_name)) %>%
+  select(contains("reference"),
+         contains("name"),
+         contains("date"))
+changed_bird_name
+```
+
+## Changed `bird_sex`
+
+Rings with changed `bird_sex`:
+
+```{r changed_bird_sex}
+changed_bird_sex <- 
+  crbirding_birds %>%
+  filter(!is.na(bird_reference_2019)) %>%
+  anti_join(crbirding_birds_2019,
+            by = c("bird_reference_2019" = "bird_reference",
+                   "bird_sex")) %>%
+  select(bird_reference, 
+         bird_reference_2019, 
+         bird_sex, 
+         bird_date_begin,
+         bird_date_end) %>%
+  left_join(crbirding_birds_2019 %>%
+              rename(bird_sex_2019 = bird_sex) %>%
+              select(bird_reference,
+                     bird_sex_2019,
+                     bird_date_begin,
+                     bird_date_end),
+            by = (c("bird_reference_2019" = "bird_reference",
+                    "bird_date_begin", "bird_date_end"))) %>%
+  filter(!is.na(bird_sex_2019) | !is.na(bird_sex)) %>%
+  select(contains("reference"),
+         contains("sex"),
+         contains("date"))
+changed_bird_sex
+```
+
+## Changed `bird_date_begin`
+
+Rings with changed `bird_date_begin`:
+
+```{r changed_bird_date_begin}
+same_rings <- 
+  crbirding_birds %>%
+  select(bird_reference,
+         bird_reference_2019,
+         bird_shorthand,
+         bird_date_begin,
+         bird_date_end) %>%
+  inner_join(crbirding_birds_2019 %>%
+               select(bird_reference,
+                      bird_date_begin_2019 = bird_date_begin,
+                      bird_shorthand,
+                      bird_date_end_2019 = bird_date_end),
+             by = c("bird_reference_2019" = "bird_reference",
+                    "bird_shorthand"))
+changed_bird_date_begin_end <-
+  same_rings %>%
+  group_by(bird_reference) %>%
+  filter(!bird_date_begin %in% bird_date_begin_2019 | 
+           !bird_date_end %in% bird_date_end_2019) %>%
+  filter(!is.na(bird_date_begin) &
+           !is.na(bird_date_begin_2019) &
+           !is.na(bird_date_end) &
+           !is.na(bird_date_end_2019))
+changed_bird_date_begin_end
+```
+
 ## Map `observation_reference`
 
 Number of new observations based on new `_reference` (email and other private info not shown):
@@ -307,19 +448,6 @@ Old `osbervation_reference` IDs not anymore present
 ```{r old_obs_ref_not_present}
 crbirding_observations_2019 %>%
   filter(!observation_reference %in% 
-           crbirding_observations$observation_reference)
-```
-
-Observations where some changes have been applied:
-
-```{r obs_with_changes}
-same_ref_ids <- 
-  crbirding_observations %>%
-  filter(observation_reference %in% 
-           crbirding_observations_2019$observation_reference) %>%
-  pull(observation_reference)
-crbirding_observations_2019 %>%
-  filter(observation_reference %in% same_ref_ids) %>%
-  anti_join(crbirding_observations) %>%
-  pull(observation_reference)
+           crbirding_observations$observation_reference) %>%
+  select(-contains("melder"))
 ```
