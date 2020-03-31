@@ -228,7 +228,7 @@ crbirding_birds %>%
 
 ### Changed  `bird_euring` 
 
-```{r new_birds_or_modified_first_ring}
+```{r changed_bird_euring}
 crbirding_birds %>%
   filter(!is.na(bird_reference_2019)) %>%
   anti_join(crbirding_birds_2019,
@@ -245,7 +245,7 @@ crbirding_birds %>%
 
 Birds with changed ring history:
 
-```{r new_birds_or_modified_first_ring}
+```{r changed_bird_shorthand}
 bird_ref_changed_shorthand <-
   crbirding_birds %>%
   filter(!is.na(bird_reference_2019)) %>%
@@ -436,7 +436,7 @@ changed_bird_date_begin_end
 
 Number of new observations based on new `_reference` (email and other private info not shown):
 
-```{r new_user_reference}
+```{r new_observation_reference}
 crbirding_observations %>%
   filter(!observation_reference %in% 
            crbirding_observations_2019$observation_reference) %>%
