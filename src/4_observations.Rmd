@@ -470,19 +470,19 @@ obs_and_acts <-
 
 ### Observation status
 
-Adding the EURING status information arises by the need of mapping the observations with action code `br` and `vang`:
+Adding the status (based on EURING) information arises by the need of mapping the observations with action code `br` and `vang`:
 
 ```{r breed_show}
 actions_meaning %>%
   filter(Code %in% c("br", "vang"))
 ```
 
-The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document, we define the following mapping:
+The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document and based on discussion in [this issue](https://github.com/inbo/cr-birding/issues/114), we define the following mapping for field `status_full_grown_bird`:
 
 ```{r obs_status}
 obs_and_acts <-
   obs_and_acts %>%
-  mutate(sovon_status = case_when(
+  mutate(sovon_status_full_grown_bird = case_when(
     !is.na(br) | !is.na(vang) ~ "N",
     LeeftijdCode == "PU" ~ "-",
     TRUE ~ "U"
