@@ -346,7 +346,7 @@ Assign negative longitude if `PlaatsLengtegraadRichtingCode` is equal to `W`:
 obs_and_acts <-
   obs_and_acts %>%
   mutate(
-    sovon_observation_lng2 = case_when(
+    sovon_observation_lng = case_when(
       PlaatsLengtegraadRichtingCode == "E" ~ sovon_observation_lng,
       PlaatsLengtegraadRichtingCode == "W" & is.na(sovon_observation_lng) ~ paste0("-", sovon_observation_lng),
       TRUE ~ sovon_observation_lng
@@ -902,7 +902,7 @@ cr_obs_cols <- c(
   "observation_reference", "observation_date", "observation_time",
   "observation_lat", "observation_lng", "observation_location",
   "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
-  "melder_email", "melder_ringersnummer", "ring_number", "condition", "status",
+  "melder_email", "melder_ringersnummer", "ring_number", "condition", "status_full_grown_bird",
   "bird_age_obs", "bird_sex", "bird_ring_position", "bird_ring_direction"
 )
 ```

@@ -280,7 +280,7 @@ crbirding_birds_2019 %>%
   rename_all(paste0, "_2019")
 ```
 
-## Changed `bird_scheme`
+### Changed `bird_scheme`
 
 Rings with changed `bird_scheme`:
 
@@ -312,7 +312,7 @@ changed_bird_scheme %>%
   count()
 ```
 
-## Changed `bird_ring_number`
+### Changed `bird_ring_number`
 
 Rings with changed `bird_ring_number`:
 
@@ -339,7 +339,7 @@ changed_bird_ring_number <-
 changed_bird_ring_number
 ```
 
-## Changed `bird_name`
+### Changed `bird_name`
 
 Rings with changed `bird_name`:
 
@@ -370,7 +370,7 @@ changed_bird_name <-
 changed_bird_name
 ```
 
-## Changed `bird_sex`
+### Changed `bird_sex`
 
 Rings with changed `bird_sex`:
 
@@ -401,7 +401,7 @@ changed_bird_sex <-
 changed_bird_sex
 ```
 
-## Changed `bird_date_begin`
+### Changed `bird_date_begin`
 
 Rings with changed `bird_date_begin`:
 
