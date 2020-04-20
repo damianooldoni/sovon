@@ -210,6 +210,17 @@ crbirding_birds <-
   select(bird_id, bird_reference, bird_reference_2019, everything())
 ```
 
+and we save it:
+
+```{r save_birds_with_bird_ref_2019}
+write_csv(
+  crbirding_birds,
+  path = here::here("data", "processed", "crbirding_birds.csv"),
+  na = ""
+)
+```
+
+
 ### New `bird_reference`
 
 Some birds where not present in data transfer of April 2019, so the `bird_reference` cannot be mapped to `bird_reference_2019`.
@@ -434,7 +445,7 @@ changed_bird_date_begin_end
 
 ## Map `observation_reference`
 
-Number of new observations based on new `_reference` (email and other private info not shown):
+Number of new observations based on new `observation_reference` (email and other private info not shown):
 
 ```{r new_observation_reference}
 crbirding_observations %>%
