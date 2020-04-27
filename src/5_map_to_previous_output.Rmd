@@ -133,7 +133,7 @@ crbirding_users_2019 %>%
 
 ## Map birds
 
-### Map to `bird_reference` of 2019
+### Map `bird_reference`
 
 In INBO ring table, birds were uniquely identified by their very first ring (data were spread and untidy). We added a `bird_reference` field to gather information about multiple rings and link them to the same bird. This means that this field cannot be used to compare the actual INBO data with the data of 2019. We have to compare data by the very first color ring.
 
@@ -443,7 +443,10 @@ changed_bird_date_begin_end <-
 changed_bird_date_begin_end
 ```
 
-## Map `observation_reference`
+
+## Map observations
+
+### Map `observation_reference`
 
 Number of new observations based on new `observation_reference` (email and other private info not shown):
 
@@ -454,7 +457,7 @@ crbirding_observations %>%
   nrow()
 ```
 
-Old `osbervation_reference` IDs not anymore present
+Old observations not anymore present (all columns info from 2019 data):
 
 ```{r old_obs_ref_not_present}
 crbirding_observations_2019 %>%
