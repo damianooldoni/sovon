@@ -742,12 +742,12 @@ birds %>%
   select(first_Nummer, NummerNieuw)
 ```
 
-Mapping example: the bird with `Nummer` equal to `GP130` is mapped as follows:
+Mapping example: the bird with `Nummer` equal to `GP104` is mapped as follows:
 
 ```{r example_gps_mapping_and_name}
 birds %>%
-  filter(Nummer == "GP130") %>%
-  select(Nummer, first_Nummer, sovon_bird_notes)
+  filter(Nummer == "GP104") %>%
+  select(Nummer, first_Nummer, NummerNieuw, sovon_bird_notes)
 ```
 
 Column `first_Nummer` should contain unique elements. Check for exceptions:
@@ -761,7 +761,7 @@ birds %>%
   select(-n)
 ```
 
-Exceptions, if exist, are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions, if present, should be handled separately while mapping `bird_shorthand` in document `3_birds.Rmd`.
+Exceptions, if exist, are due to double entry, one with the original color ring, a second one with GPS tracker ID. Such exceptions, if present, should be handled separately while mapping `bird_shorthand` in document `3_birds.Rmd`. Another reason could be mapping in `map_gps` as result of reringing of birds with GPS. Notice that `map_gps` should map to the very first ring.
 
 ## Check inconsistencies between users and observers
 
