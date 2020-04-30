@@ -127,7 +127,8 @@ same_ref_ids <-
   pull(user_reference)
 crbirding_users_2019 %>%
   filter(user_reference %in% same_ref_ids) %>%
-  anti_join(crbirding_users) %>%
+  anti_join(crbirding_users,
+            by = names(crbirding_users)) %>%
   pull(user_reference)
 ```
 
@@ -210,16 +211,26 @@ crbirding_birds <-
   select(bird_id, bird_reference, bird_reference_2019, everything())
 ```
 
-and we save it:
+Number of birds present in 2019 but with `bird_reference` not equal to `bird_reference_2019` :
 
-```{r save_birds_with_bird_ref_2019}
-write_csv(
-  crbirding_birds,
-  path = here::here("data", "processed", "crbirding_birds.csv"),
-  na = ""
-)
+```{r n_birds_changed_bird_reference}
+crbirding_birds %>%
+  filter(!is.na(bird_reference_2019)) %>%
+  filter(bird_reference != bird_reference_2019) %>%
+  nrow
 ```
 
+This is not surprising as the bird_reference has always been defined as a progressive number, so it is sufficient the change of one bird reference to modify all the other references coming after.
+
+First change appears at:
+
+```{r first_change}
+crbirding_birds %>%
+  filter(!is.na(bird_reference_2019)) %>%
+  filter(bird_reference != bird_reference_2019) %>%
+  filter(bird_reference == min(bird_reference)) %>%
+  select(bird_reference, bird_reference_2019)
+```
 
 ### New `bird_reference`
 
@@ -443,10 +454,29 @@ changed_bird_date_begin_end <-
 changed_bird_date_begin_end
 ```
 
+### Save crbirding_birds with added reference from 2019 export
+
+We save crbirding_birds with the added `bird_reference_2019`:
+
+```{r save_birds_with_bird_ref_2019}
+# transform dates to characters
+crbirding_birds %>%
+  mutate(
+    bird_date_begin = as.character(bird_date_begin,
+      format = "%d-%m-%Y"
+    ),
+    bird_date_end = as.character(bird_date_end,
+      format = "%d-%m-%Y"
+    )
+  ) %>%
+  write_csv(path = here::here("data",
+                              "processed",
+                              "crbirding_birds.csv"),
+  na = ""
+)
+```
 
 ## Map observations
-
-### Map `observation_reference`
 
 Number of new observations based on new `observation_reference` (email and other private info not shown):
 
@@ -465,3 +495,267 @@ crbirding_observations_2019 %>%
            crbirding_observations$observation_reference) %>%
   select(-contains("melder"))
 ```
+
+Save in `same_ref_ids` the observation reference of observations present in both data.frames:
+
+```{r same_ref_ids_obs}
+same_ref_ids <- 
+  crbirding_observations %>%
+  filter(observation_reference %in% crbirding_observations_2019$observation_reference) %>%
+  pull(observation_reference)
+```
+
+### Changed geospatial information
+
+Details of observations with changes in latitude (`observation_lat`) and/or longitude (`observation_lng`):
+
+```{r obs_with_changes_lat_lng}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "observation_lat",
+                   "observation_lng")) %>%
+  select(observation_reference, observation_lat, observation_lng) %>%
+  rename(observation_lat_2019 = observation_lat,
+         observation_lng_2019 = observation_lng) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference,
+                     observation_lat,
+                     observation_lng),
+            by = "observation_reference") %>%
+  select(observation_reference,
+         observation_lat_2019,
+         observation_lat,
+         observation_lng_2019,
+         observation_lng)
+```
+
+Details of observations with changes in location (column `observation_location`):
+
+```{r obs_with_changes_location}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "observation_location")) %>%
+  select(observation_reference, observation_location) %>%
+  rename(observation_location_2019 = observation_location) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, observation_location),
+            by = "observation_reference")
+```
+
+### Changed temporal information
+
+Details of observations with changes in temporal information (column `observation_date`):
+
+```{r obs_with_changes_date}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "observation_date")) %>%
+  select(observation_reference, observation_date) %>%
+  rename(observation_date_2019 = observation_date) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, observation_date),
+            by = "observation_reference")
+```
+
+### Changed user information
+
+Details of observations with changes in user detail(no details about users shown, just `user_reference`):
+
+```{r obs_with_changes_user}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "user_reference",
+                   "melder",
+                   "melder_email")) %>%
+  select(observation_reference, user_reference) %>%
+  rename(user_reference_2019 = user_reference) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, user_reference),
+            by = "observation_reference")
+```
+
+### Changed metal ring information
+
+Details of observations with changes in metal ring information (columns `MRI` and  `ring_number`):
+
+```{r obs_with_changes_metalring_infos}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "MRI",
+                   "ring_number")) %>%
+  select(observation_reference, MRI, ring_number) %>%
+  rename(MRI_2019 = MRI,
+         ring_number_2019 = ring_number) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, MRI, ring_number),
+            by = "observation_reference")
+```
+
+### Changed condition
+
+Details of observations with changes in condition (column `condition`):
+
+```{r obs_with_changes_condition}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "condition")) %>%
+  select(observation_reference, condition) %>%
+  rename(condition_2019 = condition) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, condition),
+            by = "observation_reference")
+```
+
+### Changed status
+
+First we rename column `status` of  `crbirding_observation_2019` to new column name `status_full_grown_bird`:
+
+```{r rename_status}
+crbirding_observations_2019 <-
+  crbirding_observations_2019 %>%
+  rename(status_full_grown_bird = status)
+```
+
+Details of observations with changes in status (column `status_full_grown_bird`):
+
+```{r obs_with_changes_status}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "status_full_grown_bird")) %>%
+  select(observation_reference, status_full_grown_bird) %>%
+  rename(status_full_grown_bird_2019 = status_full_grown_bird) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, status_full_grown_bird),
+            by = "observation_reference")
+```
+
+### Changed bird age
+
+Details of observations with changes in bird age at time of observation (column `bird_age_obs`):
+
+```{r obs_with_changes_bird_age_obs}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "bird_age_obs")) %>%
+  select(observation_reference, bird_age_obs) %>%
+  rename(bird_age_obs_2019 = bird_age_obs) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, bird_age_obs),
+            by = "observation_reference")
+
+```
+
+### Changed bird sex
+
+Details of observations with changes in bird sex at time of observation (column `bird_sex`):
+
+```{r obs_with_changes_bird_sex}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "bird_sex")) %>%
+  select(observation_reference, bird_sex) %>%
+  rename(bird_sex_2019 = bird_sex) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, bird_sex),
+            by = "observation_reference")
+
+```
+
+### Changed bird ring position
+
+Details of observations with changes in bird ring position (column `bird_ring_position`) or direction (`bird_ring_direction`):
+
+```{r obs_with_changes_bird_ring_position_direction}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference", 
+                   "bird_ring_position",
+                   "bird_ring_direction")) %>%
+  select(observation_reference,
+         bird_ring_position, 
+         bird_ring_direction) %>%
+  rename(bird_ring_position_2019 = bird_ring_position,
+         bird_ring_direction_2019 = bird_ring_direction) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference,
+                     bird_ring_position,
+                     bird_ring_direction),
+            by = "observation_reference") %>%
+  select(observation_reference,
+         bird_ring_position_2019,
+         bird_ring_position,
+         bird_ring_direction_2019,
+         bird_ring_direction)
+```
+
+### Changed notes
+
+Details of observations with changes in observation notes (column `observation_notes`):
+
+```{r obs_with_changes_observation_notes}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "observation_notes")) %>%
+  select(observation_reference, observation_notes) %>%
+  rename(observation_notes_2019 = observation_notes) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, observation_notes),
+            by = "observation_reference")
+```
+
+### Changed capture information
+
+Details of observations with changes in capture information (column `observation_is_capture`):
+
+```{r obs_with_changes_observation_is_capture}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("observation_reference",
+                   "observation_is_capture")) %>%
+  select(observation_reference, observation_is_capture) %>%
+  rename(observation_is_capture_2019 = observation_is_capture) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, observation_is_capture),
+            by = "observation_reference")
+```
+
+### Changed bird reference
+
+Details of observations with changes in bird reference (column `bird_reference`):
+
+```{r obs_with_changes_bird_reference}
+crbirding_observations_2019 %>%
+  filter(observation_reference %in% same_ref_ids) %>%
+  anti_join(crbirding_observations,
+            by = c("bird_reference",
+                   "observation_reference")) %>%
+  select(observation_reference, bird_reference) %>%
+  rename(bird_reference_2019 = bird_reference) %>%
+  left_join(crbirding_observations %>%
+              select(observation_reference, bird_reference),
+            by = "observation_reference")
+```
+
+The huge number of changes of `bird_reference` has been discussed in previous session related to `crbirding_birds`.
