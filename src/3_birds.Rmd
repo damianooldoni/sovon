@@ -3033,30 +3033,6 @@ crbirding_birds <-
   ))
 ```
 
-Transform date from ISO standard yyyy-mm-dd to SOVON's standard dd-mm-yyyy:
-
-```{r transform_date_dd-mm-yyyy_bird_date_begin_end}
-crbirding_birds <-
-  crbirding_birds %>%
-  mutate(
-    sovon_bird_date_begin = as.character(sovon_bird_date_begin,
-      format = "%d-%m-%Y"
-    ),
-    sovon_bird_date_end = as.character(sovon_bird_date_end,
-      format = "%d-%m-%Y"
-    )
-  )
-```
-
-Example:
-
-```{r example_dd-mm-yyyy}
-crbirding_birds %>%
-  filter(!is.na(sovon_bird_date_end)) %>%
-  select(sovon_bird_date_begin, sovon_bird_date_end) %>%
-  head()
-```
-
 SOVON is interested in color ring versions with a dot if dots are present, even if their purpose is just improving readibility. We can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
 
 ```{r remove_col_bird_shorthand_pt}

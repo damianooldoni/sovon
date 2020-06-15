@@ -870,16 +870,6 @@ obs_and_acts %>%
 
 ## Save final observation data
 
-Transform date from ISO standard yyyy-mm-dd to SOVON's standard dd-mm-yyyy:
-
-```{r transform_date_dd-mm-yyyy_observation_date}
-obs_and_acts <-
-  obs_and_acts %>%
-  mutate(sovon_observation_date = as.character(sovon_observation_date,
-    format = "%d-%m-%Y"
-  ))
-```
-
 Select the required columns, starting with prefix `sovon_`:
 
 ```{r select_sovon_cols}
