@@ -25,9 +25,9 @@ crbirding_birds_2019 <- read_csv(here::here("data",
                          bird_bto = col_logical(),
                          bird_birth_year = col_logical(),
                          bird_date_begin = col_datetime(
-                           format = "%d-%m-%Y"),
+                           format = ""),
                          bird_date_end = col_datetime(
-                           format = "%d-%m-%Y")),
+                           format = "")),
                        na = "")
 crbirding_observations_2019 <- read_csv(here::here(
   "data",
@@ -42,7 +42,7 @@ crbirding_observations_2019 <- read_csv(here::here(
     observation_id = col_logical(),
     observation_reference = col_number(),
     observation_date = col_datetime(
-      format = "%d-%m-%Y"),
+      format = ""),
     observation_time = col_logical(),
     check_bird = col_logical(),
     MRI = col_number(),
@@ -73,9 +73,9 @@ crbirding_birds <- read_csv(here::here("data",
                               bird_bto = col_logical(),
                               bird_birth_year = col_logical(),
                               bird_date_begin = col_datetime(
-                                format = "%d-%m-%Y"),
+                                format = ""),
                               bird_date_end = col_datetime(
-                                format = "%d-%m-%Y")),
+                                format = "")),
                             na = "")
 crbirding_observations <- read_csv(here::here(
   "data",
@@ -90,7 +90,7 @@ crbirding_observations <- read_csv(here::here(
     observation_id = col_logical(),
     observation_reference = col_number(),
     observation_date = col_datetime(
-      format = "%d-%m-%Y"),
+      format = ""),
     observation_time = col_logical(),
     check_bird = col_logical(),
     MRI = col_number(),
@@ -462,13 +462,8 @@ We save crbirding_birds with the added `bird_reference_2019`:
 # transform dates to characters
 crbirding_birds %>%
   mutate(
-    bird_date_begin = as.character(bird_date_begin,
-      format = "%d-%m-%Y"
-    ),
-    bird_date_end = as.character(bird_date_end,
-      format = "%d-%m-%Y"
-    )
-  ) %>%
+    bird_date_begin = as.Date(bird_date_begin),
+    bird_date_end = as.Date(bird_date_end)) %>%
   write_csv(path = here::here("data",
                               "processed",
                               "crbirding_birds.csv"),

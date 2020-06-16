@@ -49,8 +49,8 @@ crbirding_birds <- read_csv(
     bird_reference = col_double(),
     bird_bto = col_logical(),
     bird_birth_year = col_logical(),
-    bird_date_begin = col_datetime(format = "%d-%m-%Y"),
-    bird_date_end = col_datetime(format = "%d-%m-%Y")
+    bird_date_begin = col_datetime(format = ""),
+    bird_date_end = col_datetime(format = "")
   )
 )
 ```
@@ -882,6 +882,14 @@ Remove prefix `sovon_`:
 
 ```{r remove prefix_sovon_observations}
 names(crbirding_observations) <- str_remove_all(names(crbirding_observations), pattern = "sovon_")
+```
+
+Remove time and timezone information from `bird_date_begin` and `bird_date_end`:
+
+```{r remove_time_and_tz_obs}
+crbirding_observations <-
+  crbirding_observations %>%
+  mutate(observation_date = as.Date(observation_date))
 ```
 
 The desired order of columns in `crbirding_observations`:
