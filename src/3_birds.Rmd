@@ -1813,7 +1813,6 @@ The combination of `vang` + `klweg` doesn't change anything in the mapping, as n
 1. the ringer applies always a new metal ring if missing
 2. the ringer doesn't change a metal ring if present
 
-
 So, `vang` after a `meweg` or `vang` together with `meweg` are interpreted as applying a new metal ring, therefore `sovon_bird_rings_changed` = 2. Again, this is a consequence of the fact that the change of a metal ring is not coded by any action, but only described in informative notes.
 
 Effects of this mapping:
@@ -1938,7 +1937,7 @@ crbirding_birds %>%
   filter(sovon_bird_rings_changed == 2) %>%
   filter(n == 1) %>%
   select(-n) %>%
-  head(n = 50)
+  head(n = 100)
 ```
 
 Birds ringed in two different moments:
@@ -1950,7 +1949,7 @@ crbirding_birds %>%
   ungroup() %>%
   filter(n == 2) %>%
   select(-n) %>%
-  head(n = 50)
+  head(n = 100)
 ```
 
 Birds ringed at three different moments:
@@ -1962,7 +1961,7 @@ crbirding_birds %>%
   ungroup() %>%
   filter(n == 3) %>%
   select(-n) %>%
-  head(n = 50)
+  head(n = 100)
 ```
 
 Birds ringed at four different moments:
@@ -1973,12 +1972,12 @@ crbirding_birds %>%
   add_tally() %>%
   filter(n == 4) %>%
   select(-n) %>%
-  head(n = 50)
+  head(n = 100)
 ```
 
 ### Map color of rings and inscriptions
 
-The color of the ring and the color of the inscription should be added, if available, to `bird_shorthand`. It's important to highlight the fact that we have this information only for the most recent color ring of each bird. Following combinations are present:
+The color of the ring should be added, if available, to `bird_shorthand`. It's important to highlight the fact that we have this information only for the most recent color ring of each bird. Following combinations are present, although the color of the inscription `InscriptieKleurCode` will be not mapped:
 
 ```{r color_combinations_inbo_db}
 birds %>%
@@ -1991,7 +1990,7 @@ We first map the colors based on the official cr-birding values ( [cr-birding.or
 ```{r map_colors}
 color_table <-
   color_table %>%
-  mutate(crbirding_colors = case_when(
+  mutate(crbirding_color = case_when(
     Code == "X" ~ "P",
     Code == "Z" ~ "N",
     TRUE ~ Code
@@ -2005,70 +2004,60 @@ We map the colors in `birds`:
 birds <-
   birds %>%
   left_join(color_table %>%
-    select(Code, crbirding_colors),
+    select(Code, crbirding_color),
   by = c("RingKleurCode" = "Code")
   ) %>%
-  rename(ring_color = crbirding_colors) %>%
-  left_join(color_table %>%
-    select(Code, crbirding_colors),
-  by = c("InscriptieKleurCode" = "Code")
-  ) %>%
-  rename(inscription_color = crbirding_colors)
+  rename(ring_color = crbirding_color)
 ```
 
 Effects of the mapping:
 
 ```{r result_mapping_colors_birds}
 birds %>%
-  distinct(ring_color, RingKleurCode, inscription_color, InscriptieKleurCode)
+  distinct(ring_color, RingKleurCode)
 ```
 
 The `bird_shorthand` should be composed of:
 1. color of the ring
-2. color of the inscription
 3. inscription
 
-For example: BW(BBAP) is a color ring, with inscription text BBAP, with dark blue ring and white inscription. We add colors to `bird_shorthand`
+For example, B-BBAP is a dark blue ring (see [issue #67](https://github.com/inbo/cr-birding/issues/67#issuecomment-643954772)).
+
+We add ring color to `bird_shorthand`:
 
 ```{r add_colors_bird_shorthand}
 crbirding_birds <-
   crbirding_birds %>%
   left_join(birds %>%
-    unite(color_combination, c(
-      ring_color,
-      inscription_color
-    ),
-    sep = ""
-    ) %>%
-    select(sovon_bird_reference, color_combination),
-  by = "sovon_bird_reference"
-  ) %>%
+              select(sovon_bird_reference, ring_color),
+            by = "sovon_bird_reference") %>%
   group_by(sovon_bird_reference) %>%
-  mutate(color_combination = if_else(
-    sovon_bird_date_begin == max(sovon_bird_date_begin) &
-      color_combination != "NANA",
-    color_combination,
+  filter(!is.na(sovon_bird_shorthand)) %>%
+  mutate(ring_color = if_else(
+    sovon_bird_date_begin == max(sovon_bird_date_begin),
+    ring_color,
     NA_character_
   )) %>%
+  bind_rows(crbirding_birds %>%
+              filter(is.na(sovon_bird_shorthand))) %>%
+  arrange(sovon_bird_reference, sovon_bird_date_begin) %>%
   mutate(
     sovon_bird_shorthand_color = case_when(
       !is.na(sovon_bird_shorthand) &
-        !is.na(color_combination) ~ paste0(
-        color_combination,
-        "(",
-        sovon_bird_shorthand,
-        ")"
-      ),
+        !is.na(ring_color) ~ paste0(
+          ring_color,
+          "-",
+          sovon_bird_shorthand
+        ),
       TRUE ~ sovon_bird_shorthand
     ),
     sovon_bird_shorthand_pt_color = case_when(
       !is.na(sovon_bird_shorthand_pt) &
-        !is.na(color_combination) ~ paste0(
-        color_combination,
-        "(",
-        sovon_bird_shorthand_pt,
-        ")"
-      ),
+        !is.na(ring_color) ~ paste0(
+          ring_color,
+          "-",
+          sovon_bird_shorthand_pt
+        ),
       TRUE ~ sovon_bird_shorthand_pt
     )
   ) %>%
@@ -2085,11 +2074,11 @@ crbirding_birds %>%
   filter(n > 2) %>%
   select(
     sovon_bird_reference,
-    color_combination,
-    sovon_bird_shorthand,
+    ring_color,
     sovon_bird_shorthand_color,
-    sovon_bird_shorthand_pt,
     sovon_bird_shorthand_pt_color,
+    sovon_bird_shorthand,
+    sovon_bird_shorthand_pt,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
@@ -2104,7 +2093,7 @@ Rings still not mapped satisfying this condition:
 old_rings_with_A <-
   crbirding_birds %>%
   filter(
-    !str_detect(sovon_bird_shorthand_color, "\\(") &
+    !str_detect(sovon_bird_shorthand_color, "\\-") &
       str_detect(sovon_bird_shorthand, "[A-Z]") &
       str_length(sovon_bird_shorthand) == 4 &
       str_sub(sovon_bird_shorthand, 3, 3) == "A"
@@ -2118,20 +2107,17 @@ Assign colors:
 old_rings_with_A <-
   old_rings_with_A %>%
   mutate(
-    sovon_bird_shorthand_color = paste0("BW(", sovon_bird_shorthand_color, ")"),
-    sovon_bird_shorthand_pt_color = paste0(
-      "BW(",
-      sovon_bird_shorthand_pt_color,
-      ")"
-    )
-  ) %>%
+    sovon_bird_shorthand_color = paste0("B-",
+                                        sovon_bird_shorthand_color),
+    sovon_bird_shorthand_pt_color = paste0("B-",
+                                           sovon_bird_shorthand_pt_color)) %>%
   select(
     sovon_bird_reference,
-    color_combination,
-    sovon_bird_shorthand,
+    ring_color,
     sovon_bird_shorthand_color,
-    sovon_bird_shorthand_pt,
     sovon_bird_shorthand_pt_color,
+    sovon_bird_shorthand,
+    sovon_bird_shorthand_pt,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
@@ -2150,7 +2136,7 @@ crbirding_birds <-
       "sovon_bird_date_begin",
       "sovon_bird_date_end"
     )
-  ) %>%
+  ) %>% 
   bind_rows(old_rings_with_A) %>%
   select(names(crbirding_birds)) %>%
   arrange(sovon_bird_reference, sovon_bird_date_begin)
@@ -2166,11 +2152,11 @@ crbirding_birds %>%
   filter(n > 2) %>%
   select(
     sovon_bird_reference,
-    color_combination,
-    sovon_bird_shorthand,
+    ring_color,
     sovon_bird_shorthand_color,
-    sovon_bird_shorthand_pt,
     sovon_bird_shorthand_pt_color,
+    sovon_bird_shorthand,
+    sovon_bird_shorthand_pt,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
@@ -2182,8 +2168,19 @@ Rings still without color:
 ```{r old_rings_without_color}
 rings_color_still_unknown <-
   crbirding_birds %>%
-  filter(!str_detect(sovon_bird_shorthand_color, "\\)"))
-rings_color_still_unknown
+  filter(!str_detect(sovon_bird_shorthand_color, "\\-"))
+rings_color_still_unknown %>%
+  select(
+    sovon_bird_reference,
+    ring_color,
+    sovon_bird_shorthand_color,
+    sovon_bird_shorthand_pt_color,
+    sovon_bird_shorthand,
+    sovon_bird_shorthand_pt,
+    sovon_bird_date_begin,
+    sovon_bird_date_end,
+    everything()
+  )
 ```
 
 Some ring inscriptions contain a `B` at third position:
@@ -2213,7 +2210,7 @@ rings_color_still_unknown_with_B_third_pos <-
       "sovon_bird_reference", "sovon_bird_shorthand",
       "sovon_bird_shorthand_pt", "sovon_bird_date_begin",
       "sovon_bird_date_end", "sovon_bird_notes",
-      "color_combination", "sovon_bird_shorthand_color",
+      "ring_color", "sovon_bird_shorthand_color",
       "sovon_bird_shorthand_pt_color",
       "sovon_bird_rings_changed",
       "metal_ring_missing"
@@ -2233,7 +2230,7 @@ crbirding_birds <-
   arrange(sovon_bird_reference, sovon_bird_date_begin)
 ```
 
-We assign them color blue as ring color, color white as inscription color and add note `virtual_ring.` to `sovon_bird_notes` as decided [here](https://github.com/inbo/cr-birding/issues/81#issuecomment-479365880):
+We assign them color blue as ring color and add note `virtual_ring.` to `sovon_bird_notes` as decided in [#81](https://github.com/inbo/cr-birding/issues/81#issuecomment-479365880):
 
 ```{r solve_virtual_rings}
 crbirding_birds <-
@@ -2249,12 +2246,12 @@ crbirding_birds <-
     ),
     sovon_bird_shorthand_color = if_else(
       sovon_bird_shorthand %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_shorthand,
-      paste0("BW(", sovon_bird_shorthand_color, ")"),
+      paste0("B-", sovon_bird_shorthand_color),
       sovon_bird_shorthand_color
     ),
     sovon_bird_shorthand_pt_color = if_else(
       sovon_bird_shorthand %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_shorthand,
-      paste0("BW(", sovon_bird_shorthand_pt_color, ")"),
+      paste0("B-", sovon_bird_shorthand_pt_color),
       sovon_bird_shorthand_pt_color
     )
   )
@@ -2268,10 +2265,11 @@ crbirding_birds %>%
     rings_color_still_unknown_with_B_third_pos$sovon_bird_reference) %>%
   select(
     sovon_bird_reference,
-    sovon_bird_shorthand,
     sovon_bird_shorthand_color,
     sovon_bird_shorthand_pt_color,
     sovon_bird_notes,
+    sovon_bird_shorthand,
+    sovon_bird_shorthand_pt,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
@@ -2283,11 +2281,11 @@ The replaced rings left are foreign rings.
 ```{r show_foreign_rings}
 rings_color_still_unknown_foreign <-
   crbirding_birds %>%
-  filter(!str_detect(sovon_bird_shorthand_pt_color, "\\("))
+  filter(!str_detect(sovon_bird_shorthand_pt_color, "\\-"))
 rings_color_still_unknown_foreign
 ```
 
-We assign fictive color to them to ease the submission to cr-birding database. We assign them blue as ring color and white as incription colors (see [issue 84](https://github.com/inbo/cr-birding/issues/84#issuecomment-479443389)):
+We assign fictive color to them to ease the submission to cr-birding database. We assign them blue as ring color (see [issue #84](https://github.com/inbo/cr-birding/issues/84#issuecomment-479443389)):
 
 ```{r solve_foreign_rings}
 rings_color_still_unknown_foreign <-
@@ -2301,14 +2299,12 @@ rings_color_still_unknown_foreign <-
       )
     ),
     sovon_bird_shorthand_color = paste0(
-      "BW(",
-      sovon_bird_shorthand_color,
-      ")"
+      "B-",
+      sovon_bird_shorthand_color
     ),
     sovon_bird_shorthand_pt_color = paste0(
-      "BW(",
-      sovon_bird_shorthand_pt_color,
-      ")"
+      "B-",
+      sovon_bird_shorthand_pt_color
     )
   )
 
@@ -2353,12 +2349,11 @@ Did we assigned a color to all rings?
 ```{r check_presence_colors_in_bird_shorthand}
 crbirding_birds %>%
   filter(is.na(sovon_bird_shorthand_color) |
-    (str_sub(sovon_bird_shorthand_color, 3, 3) == "(" &
-      str_sub(sovon_bird_shorthand_pt_color, 3, 3) == "(")) %>%
+           str_detect(sovon_bird_shorthand_pt_color, "\\-")) %>%
   nrow() == nrow(crbirding_birds)
 ```
 
-We will overwrite the columns `sovon_bird_shorthand` and `sovon_bird_shorthand_pt` and remove the help columns  `sovon_bird_shorthand_color`, `sovon_bird_shorthand_pt_color` and `color_combination` at the end of the processing.
+We will overwrite the columns `sovon_bird_shorthand` and `sovon_bird_shorthand_pt` and remove the help columns  `sovon_bird_shorthand_color`, `sovon_bird_shorthand_pt_color` and `ring_color` at the end of the processing.
 
 ### Position of the color ring and inscription orientation
 
@@ -2370,7 +2365,7 @@ In case of birds with one color ring only, SOVON doesn't save these fields. Howe
 
 > it can help a lot when identifying mistakes in reading. 
 
-For more details, see issue [here](https://github.com/inbo/cr-birding/issues/61#issuecomment-472862064).
+For more details, see [issue #61](https://github.com/inbo/cr-birding/issues/61#issuecomment-472862064).
 
 As for colors, this informations are only available for the very last ring of each bird. 
 
@@ -2556,7 +2551,7 @@ crbirding_birds <-
   select(-MetaalringNummer)
 ```
 
-Notice that in these cases the ring number is unknown although we are sure it exists. We left `sovon_bird_ring_number` empty as suggested by SOVON experts (see [comment on issue 100](https://github.com/inbo/cr-birding/issues/100#issuecomment-481217404)) without modifying the value of `bird_rings_changed`.
+Notice that in these cases the ring number is unknown although we are sure it exists. We left `sovon_bird_ring_number` empty as suggested by SOVON experts (see [comment on issue #100](https://github.com/inbo/cr-birding/issues/100#issuecomment-481217404)) without modifying the value of `bird_rings_changed`.
 
 This is how `sovon_bird_notes` has been updated, limited to birds where changes could happen:
 
@@ -2795,7 +2790,7 @@ crbirding_birds %>%
   filter(n_rings == 1)
 ```
 
-We rename  `sovon_bird_age_obs` to `sovon_bird_age_ringing` in `crbirding_birds`:
+We rename `sovon_bird_age_obs` to `sovon_bird_age_ringing` in `crbirding_birds`:
 
 ```{r rename_sovon_bird_age_obs}
 crbirding_birds <-
