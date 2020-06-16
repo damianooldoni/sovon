@@ -3046,6 +3046,15 @@ names(crbirding_birds) <- str_remove_all(names(crbirding_birds),
 names(crbirding_birds)
 ```
 
+Remove time and timezone information from `bird_date_begin` and `bird_date_end`:
+
+```{r remove_time_and_tz}
+crbirding_birds <-
+  crbirding_birds %>%
+  mutate(bird_date_begin = as.Date(bird_date_begin),
+         bird_date_end = as.Date(bird_date_end))
+```
+
 The desired order of columns in `crbirding_birds`:
 
 ```{r cols_order_birds}
