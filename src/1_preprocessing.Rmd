@@ -339,7 +339,8 @@ obs_actions <-
 The following combinations occurr:
 
 ```{r distinct_combinations_actions}
-combinations_actions <- obs_actions %>%
+combinations_actions <- 
+  obs_actions %>%
   select(-WaarnemingNummer) %>%
   distinct()
 combinations_actions
