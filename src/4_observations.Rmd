@@ -489,110 +489,72 @@ obs_and_acts <-
   ))
 ```
 
-### Condition
+### Observation condition
 
-The SOVON field `condition` is mapped following the scheme at page 22 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. The following actions are mapped as follows in order of priority:
+The SOVON field `observation_condition` is NOT mapped following the [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. SOVON experts provided us the following list of conditions (see [#126](https://github.com/inbo/cr-birding/issues/126)):
 
-1. `dood`: condition = 1
-2. `ziek`: condition = 4
-3. `rngkl`, `rngme`, `vang`, `vangl`: condition = 8
-4. `veld`, `me`, `meweg`, `klweg`, `br`: condition = 7
+- `1`: healthy
+- `2`: sick/wounded
+- `3`: dead (less than week)
+- `4`: dead (more than week)
+- `5`: dead (unknown if freshly dead)
+- `6`: released after revalidation
+
+So, we do an initial mapping of following actions as follows (in order of priority):
+
+1. `dood`, `klgev`, `megev`: `observation_condition` = `5` 
+2. `ziek` (or observations of bird shelter workers): `observation_condition` = `2`
+3. `rngkl`, `rngme`, `vang`, `vangl`, `veld`, `me`, `meweg`, `klweg`, `br`: `observation_condition` = `1`
 
 ```{r obs_condition}
 obs_and_acts <-
   obs_and_acts %>%
-  mutate(sovon_condition = case_when(
-    dood == "dood" ~ 1,
-    klgev == "klgev" ~ 1,
-    ziek == "ziek" ~ 4,
-    !is.na(rngkl) | !is.na(rngme) | !is.na(vang) | !is.na(vangl) ~ 8,
-    !is.na(veld) | !is.na(me) | !is.na(meweg) | !is.na(klweg) | !is.na(br) ~ 7
+  mutate(sovon_observation_condition = case_when(
+    dood == "dood" ~ 5,
+    klgev == "klgev" ~ 5,
+    ziek == "ziek" | 
+      sovon_user_reference %in% workers_bird_shelters$user_reference ~ 2,
+    !is.na(rngkl) | !is.na(rngme) | !is.na(vang) | !is.na(vangl) |
+    !is.na(veld) | !is.na(me) | !is.na(meweg) | !is.na(klweg) | !is.na(br) ~ 1
   ))
 ```
 
-The observations of sick birds not anymore released should get condition equal to 5. These observations are linked to the very last `ziek` action and followed by an observation with action `dood`. Not only, the observer should be a worker of a bird shelter, in `workers_bird_shelters`.
+Releasing after revalidation can be detected by the notes in field `Opmerking` for the observations of bird shelter workers. This is due to the fact that some of these observations are linked to ringing actions, other are linked to `veld` actions thus making the detection of release by actions troublesome.
 
-Reference number of observations with condition 5:
+Assign condition value `6` to the release after revalidation:
 
-```{r get_obs_cond_5}
-last_sick_df <-
-  obs_and_acts %>%
-  filter(sovon_user_reference %in% workers_bird_shelters$user_reference) %>%
-  filter(ziek == "ziek") %>%
-  group_by(sovon_bird_reference) %>%
-  filter(sovon_observation_date == max(sovon_observation_date)) %>%
-  ungroup() %>%
-  select(sovon_observation_reference, sovon_bird_reference, sovon_observation_date) %>%
-  rename(
-    last_sick_date = sovon_observation_date,
-    obs_ref = sovon_observation_reference
-  )
-dead_df <-
-  obs_and_acts %>%
-  filter(dood == "dood") %>%
-  select(sovon_bird_reference, sovon_observation_date) %>%
-  rename(dead_date = sovon_observation_date)
-
-last_sick_before_dead_df <-
-  last_sick_df %>%
-  filter(sovon_bird_reference %in% dead_df$sovon_bird_reference) %>%
-  left_join(dead_df, by = "sovon_bird_reference")
-
-condition_5_obs_ref <-
-  obs_and_acts %>%
-  filter(sovon_bird_reference %in%
-    last_sick_before_dead_df$sovon_bird_reference) %>%
-  left_join(last_sick_before_dead_df,
-    by = "sovon_bird_reference"
-  ) %>%
-  group_by(sovon_bird_reference) %>%
-  filter(sovon_observation_date >= last_sick_date &
-    sovon_observation_date < dead_date) %>%
-  count() %>%
-  ## only one ziek action present -> no obs possible if not released
-  filter(n == 1) %>%
-  left_join(last_sick_before_dead_df,
-    by = c("sovon_bird_reference")
-  ) %>%
-  pull(obs_ref)
-```
-
-Number of observations selected to get condition code 5:
-
-```{r n_obs_condition_5}
-length(condition_5_obs_ref)
-```
-
-Assign condition value `5` to these observations:
-
-```{r assign_5}
+```{r assign_6_release_after_revalidation}
 obs_and_acts <-
   obs_and_acts %>%
-  mutate(
-    sovon_condition =
-      if_else(
-        sovon_observation_reference %in% condition_5_obs_ref,
-        5,
-        sovon_condition
-      )
-  )
+  mutate(sovon_observation_condition = if_else(
+    # observation of a bird shelter worker
+    sovon_user_reference %in% workers_bird_shelters$user_reference & 
+      # bird is not dead
+      is.na(dood) & 
+      # no empty note
+      !is.na(Opmerking) & 
+      #  note mentions the release in Dutch
+      str_detect(Opmerking, pattern = "gelost|vrijlating") & 
+      # note does not mention the unrelease
+      !str_detect(Opmerking, pattern = "niet gelost"),
+    6, sovon_observation_condition
+  ))
 ```
 
-Observations with `sovon_condition`= 5:
+Overview of notes and actions of observations with `sovon_observation_condition` = 6 (released after revalidation):
 
-```{r show_condition_5}
+```{r show_obs_condition_6}
 obs_and_acts %>%
-  filter(sovon_condition == 5) %>%
+  filter(sovon_observation_condition == 6) %>%
   select(
-    sovon_observation_reference,
-    sovon_bird_reference,
-    sovon_observation_date,
-    sovon_condition,
+    Opmerking,
     acts
-  )
+  ) %>%
+  select_if(function(x) any(!is.na(x))) %>%
+  distinct()
 ```
 
-Mapping of `sovon_condition`: 
+Preview of mapping of `sovon_observation_condition`: 
 
 ```{r preview}
 obs_and_acts %>%
@@ -600,7 +562,7 @@ obs_and_acts %>%
     sovon_observation_reference,
     sovon_bird_reference,
     sovon_observation_date,
-    sovon_condition,
+    sovon_observation_condition,
     acts
   ) %>%
   head(n = 100)
@@ -900,7 +862,7 @@ cr_obs_cols <- c(
   "observation_reference", "observation_date", "observation_time",
   "observation_lat", "observation_lng", "observation_location",
   "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
-  "melder_email", "melder_ringersnummer", "ring_number", "condition", "status_full_grown_bird",
+  "melder_email", "melder_ringersnummer", "ring_number", "observation_condition", "status_full_grown_bird",
   "bird_age_obs", "bird_sex", "bird_ring_position", "bird_ring_direction"
 )
 ```
