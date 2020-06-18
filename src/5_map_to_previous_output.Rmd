@@ -25,9 +25,9 @@ crbirding_birds_2019 <- read_csv(here::here("data",
                          bird_bto = col_logical(),
                          bird_birth_year = col_logical(),
                          bird_date_begin = col_datetime(
-                           format = ""),
+                           format = "%d-%m-%Y"),
                          bird_date_end = col_datetime(
-                           format = "")),
+                           format = "%d-%m-%Y")),
                        na = "")
 crbirding_observations_2019 <- read_csv(here::here(
   "data",
@@ -42,7 +42,7 @@ crbirding_observations_2019 <- read_csv(here::here(
     observation_id = col_logical(),
     observation_reference = col_number(),
     observation_date = col_datetime(
-      format = ""),
+      format = "%d-%m-%Y"),
     observation_time = col_logical(),
     check_bird = col_logical(),
     MRI = col_number(),
