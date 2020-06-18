@@ -200,7 +200,7 @@ crbirding_birds_mapping_bird_reference <-
 head(crbirding_birds_mapping_bird_reference, n = 100)
 ```
 
-We add  `bird_reference_2019` to  `crbirding_birds`:
+We add `bird_reference_2019` to `crbirding_birds`:
 
 ```{r add_bird_ref_2019}
 crbirding_birds <- 
@@ -598,18 +598,26 @@ crbirding_observations_2019 %>%
 
 ### Changed condition
 
-Details of observations with changes in condition (column `condition`):
+First we rename column `conditionn` of  `crbirding_observation_2019` to new column name `observation_condition`:
+
+```{r rename_condition}
+crbirding_observations_2019 <-
+  crbirding_observations_2019 %>%
+  rename(observation_condition = condition)
+```
+
+Details of observations with changes in condition:
 
 ```{r obs_with_changes_condition}
 crbirding_observations_2019 %>%
   filter(observation_reference %in% same_ref_ids) %>%
   anti_join(crbirding_observations,
             by = c("observation_reference",
-                   "condition")) %>%
+                   "observation_condition")) %>%
   select(observation_reference, condition) %>%
-  rename(condition_2019 = condition) %>%
+  rename(observation_condition_2019 = observation_condition) %>%
   left_join(crbirding_observations %>%
-              select(observation_reference, condition),
+              select(observation_reference, observation_condition),
             by = "observation_reference")
 ```
 
