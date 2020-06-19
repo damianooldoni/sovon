@@ -838,7 +838,7 @@ birds <-
   filter(!Nummer %in% c("BGAH", "BRAB", "EAU"))
 ```
 
-Observations related to these two rings:
+Observations related to these three rings:
 
 ```{r show_obs_BGAH_BRAB}
 obs_and_acts %>%
@@ -855,7 +855,7 @@ obs_and_acts <-
 
 ## Check date of `dood`
 
-Observations with action `dood` should be the very last for each observation sequence containing this action:
+Observations with action `dood` should be the very last for each observation sequence containing this action. Exceptions:
 
 ```{r obs_after_death}
 obs_after_death <-
@@ -870,7 +870,7 @@ obs_after_death <-
 obs_after_death
 ```
 
-Observation after `dood` are removed:
+If present, observations after `dood` are removed:
 
 ```{r remove_obs_after_death}
 obs_and_acts <-
