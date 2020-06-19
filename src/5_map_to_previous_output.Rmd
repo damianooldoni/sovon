@@ -446,12 +446,12 @@ nrow(crbirding_observations %>%
          distinct(bird_reference))
 ```
 
-Now we can safely copy the values of `new_bird_reference` to `bird_reference` and remove the help column and `bird_reference_2019:
+Now we can safely copy the values of `new_bird_reference` to `bird_reference` and remove the help columns `bird_reference_2019` and `inscription`:
 
 ```{r set_bird_ref_again}
 crbirding_birds <- 
   crbirding_birds %>%
-  select(-c(bird_reference, bird_reference_2019)) %>%
+  select(-c(bird_reference, bird_reference_2019, inscription)) %>%
   rename(bird_reference = new_bird_reference) %>%
   # reorder columns 
   select(bird_id, bird_reference, everything())
@@ -466,6 +466,10 @@ crbirding_observations <-
          bird_id,
          bird_reference,
          everything())
+
+crbirding_birds_2019 <- 
+  crbirding_birds_2019 %>%
+  select(-c(inscription))
 ```
 
 ### Changed  `bird_euring` 
