@@ -100,6 +100,31 @@ crbirding_observations <- read_csv(here::here(
   na = "")
 ```
 
+To improve the comparison of bird data, we read also raw observations:
+
+```{r import_obs_and_acts}
+obs_and_acts <- read_tsv(
+  here::here("data", "interim", "obs_and_actions.tsv"),
+  col_types = cols(
+    .default = col_character(),
+    sovon_bird_reference = col_double(),
+    Nummer = col_double(),
+    Datum = col_datetime(format = ""),
+    WaarnemerNummer = col_double(),
+    PlaatsLengtegraadGraden = col_double(),
+    PlaatsLengtegraadMinuten = col_double(),
+    PlaatsLengtegraadSeconden = col_double(),
+    PlaatsBreedtegraadGraden = col_double(),
+    PlaatsBreedtegraadMinuten = col_double(),
+    PlaatsBreedtegraadSeconden = col_double(),
+    BevestigingDatum = col_datetime(format = ""),
+    AanmaakDatum = col_datetime(format = ""),
+    WijzigDatum = col_datetime(format = "")
+  )
+)
+```
+
+
 ## Users
 
 Number of new users based on new `user_reference` (email and other private info not shown):
@@ -134,29 +159,104 @@ crbirding_users_2019 %>%
 
 ## Map birds
 
+Before mapping birds, we have to modify the color rings in ` crbirding_birds_2019` by applying the syntax discussed in [#107](https://github.com/inbo/cr-birding/issues/107) and [#67](https://github.com/inbo/cr-birding/issues/67). SOVON asks to follow this syntax: ring color + hyphen (`-`) + inscription without inscription color, e.g. `W-EAAM` instead of `WN(EAAM)`.
+
+First, check that all color rings from 2019 have two letters before bracket `(`:
+
+```{r check_format_2019}
+crbirding_birds_2019 %>%
+  filter(is.na(bird_shorthand) | 
+           str_sub(bird_shorthand, start = 3, end = 3) == "(") %>%
+  nrow == nrow(crbirding_birds_2019)
+```
+
+We proceed then to modify the color rings:
+
+```{r modify_color_rings_2019}
+crbirding_birds_2019 <-
+  crbirding_birds_2019 %>%
+  mutate(bird_shorthand = if_else(
+    !is.na(bird_shorthand),
+    str_c(str_sub(bird_shorthand, start = 1, end = 1),
+          "-",
+          str_extract(bird_shorthand, pattern = "(?<=\\()(.*?)(?=\\))")),
+    bird_shorthand
+))
+```
+
+Preview:
+
+```{r preview_color_rings_2019_new_syntax}
+crbirding_birds_2019 %>%
+  select(bird_shorthand) %>%
+  filter(!is.na(bird_shorthand)) %>%
+  head(n = 100)
+```
+
+Now we can proceed mapping birds data.
+
 ### Map `bird_reference`
 
 In INBO ring table, birds were uniquely identified by their very first ring (data were spread and untidy). We added a `bird_reference` field to gather information about multiple rings and link them to the same bird. This means that this field cannot be used to compare the actual INBO data with the data of 2019. We have to compare data by the very first color ring.
 
+As the dot for readibility is only preserved for the very last ring, it can be better to compare data by removing it from bird shorthand. We create an auxiliary column called `inscription` for both `crbirding_birds` and  `crbirding_birds_2019`:
+
+```{r add_inscription}
+crbirding_birds_2019 <- 
+  crbirding_birds_2019 %>%
+  mutate(inscription = if_else(!is.na(bird_shorthand),
+                               str_extract(
+                                str_remove(bird_shorthand, "\\."),
+                                "(?<=\\-)[A-Z0-9]*"),
+                              NA_character_))
+crbirding_birds <- 
+  crbirding_birds %>%
+  mutate(inscription = if_else(!is.na(bird_shorthand),
+                               str_extract(
+                                str_remove(bird_shorthand, "\\."),
+                                "(?<=\\-)[A-Z0-9]*"),
+                              NA_character_))
+```
+
+We add the first color ring inscription as additional column, `first_color_ring`:
+
 ```{r first_color_ring}
 crbirding_birds_first_color_ring <-
   crbirding_birds %>% 
-  select(bird_reference, bird_shorthand, bird_date_begin) %>%
+  select(bird_reference, inscription, bird_date_begin) %>%
   group_by(bird_reference) %>%
-  filter(!is.na(bird_shorthand)) %>%
-  mutate(first_color_ring = if_else(bird_date_begin == min(bird_date_begin,
-                                                     na.rm = TRUE),
-                              bird_shorthand,
-                              NA_character_)) %>%
+  filter(!is.na(inscription)) %>%
+  mutate(first_color_ring = if_else(
+    bird_date_begin == min(bird_date_begin,na.rm = TRUE),
+    inscription,
+    NA_character_)) %>%
   ungroup() %>%
   filter(!is.na(first_color_ring)) %>%
   distinct(bird_reference, first_color_ring) %>%
   right_join(crbirding_birds, by = c("bird_reference"))
 ```
 
-All birds should get a valid  `first_color_ring` column. Exceptions:
+All birds should get a valid `first_color_ring` column. Exceptions:
 
 ```{r birds_without_first_color_ring}
+crbirding_birds_first_color_ring %>%
+  filter(is.na(first_color_ring))
+```
+
+A patch, first, while waiting to solve issue [#129](https://github.com/inbo/cr-birding/issues/129):
+
+```{r patch_solve_issue_129}
+crbirding_birds_first_color_ring <-
+  crbirding_birds_first_color_ring %>% 
+  mutate(first_color_ring = if_else(is.na(first_color_ring) & 
+                                      bird_reference == 5102,
+                                    "RZAG",
+                                    first_color_ring))
+```
+
+Check exceptions again:
+
+```{r birds_without_first_color_ring2}
 crbirding_birds_first_color_ring %>%
   filter(is.na(first_color_ring))
 ```
@@ -166,20 +266,20 @@ We do the same with ring data from 2019:
 ```{r first_color_ring_2019}
 crbirding_birds_first_color_ring_2019 <-
   crbirding_birds_2019 %>% 
-  select(bird_reference, bird_shorthand, bird_date_begin) %>%
+  select(bird_reference, inscription, bird_date_begin) %>%
   group_by(bird_reference) %>%
-  filter(!is.na(bird_shorthand)) %>%
-  mutate(first_color_ring = if_else(bird_date_begin == min(bird_date_begin,
-                                                           na.rm = TRUE),
-                                    bird_shorthand,
-                                    NA_character_)) %>%
+  filter(!is.na(inscription)) %>%
+  mutate(first_color_ring = if_else(
+    bird_date_begin == min(bird_date_begin,na.rm = TRUE),
+    inscription,
+    NA_character_)) %>%
   ungroup() %>%
   filter(!is.na(first_color_ring)) %>%
   distinct(bird_reference, first_color_ring) %>%
   right_join(crbirding_birds_2019, by = c("bird_reference"))
 ```
 
-Even in this case all birds should get a valid  `first_color_ring` column. Exceptions:
+Even in this case all birds should get a valid `first_color_ring` column. Exceptions:
 
 ```{r birds_without_first_color_ring_2019}
 crbirding_birds_first_color_ring_2019 %>%
@@ -229,7 +329,7 @@ crbirding_birds %>%
   filter(!is.na(bird_reference_2019)) %>%
   filter(bird_reference != bird_reference_2019) %>%
   filter(bird_reference == min(bird_reference)) %>%
-  select(bird_reference, bird_reference_2019)
+  select(bird_reference, bird_reference_2019, bird_shorthand)
 ```
 
 ### New `bird_reference`
@@ -239,28 +339,149 @@ Some birds where not present in data transfer of April 2019, so the `bird_refere
 This case includes:
 
 1. New birds: birds ringed for the very first time after the previous data transfer in April 2019.
-2. brids with modified first color ring: birds whose very first color ring has been corrected. This case is due to the fact that the first color ring is the real unique identifier in INBO ring table `tblKleurring`
+2. Birds with modified first color ring: birds whose very first color ring has been corrected. This case is due to the fact that the first color ring is the real unique identifier in INBO ring table `tblKleurring`
 
 ```{r new_birds_or_modified_first_ring}
 crbirding_birds %>%
-  # filter(!is.na(bird_reference_2019)) %>%
   anti_join(crbirding_birds_2019,
             by = c("bird_reference_2019" = "bird_reference"))
+```
+
+Based on column `bird_date_begin` (see above) we can see that most but not all rings have been placed after 2019-04-10, date of previous export. It can also occurr that there are old rings which have been added to database after that date, so they are actually _new_ rings, database speaking. So, to check which rings have been entered before 2019-04-10 we use column `AanmaakDatum` in raw osbervation data:
+
+```{r supected_new_birds_before_export_date}
+supected_new_birds_before_export_date <- 
+  crbirding_birds %>%
+  filter(is.na(bird_reference_2019)) %>%
+  left_join(crbirding_birds_first_color_ring %>%
+              distinct(bird_reference, first_color_ring),
+            by = "bird_reference") %>%
+  select(bird_reference, first_color_ring) %>%
+  left_join(obs_and_acts,
+            by = c("first_color_ring" = "KleurringNummer")) %>%
+  select(bird_reference, first_color_ring, AanmaakDatum) %>%
+  group_by(bird_reference, first_color_ring) %>%
+  filter(AanmaakDatum == min(AanmaakDatum)) %>%
+  ungroup() %>%
+  filter(AanmaakDatum < as_datetime("2019-04-10")) %>%
+  left_join(crbirding_birds,
+            by = c("bird_reference"))
+supected_new_birds_before_export_date
+```
+
+To better retrieve potential matches to birds from 2019's export, we check birds from 2019 not anymore included in actual data:
+
+```{r birds_2019_not_in_new_export}
+crbirding_birds_first_color_ring_2019 %>%
+  anti_join(crbirding_birds_first_color_ring,
+            by = "first_color_ring")
+```
+
+Based on metal ring (`bird_ring_number`) information, date of ringing (`bird_date_begin`) and other fields we can see that the ring FMOV is the same as ring FMOU from 2019 export:
+
+```{r check_FMOV-FMOU}
+all(
+  crbirding_birds_2019 %>%
+    filter(bird_shorthand == "B-FM.OU") %>%
+    select(bird_date_begin, bird_ring_number, bird_age_ringing, bird_ring_position) %>%
+    pull() ==
+    (crbirding_birds %>%
+       filter(bird_shorthand == "B-FM.OV") %>%
+       select(bird_date_begin, bird_ring_number, bird_age_ringing, bird_ring_position) %>%
+       pull()))
+```
+
+So, we can assign `bird_reference_2019` to this ring:
+
+```{r assign_bird_ref_2019_to_FMOV}
+crbirding_birds <-
+  crbirding_birds %>%
+  mutate(bird_reference_2019 = if_else(!is.na(bird_shorthand) &
+                                         bird_shorthand == "B-FM.OV",
+                                       crbirding_birds_2019 %>%
+                                         filter(bird_shorthand == "B-FM.OU") %>%
+                                         pull(bird_reference),
+                                       bird_reference_2019))
+```
+
+### Use `bird_reference` from 2019 as primary key
+
+To ease the work of SOVON Iters we reuse the old bird references (`bird_reference_2019`) as primary key in `crbirding_birds` where present, being careful to change the foreign key in `crbirding_observations` as well.
+
+We do it by using a helping column, `new_bird_reference` filled with old bird references where possible and with the new ones plus 20000 to ensure unicity:
+
+```{r add_new_bird_reference}
+crbirding_birds <-
+  crbirding_birds %>%
+  mutate(new_bird_reference = if_else(!is.na(bird_reference_2019),
+                                      bird_reference_2019,
+                                      bird_reference + 20000))
+```
+
+Is `new_bird_reference` unique?
+
+```{r unicity_new_bird_reference}
+nrow(crbirding_birds %>%
+  distinct(bird_reference, new_bird_reference)) == 
+  nrow(crbirding_birds %>%
+         distinct(bird_reference))
+```
+
+We can now add the `new_bird_reference` to observations as well:
+
+```{r add_new_bird_ref_to_obs}
+crbirding_observations <-
+  crbirding_observations %>%
+  left_join(crbirding_birds %>%
+              distinct(bird_reference, new_bird_reference),
+            by = "bird_reference")
+```
+
+Again, double checking the unicity of `new_bird_reference`:
+
+```{r check_unicity_fk_obs}
+nrow(crbirding_observations %>%
+  distinct(bird_reference, new_bird_reference)) == 
+  nrow(crbirding_observations %>%
+         distinct(bird_reference))
+```
+
+Now we can safely copy the values of `new_bird_reference` to `bird_reference` and remove the help column and `bird_reference_2019:
+
+```{r set_bird_ref_again}
+crbirding_birds <- 
+  crbirding_birds %>%
+  select(-c(bird_reference, bird_reference_2019)) %>%
+  rename(bird_reference = new_bird_reference) %>%
+  # reorder columns 
+  select(bird_id, bird_reference, everything())
+
+crbirding_observations <- 
+  crbirding_observations %>%
+  select(-bird_reference) %>%
+  rename(bird_reference = new_bird_reference) %>%
+  # reorder columns 
+  select(user_id,
+         user_reference,
+         bird_id,
+         bird_reference,
+         everything())
 ```
 
 ### Changed  `bird_euring` 
 
 ```{r changed_bird_euring}
 crbirding_birds %>%
-  filter(!is.na(bird_reference_2019)) %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   anti_join(crbirding_birds_2019,
-            by = c("bird_reference_2019" = "bird_reference",
+            by = c("bird_reference",
                    "bird_euring")) %>%
-  select(bird_reference, bird_reference_2019, bird_euring) %>%
+  select(bird_reference, bird_euring) %>%
   left_join(crbirding_birds_2019 %>%
               rename(bird_euring_2019 = bird_euring) %>%
               select(bird_reference, bird_euring_2019),
-            by = (c("bird_reference_2019" = "bird_reference")))
+            by = ("bird_reference"))
 ```
 
 ### Changed  `bird_shorthand` 
@@ -270,11 +491,11 @@ Birds with changed ring history:
 ```{r changed_bird_shorthand}
 bird_ref_changed_shorthand <-
   crbirding_birds %>%
-  filter(!is.na(bird_reference_2019)) %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   anti_join(crbirding_birds_2019,
-            by = c("bird_reference_2019" = "bird_reference",
-                   "bird_shorthand")) %>%
-  distinct(bird_reference, bird_reference_2019)
+            by = c("bird_reference", "bird_shorthand")) %>%
+  distinct(bird_reference)
 bird_ref_changed_shorthand
 ```
 
@@ -284,7 +505,6 @@ bird_ref_changed_shorthand
 crbirding_birds %>%
   filter(bird_reference %in% bird_ref_changed_shorthand$bird_reference) %>%
   select(bird_reference,
-         bird_reference_2019,
          bird_shorthand,
          bird_date_begin,
          bird_date_end)
@@ -294,11 +514,12 @@ Values of `bird_shorthand` in  `crbirding_birds_2019`:
 
 ```{r bird_shorthand_in_2019}
 crbirding_birds_2019 %>%
-  filter(bird_reference %in% bird_ref_changed_shorthand$bird_reference_2019) %>%
+  filter(bird_reference %in% bird_ref_changed_shorthand$bird_reference) %>%
   select(bird_reference,
          bird_shorthand,
          bird_date_begin,
          bird_date_end) %>%
+  # add "_2019" to make sure we are speaking of 2019's export data
   rename_all(paste0, "_2019")
 ```
 
@@ -309,19 +530,19 @@ Rings with changed `bird_scheme`:
 ```{r changed_bird_scheme}
 changed_bird_scheme <- 
   crbirding_birds %>%
-  filter(!is.na(bird_reference_2019)) %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   anti_join(crbirding_birds_2019,
-            by = c("bird_reference_2019" = "bird_reference",
-                   "bird_scheme")) %>%
-  select(bird_reference, bird_reference_2019, bird_scheme, bird_date_begin, bird_date_end) %>%
+            by = c("bird_reference", "bird_scheme")) %>%
+  select(bird_reference, bird_reference,
+         bird_scheme, bird_date_begin, bird_date_end) %>%
   left_join(crbirding_birds_2019 %>%
               rename(bird_scheme_2019 = bird_scheme) %>%
               select(bird_reference,
                      bird_scheme_2019,
                      bird_date_begin,
                      bird_date_end),
-            by = (c("bird_reference_2019" = "bird_reference",
-                    "bird_date_begin", "bird_date_end"))) %>%
+            by = (c("bird_reference", "bird_date_begin", "bird_date_end"))) %>%
   filter(!is.na(bird_scheme_2019) | !is.na(bird_scheme))
 changed_bird_scheme
 ```
@@ -341,19 +562,18 @@ Rings with changed `bird_ring_number`:
 ```{r changed_bird_ring_number}
 changed_bird_ring_number <- 
   crbirding_birds %>%
-  filter(!is.na(bird_reference_2019)) %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   anti_join(crbirding_birds_2019,
-            by = c("bird_reference_2019" = "bird_reference",
-                   "bird_ring_number")) %>%
-  select(bird_reference, bird_reference_2019, bird_ring_number, bird_date_begin, bird_date_end) %>%
+            by = c("bird_reference", "bird_ring_number")) %>%
+  select(bird_reference, bird_ring_number, bird_date_begin, bird_date_end) %>%
   left_join(crbirding_birds_2019 %>%
               rename(bird_ring_number_2019 = bird_ring_number) %>%
               select(bird_reference,
                      bird_ring_number_2019,
                      bird_date_begin,
                      bird_date_end),
-            by = (c("bird_reference_2019" = "bird_reference",
-                    "bird_date_begin", "bird_date_end"))) %>%
+            by = (c("bird_reference", "bird_date_begin", "bird_date_end"))) %>%
   filter(!is.na(bird_ring_number_2019) | !is.na(bird_ring_number)) %>%
   select(contains("reference"),
          contains("number"),
@@ -368,12 +588,11 @@ Rings with changed `bird_name`:
 ```{r changed_bird_name}
 changed_bird_name <- 
   crbirding_birds %>%
-  filter(!is.na(bird_reference_2019)) %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   anti_join(crbirding_birds_2019,
-            by = c("bird_reference_2019" = "bird_reference",
-                   "bird_name")) %>%
+            by = c("bird_reference", "bird_name")) %>%
   select(bird_reference, 
-         bird_reference_2019, 
          bird_name, 
          bird_date_begin,
          bird_date_end) %>%
@@ -383,10 +602,9 @@ changed_bird_name <-
                      bird_name_2019,
                      bird_date_begin,
                      bird_date_end),
-            by = (c("bird_reference_2019" = "bird_reference",
-                    "bird_date_begin", "bird_date_end"))) %>%
+            by = (c("bird_reference", "bird_date_begin", "bird_date_end"))) %>%
   filter(!is.na(bird_name_2019) | !is.na(bird_name)) %>%
-  select(contains("reference"),
+  select(bird_reference,
          contains("name"),
          contains("date"))
 changed_bird_name
@@ -399,12 +617,11 @@ Rings with changed `bird_sex`:
 ```{r changed_bird_sex}
 changed_bird_sex <- 
   crbirding_birds %>%
-  filter(!is.na(bird_reference_2019)) %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   anti_join(crbirding_birds_2019,
-            by = c("bird_reference_2019" = "bird_reference",
-                   "bird_sex")) %>%
+            by = c("bird_reference", "bird_sex")) %>%
   select(bird_reference, 
-         bird_reference_2019, 
          bird_sex, 
          bird_date_begin,
          bird_date_end) %>%
@@ -414,8 +631,7 @@ changed_bird_sex <-
                      bird_sex_2019,
                      bird_date_begin,
                      bird_date_end),
-            by = (c("bird_reference_2019" = "bird_reference",
-                    "bird_date_begin", "bird_date_end"))) %>%
+            by = (c("bird_reference", "bird_date_begin", "bird_date_end"))) %>%
   filter(!is.na(bird_sex_2019) | !is.na(bird_sex)) %>%
   select(contains("reference"),
          contains("sex"),
@@ -430,8 +646,9 @@ Rings with changed `bird_date_begin`:
 ```{r changed_bird_date_begin}
 same_rings <- 
   crbirding_birds %>%
+  # remove new rings
+  filter(bird_reference - 20000 < 0) %>%
   select(bird_reference,
-         bird_reference_2019,
          bird_shorthand,
          bird_date_begin,
          bird_date_end) %>%
@@ -440,8 +657,7 @@ same_rings <-
                       bird_date_begin_2019 = bird_date_begin,
                       bird_shorthand,
                       bird_date_end_2019 = bird_date_end),
-             by = c("bird_reference_2019" = "bird_reference",
-                    "bird_shorthand"))
+             by = c("bird_reference", "bird_shorthand"))
 changed_bird_date_begin_end <-
   same_rings %>%
   group_by(bird_reference) %>%
@@ -450,13 +666,30 @@ changed_bird_date_begin_end <-
   filter(!is.na(bird_date_begin) &
            !is.na(bird_date_begin_2019) &
            !is.na(bird_date_end) &
-           !is.na(bird_date_end_2019))
+           !is.na(bird_date_end_2019)) %>%
+distinct(bird_reference)
 changed_bird_date_begin_end
+```
+
+Actual color ring history:
+
+```{r actual_history_changed_rings}
+changed_bird_date_begin_end %>%
+  left_join(crbirding_birds,
+            by = "bird_reference")
+```
+
+COlor ring history data from 2019:
+
+```{r history_changed_rings_from_2019}
+changed_bird_date_begin_end %>%
+  left_join(crbirding_birds_2019,
+            by = "bird_reference")
 ```
 
 ### Save crbirding_birds with added reference from 2019 export
 
-We save crbirding_birds with the added `bird_reference_2019`:
+We save crbirding_birds:
 
 ```{r save_birds_with_bird_ref_2019}
 # transform dates to characters
@@ -620,6 +853,8 @@ crbirding_observations_2019 %>%
               select(observation_reference, observation_condition),
             by = "observation_reference")
 ```
+
+A lot of changes expected as the mapping codes used for observation_condition changed.
 
 ### Changed status
 
