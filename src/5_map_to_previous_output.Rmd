@@ -95,7 +95,7 @@ crbirding_observations <- read_csv(here::here(
     check_bird = col_logical(),
     MRI = col_number(),
     melder_ringersnummer = col_logical(),
-    condition = col_number()
+    observation_condition = col_number()
   ),
   na = "")
 ```
