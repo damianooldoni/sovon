@@ -343,7 +343,7 @@ obs_and_acts <-
   mutate(
     sovon_observation_lng = case_when(
       PlaatsLengtegraadRichtingCode == "E" ~ sovon_observation_lng,
-      PlaatsLengtegraadRichtingCode == "W" & is.na(sovon_observation_lng) ~ paste0("-", sovon_observation_lng),
+      PlaatsLengtegraadRichtingCode == "W" & !is.na(sovon_observation_lng) ~ paste0("-", sovon_observation_lng),
       TRUE ~ sovon_observation_lng
     )
   )
