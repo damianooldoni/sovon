@@ -195,11 +195,6 @@ obs_missing_latitude_longitude <-
     PlaatsGemeente,
     PlaatsToponym
   )
-# obs_missing_latitude_longitude %>%
-#   write_csv("missing_latitude_longitude_info.txt",
-#     na = "",
-#     quote_escape = "double"
-#   )
 obs_missing_latitude_longitude
 ```
 
@@ -331,7 +326,7 @@ obs_and_acts %>%
   count()
 ```
 
-If present, the observations with valid `PlaatsLengtegraadRichtingCode` but without `PlaatsLengtegraadRichtingCode` should be further evaluated:
+If present, the observations with valid `PlaatsLengtegraadGraden` but without `PlaatsLengtegraadRichtingCode` should be further evaluated:
 
 ```{r obs_without_E_or_W}
 obs_and_acts %>%
