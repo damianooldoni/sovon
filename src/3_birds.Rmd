@@ -567,16 +567,37 @@ info_fhov <-
 info_fhov
 ```
 
+Based on notes (column `Opmerking` in `obs_and_acts`) we understand that the color ring BUAH has been placed while applying the metal ring, so it is linked to action `rngme`.
+
+The date of applying BUAH:
+
+```{r get_info_buah}
+info_buah <-
+  crbirding_birds %>%
+  filter(sovon_bird_shorthand == "BUAH") %>%
+  mutate(
+    sovon_bird_date_begin =
+      obs_and_acts %>%
+        filter(
+          first_Nummer == "ZBZZ",
+          !is.na(rngme)
+        ) %>%
+        pull(Datum)
+  )
+info_buah
+```
+
 Add this dates to `crbirding_birds`:
 
 ```{r add_to_crbirding_birds}
 crbirding_birds <-
   bind_rows(
     crbirding_birds %>%
-      filter(!sovon_bird_shorthand %in% c("FAAG", "YCAF", "FHOV")),
+      filter(!sovon_bird_shorthand %in% c("FAAG", "YCAF", "FHOV", "BUAH")),
     info_faag,
     info_ycaf,
-    info_fhov
+    info_fhov,
+    info_buah
   ) %>%
   arrange(sovon_bird_reference, sovon_bird_date_begin)
 ```
