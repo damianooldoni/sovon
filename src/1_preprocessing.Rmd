@@ -144,7 +144,7 @@ This file will be used later in this same document.
 
 ## Preview raw data
 
-For privcay reasons users data cannot be shown. Users data refer to the following fields:
+For privacy reasons users data cannot be shown. Users data refer to the following fields:
 
 ```{r prview_users}
 colnames(users)
@@ -336,7 +336,7 @@ obs_actions <-
   pivot_wider(names_from = AktieCode, values_from = AktieCode)
 ```
 
-The following combinations occurr:
+The following combinations occur:
 
 ```{r distinct_combinations_actions}
 combinations_actions <- 
