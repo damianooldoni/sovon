@@ -552,7 +552,7 @@ and metal ring (action code `rngme`):
 ```{r duplicates_apply_first_metal_ring}
 duplicates_ringing_rngme <-
   obs_and_acts %>%
-  filter(!is.na(rngkl)) %>%
+  filter(!is.na(rngme)) %>%
   group_by(KleurringNummer, Datum, rngme) %>%
   add_tally() %>%
   ungroup() %>%
