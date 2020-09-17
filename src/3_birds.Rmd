@@ -606,7 +606,10 @@ intermediate_rings <- tibble(
     "E099",
     "MKAU",
     "ASAH",
-    "ADAF"
+    "ADAF",
+    "KMAV",
+    "KCAV",
+    "BCAV"
   ),
   intermediate_ring = c(
     "BUAG",
@@ -619,7 +622,10 @@ intermediate_rings <- tibble(
     "GHAT",
     "ZVAU",
     "HWAX",
-    "DJAU"
+    "DJAU",
+    "UMAR",
+    "RTAK",
+    "LMAA"
   ),
   sovon_bird_date_begin = as.POSIXct(c(
     "2000-05-08", ## BUAG
@@ -632,7 +638,10 @@ intermediate_rings <- tibble(
     "2007-06-18", ## GHAT
     "2014-05-23", ## ZVAU
     "2009-05-18", ## HWAX
-    "2006-05-26" ## DJAU
+    "2006-05-26", ## DJAU
+    "2012-05-31", ## UMAR
+    "2016-05-26" ## RTAK
+    "2009-06-01" ## LMAA
   ), tz = "UTC")
 )
 intermediate_rings
