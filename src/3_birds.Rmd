@@ -1222,6 +1222,13 @@ crbirding_birds <-
   ))
 ```
 
+Show changes in color/metal ring  for these birds:
+
+```{r show_changes_rngme_before_rngkl}
+crbirding_birds %>%
+  filter(sovon_bird_reference %in% rngme_before_rngkl$sovon_bird_reference)
+```
+
 ### Add rows for loosing color or metal rings: `klweg`,  `meweg`
 
 We have observations linked to actions `klweg` and `meweg`. These actions mean that the bird has been observed without the color ring or metal ring respectively.
