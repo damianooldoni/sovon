@@ -758,7 +758,7 @@ crbirding_birds <-
   group_by(sovon_bird_reference) %>%
   nest() %>%
   mutate(sovon_bird_date_end = map(data, assign_end_date)) %>%
-  unnest() %>%
+  unnest(cols = c(data, sovon_bird_date_end)) %>%
   mutate(sovon_bird_date_end = as.POSIXct(sovon_bird_date_end)) %>%
   select(
     sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt,
