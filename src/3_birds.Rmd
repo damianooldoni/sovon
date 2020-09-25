@@ -963,8 +963,8 @@ Preview:
 
 ```{r preview_remove_asterisks}
 birds_others %>%
-  select(sovon_bird_ring_number) %>%
-  head(n = 50)
+  select(MetaalringNummer, sovon_bird_ring_number) %>%
+  filter(str_detect(MetaalringNummer, "\\*")) 
 ```
 
 Add points `.` where needed:
