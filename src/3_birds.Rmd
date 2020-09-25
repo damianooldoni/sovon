@@ -972,25 +972,17 @@ Add points `.` where needed:
 ```{r add_points_in_ring_number}
 birds_others <-
   birds_others %>%
-  mutate(reversed = stri_reverse(str = sovon_bird_ring_number))
-idx <- as.data.frame(str_locate(birds_others$reversed, pattern = regex("\\d+")))$end
-idx <- replace_na(idx, 0)
-birds_others <- birds_others %>%
-  mutate(sovon_bird_ring_number = stri_reverse(str_c(
-    str_sub(reversed,
-      end = idx
-    ),
-    map_chr(nchar(reversed), function(x) {
-      ifelse(x < 10,
-        str_c(rep(".", 10 - x), collapse = ""),
-        ""
-      )
-    }),
-    str_sub(reversed,
-      start = idx + 1
-    )
-  ))) %>%
-  select(-reversed)
+  # calculate the number of dots needed
+  mutate(ndots = 10 - str_length(sovon_bird_ring_number)) %>%
+  # created a string with the needed dots
+  mutate(dots = str_dup(".", ndots)) %>%
+  # concatenate the first uppercase letter, the dots and the digits together
+  mutate(sovon_bird_ring_number = str_c(
+    str_extract(sovon_bird_ring_number, "^[:upper:]+"),
+    dots,
+    str_extract(sovon_bird_ring_number, "[:digit:]+$"))) %>%
+  # remove auxiliary columns after use
+  select(-c(ndots, dots))
 ```
 
 Merge the two data frames together:
