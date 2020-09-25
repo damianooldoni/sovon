@@ -716,16 +716,16 @@ crbirding_birds <-
   arrange(sovon_bird_reference, sovon_bird_date_begin)
 ```
 
-Example of a triplet ring sequence:
+These are all mapped triplet ring sequences:
 
-```{r example_triplet_ring_session}
-bird_reference_example_triplet <-
+```{r triplet_ring_sequences}
+bird_reference_triplets <-
   crbirding_birds %>%
-  filter(sovon_bird_shorthand == "BUAG") %>%
+  filter(sovon_bird_shorthand %in% c(intermediate_rings$intermediate_ring)) %>%
   distinct(sovon_bird_reference) %>%
   pull()
 crbirding_birds %>%
-  filter(sovon_bird_reference == bird_reference_example_triplet)
+  filter(sovon_bird_reference %in% bird_reference_triplets)
 ```
 
 At this point all rings should have a `sovon_bird_date_begin`:
