@@ -425,6 +425,41 @@ obs_and_acts <-
   filter(!Nummer %in% no_actions$Nummer)
 ```
 
+## Check combinations of actions with `klgev` or `megev`
+
+`klgev` should never occur with other *active* actions like `vang`, `vangl` or action `dood`. Is this true?
+
+```{r check_acts_with_klgev}
+acts_with_klgev <-
+  obs_and_acts %>%
+  filter(klgev == "klgev") %>%
+  select(acts) %>%
+  distinct() %>%
+  select_if(~ sum(!is.na(.)) > 0) %>%
+  names()
+acts_with_klgev <- acts_with_klgev[acts_with_klgev != "klgev"]
+length(acts_with_klgev) == 0
+```
+
+Same for `megev`:
+
+```{r check_acts_with_megev}
+if ("megev" %in% acts) {
+  acts_with_megev <-
+    obs_and_acts %>%
+    filter(megev == "megev") %>%
+    select(acts) %>%
+    distinct() %>%
+    select_if(~ sum(!is.na(.)) > 0) %>%
+    names()
+  acts_with_megev <- acts_with_megev[acts_with_megev != "megev"]
+  length(acts_with_megev) == 0
+} else {
+  message("No 'megev' actions found.")
+}
+```
+
+
 ## Remove data labelled as `FOUT`
 
 There are observations judged as error. They are marked by`KleurringNummmer` equal to `FOUT`:

@@ -1539,44 +1539,6 @@ if ("megev" %in% acts) {
 }
 ```
 
-`klgev` should never occur with other *active* actions like `vang`, `vangl` or action `dood`:
-
-```{r check_acts_with_klgev}
-acts_with_klgev <-
-  obs_and_acts %>%
-  filter(klgev == "klgev") %>%
-  select(acts) %>%
-  distinct() %>%
-  select_if(~ sum(!is.na(.)) > 0) %>%
-  names()
-if (any(c("vang", "vangl", "dood") %in% acts_with_klgev)) {
-  print("One of 'vang', 'vangl', 'dood' present with 'klgev'! To be checked...")
-} else {
-  print("Check: OK. No 'vang', 'vangl', 'dood' present with 'klgev'")
-}
-```
-
-Same for `megev`:
-
-```{r check_acts_with_megev}
-if ("megev" %in% acts) {
-  acts_with_megev <-
-    obs_and_acts %>%
-    filter(megev == "megev") %>%
-    select(acts) %>%
-    distinct() %>%
-    select_if(~ sum(!is.na(.)) > 0) %>%
-    names()
-  if (any(c("vang", "vangl", "dood") %in% acts_with_megev)) {
-    print("One of 'vang', 'vangl', 'dood' present with 'megev'! To be checked...")
-  } else {
-    print("Check: OK. No 'vang', 'vangl', 'dood' present with 'megev'")
-  }
-} else {
-  print("'megev' is not present.")
-}
-```
-
 Are there observations of birds linked to both actions `klgev` and `megev`?
 
 ```{r bird_ref_klgev_megev}
