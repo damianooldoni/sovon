@@ -313,15 +313,15 @@ crbirding_birds %>%
 And in case solve:
 
 ```{r solve_date_of_exceptions_double_rngkl, evaluate = FALSE}
-if (nrow(exceptions_one_bird_one_rngkl) > 0) {
-  crbirding_birds <-
-    crbirding_birds %>%
-    mutate(sovon_bird_date_begin = case_when(
-      sovon_bird_shorthand == "MKAU" ~ sovon_bird_date_begin,
-      sovon_bird_shorthand == "CZOZ" ~ as.POSIXct(NA_character_),
-      TRUE ~ sovon_bird_date_begin
-    ))
-}
+# if (nrow(exceptions_one_bird_one_rngkl) > 0) {
+#   crbirding_birds <-
+#     crbirding_birds %>%
+#     mutate(sovon_bird_date_begin = case_when(
+#       sovon_bird_shorthand == "MKAU" ~ sovon_bird_date_begin,
+#       sovon_bird_shorthand == "CZOZ" ~ as.POSIXct(NA_character_),
+#       TRUE ~ sovon_bird_date_begin
+#     ))
+# }
 ```
 
 Summary of rings with date (`sovon_bird_date_begin`):
