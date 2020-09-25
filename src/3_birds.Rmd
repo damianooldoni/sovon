@@ -176,7 +176,7 @@ obs_and_acts <-
 
 The reconstruction of the series of color rings for each bird is made by using columns `first_Nummer` (very first color ring), `NummerNieuw` (very last color ring) and the information from spreadsheets of experts. We will collect the needed information in a new dataframe, called `crbirding_birds` which will grow up to become the end product containing the ring data to deliver to SOVON.
 
-First step is to *gather* `first_Nummer`  and `NummerNieuw` in new column `sovon_bird_shorthand`:
+First step is to *gather* `first_Nummer` and `NummerNieuw` in new column `sovon_bird_shorthand`:
 
 ```{r backbone_mapping_shorthand}
 crbirding_birds <-
@@ -834,7 +834,7 @@ crbirding_birds %>%
 
 ### Add rows for metal rings applied before color rings
 
-Sometimes metal rings have been applied **before** color rings. These cases should be added to `crbirding_birds` as new rows. We can detect these situtations by comparing the date of actions `rngme` and `rngkl` for each bird.
+Sometimes metal rings have been applied **before** color rings. These cases should be added to `crbirding_birds` as new rows. We can detect these situations by comparing the date of actions `rngme` and `rngkl` for each bird.
 
 ```{r compare_rngme_rngkl}
 rngme_before_rngkl <-
@@ -1115,7 +1115,7 @@ crbirding_birds %>%
 
 ### Add rows for first metal ring applied after color rings
 
-Sometimes metal rings have been applied **after** color rings. We can detect these situtations by using `sovon_bird_rings_changed` value 1 (`rngkl` only) to identify the birds, observations with action `rngme` to get date of applying metal rings:
+Sometimes metal rings have been applied **after** color rings. We can detect these situations by using `sovon_bird_rings_changed` value 1 (`rngkl` only) to identify the birds, observations with action `rngme` to get date of applying metal rings:
 
 ```{r rngkl_before_rngme}
 rngme_after_rngkl <-
@@ -1309,7 +1309,7 @@ bird_ref_multiple_klweg <-
   filter(n > 1)
 ```
 
-If `meweg`/`klweg` occur not in combination with `dood` or `vang`/ `vangl`, then a new row should be added to `crbirding_birds` as the ring situation changed. 
+If `meweg`/`klweg` occurs not in combination with `dood` or `vang`/ `vangl`, then a new row should be added to `crbirding_birds` as the ring situation changed. 
 
 We create first new rows based on action `meweg`. We set `sovon_bird_rings_changed` = 0 and `metal_ring_missing` = `TRUE`:
 
@@ -1493,7 +1493,7 @@ crbirding_birds %>%
 
 ### Add rows for found color or metal rings: `klgev`,  `megev`
 
-We have observations linked to actions `klgev` and `megev`. These actions mean that a color/metal ring has been found. This means the bird is not waering it anymore: we proceed as in previous section by adding a new row in `crbirding_birds`.
+We have observations linked to actions `klgev` and `megev`. These actions mean that a color/metal ring has been found. This means the bird is not wearing it anymore: we proceed as in previous section by adding a new row in `crbirding_birds`.
 
 Number of observations with action `klgev`:
 
