@@ -956,7 +956,7 @@ We remove the asterisks:
 ```{r remove_*_in_ring_number}
 birds_others <-
   birds_others %>%
-  mutate(sovon_bird_ring_number = gsub("\\*", "", sovon_bird_ring_number))
+  mutate(sovon_bird_ring_number = str_remove_all(sovon_bird_ring_number, "\\*"))
 ```
 
 Preview:
