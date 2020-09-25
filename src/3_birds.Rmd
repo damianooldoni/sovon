@@ -1306,6 +1306,7 @@ bird_ref_multiple_klweg <-
   add_tally() %>%
   ungroup() %>%
   filter(n > 1)
+bird_ref_multiple_klweg
 ```
 
 If `meweg`/`klweg` occurs not in combination with `dood` or `vang`/ `vangl`, then a new row should be added to `crbirding_birds` as the ring situation changed. 
