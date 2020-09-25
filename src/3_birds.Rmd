@@ -1553,7 +1553,7 @@ if ("megev" %in% acts) {
     pull(sovon_bird_reference)
   bird_ref_meweg[which(bird_ref_megev %in% bird_ref_klgev)]
 } else {
-  print("'megev' is not present.")
+  message("'megev' is not present.")
 }
 ```
 
