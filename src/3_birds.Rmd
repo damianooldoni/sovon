@@ -2004,14 +2004,19 @@ birds <-
     select(Code, crbirding_color),
   by = c("RingKleurCode" = "Code")
   ) %>%
-  rename(ring_color = crbirding_color)
+  rename(ring_color = crbirding_color) %>%
+  left_join(color_table %>%
+    select(Code, crbirding_color),
+  by = c("InscriptieKleurCode" = "Code")
+  ) %>%
+  rename(inscription_color = crbirding_color)
 ```
 
 Effects of the mapping:
 
 ```{r result_mapping_colors_birds}
 birds %>%
-  distinct(ring_color, RingKleurCode)
+  distinct(ring_color, RingKleurCode, inscription_color, InscriptieKleurCode)
 ```
 
 The `bird_shorthand` should be composed of:
@@ -2061,6 +2066,25 @@ crbirding_birds <-
   ungroup()
 ```
 
+As inscription color would be lost in cr-birding database, we add it as a note: `inscription color: ` followed by the EURING Exchange Code 2000+ standard color code:
+
+```{r add_incsription_color_as_note}
+crbirding_birds <- 
+  crbirding_birds %>%
+  # filter(str_sub(sovon_bird_shorthand_color, start = 2, end = 2) == "-") %>%
+  left_join(birds %>%
+              select(sovon_bird_reference, inscription_color),
+            by = "sovon_bird_reference") %>%
+  mutate(sovon_bird_notes = if_else(
+    str_sub(sovon_bird_shorthand_color, start = 2, end = 2) == "-",
+    if_else(is.na(sovon_bird_notes),
+            str_c("inscription color: ", inscription_color, "."),
+            str_c(sovon_bird_notes,
+                  str_c("inscription color: ", inscription_color, "."),
+                  sep = " ")),
+    sovon_bird_notes))
+```
+
 Some examples from birds ringed thrice or more:
 
 ```{r show_example_colors}
@@ -2072,10 +2096,12 @@ crbirding_birds %>%
   select(
     sovon_bird_reference,
     ring_color,
+    inscription_color,
     sovon_bird_shorthand_color,
     sovon_bird_shorthand_pt_color,
     sovon_bird_shorthand,
     sovon_bird_shorthand_pt,
+    sovon_bird_notes,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
@@ -2107,7 +2133,13 @@ old_rings_with_A <-
     sovon_bird_shorthand_color = paste0("B-",
                                         sovon_bird_shorthand_color),
     sovon_bird_shorthand_pt_color = paste0("B-",
-                                           sovon_bird_shorthand_pt_color)) %>%
+                                           sovon_bird_shorthand_pt_color),
+    sovon_bird_notes = if_else(is.na(sovon_bird_notes),
+                               "inscription color: W.",
+                               str_c(sovon_bird_notes,
+                                     "inscription color: W.",
+                                     sep = " "))
+    ) %>%
   select(
     sovon_bird_reference,
     ring_color,
@@ -2115,6 +2147,7 @@ old_rings_with_A <-
     sovon_bird_shorthand_pt_color,
     sovon_bird_shorthand,
     sovon_bird_shorthand_pt,
+    sovon_bird_notes,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
@@ -2154,6 +2187,7 @@ crbirding_birds %>%
     sovon_bird_shorthand_pt_color,
     sovon_bird_shorthand,
     sovon_bird_shorthand_pt,
+    sovon_bird_notes,
     sovon_bird_date_begin,
     sovon_bird_date_end,
     everything()
