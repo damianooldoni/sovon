@@ -792,8 +792,8 @@ Preview:
 
 ```{r no_color_ring_example}
 obs_and_acts %>%
-  filter(!is.na(klweg)) %>%
-  select(sovon_observation_notes) %>%
+  filter(!is.na(klweg) | !is.na(me)) %>%
+  select(, klweg, me, sovon_observation_notes) %>%
   head()
 ```
 
