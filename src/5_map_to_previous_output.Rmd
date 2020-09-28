@@ -359,6 +359,18 @@ crbirding_birds_first_color_ring_2019 %>%
             by = "first_color_ring")
 ```
 
+As expected most of these rings are the so called virtual rings that we have decided to not include in new export (see [#81-issuecomment-698964036]( https://github.com/inbo/cr-birding/issues/81#issuecomment-698964036)).
+
+If we exclude them from this overview, the following birds remain:
+
+```{r birds_2019_not_in_new_export_except_virtual_rings}
+crbirding_birds_first_color_ring_2019 %>%
+  filter(str_sub(first_color_ring, start = 3, end = 3) != "B") %>%
+  anti_join(crbirding_birds_first_color_ring,
+            by = "first_color_ring")
+```
+
+
 Based on metal ring (`bird_ring_number`) information, date of ringing (`bird_date_begin`) and other fields we can see that the ring FMOV is the same as ring FMOU from 2019 export:
 
 ```{r check_FMOV-FMOU}
