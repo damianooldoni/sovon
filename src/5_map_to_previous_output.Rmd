@@ -243,24 +243,6 @@ crbirding_birds_first_color_ring %>%
   filter(is.na(first_color_ring))
 ```
 
-A patch, first, while waiting to solve issue [#129](https://github.com/inbo/cr-birding/issues/129):
-
-```{r patch_solve_issue_129}
-crbirding_birds_first_color_ring <-
-  crbirding_birds_first_color_ring %>% 
-  mutate(first_color_ring = if_else(is.na(first_color_ring) & 
-                                      bird_reference == 5102,
-                                    "RZAG",
-                                    first_color_ring))
-```
-
-Check exceptions again:
-
-```{r birds_without_first_color_ring2}
-crbirding_birds_first_color_ring %>%
-  filter(is.na(first_color_ring))
-```
-
 We do the same with ring data from 2019:
 
 ```{r first_color_ring_2019}
