@@ -2831,7 +2831,7 @@ crbirding_birds <-
 Some birds, the ones with a GPS tracker, have a name saved in [this file](https://github.com/inbo/bird-tracking/blob/8a7a2c91d54b486d90a97f85cfaa30cede67315d/data/interim/individuals.csv). The names are saved in column `individual_remarks`:
 
 ```{r read_names}
-uvabits_file <- "https://github.com/inbo/bird-tracking/blob/8a7a2c91d54b486d90a97f85cfaa30cede67315d/data/interim/individuals.csv"
+uvabits_file <- "https://raw.githubusercontent.com/inbo/bird-tracking/8a7a2c91d54b486d90a97f85cfaa30cede67315d/data/interim/individuals.csv"
 uvabits_names <-
   read_csv(uvabits_file,
     col_types = cols(
