@@ -347,7 +347,7 @@ crbirding_birds %>%
             by = c("bird_reference_2019" = "bird_reference"))
 ```
 
-Based on column `bird_date_begin` (see above) we can see that most but not all rings have been placed after 2019-04-10, date of previous export. It can also occurr that there are old rings which have been added to database after that date, so they are actually _new_ rings, database speaking. So, to check which rings have been entered before 2019-04-10 we use column `AanmaakDatum` in raw osbervation data:
+Based on column `bird_date_begin` (see above) we can see that most but not all rings have been placed after 2019-04-10, date of previous export. It can also occur that there are old rings which have been added to database after that date, so they are actually _new_ rings, database speaking. So, to check which rings have been entered before 2019-04-10 we use column `AanmaakDatum` in raw observation data:
 
 ```{r supected_new_birds_before_export_date}
 supected_new_birds_before_export_date <- 
@@ -437,7 +437,7 @@ crbirding_observations <-
             by = "bird_reference")
 ```
 
-Again, double checking the unicity of `new_bird_reference`:
+Again, double checking that `new_bird_reference` is unique:
 
 ```{r check_unicity_fk_obs}
 nrow(crbirding_observations %>%
@@ -645,7 +645,7 @@ changed_bird_sex
 
 ### Changed `bird_date_begin`
 
-Rings with changed `bird_date_begin`:
+Rings with changed `bird_date_begin` excluding the birds with new rings:
 
 ```{r changed_bird_date_begin}
 same_rings <- 
@@ -671,7 +671,7 @@ changed_bird_date_begin_end <-
            !is.na(bird_date_begin_2019) &
            !is.na(bird_date_end) &
            !is.na(bird_date_end_2019)) %>%
-distinct(bird_reference)
+  distinct(bird_reference)
 changed_bird_date_begin_end
 ```
 
@@ -683,7 +683,7 @@ changed_bird_date_begin_end %>%
             by = "bird_reference")
 ```
 
-COlor ring history data from 2019:
+Color ring history data from 2019:
 
 ```{r history_changed_rings_from_2019}
 changed_bird_date_begin_end %>%
@@ -691,12 +691,11 @@ changed_bird_date_begin_end %>%
             by = "bird_reference")
 ```
 
-### Save crbirding_birds with added reference from 2019 export
+### Save bird data with updated `bird_reference`
 
-We save crbirding_birds:
+We save `crbirding_birds` with the updated unique identifiers in `bird_reference`:
 
 ```{r save_birds_with_bird_ref_2019}
-# transform dates to characters
 crbirding_birds %>%
   mutate(
     bird_date_begin = as.Date(bird_date_begin),
@@ -835,7 +834,7 @@ crbirding_observations_2019 %>%
 
 ### Changed condition
 
-First we rename column `conditionn` of  `crbirding_observation_2019` to new column name `observation_condition`:
+First we rename column `condition` of  `crbirding_observation_2019` to new column name `observation_condition`:
 
 ```{r rename_condition}
 crbirding_observations_2019 <-
@@ -851,7 +850,7 @@ crbirding_observations_2019 %>%
   anti_join(crbirding_observations,
             by = c("observation_reference",
                    "observation_condition")) %>%
-  select(observation_reference, condition) %>%
+  select(observation_reference, observation_condition) %>%
   rename(observation_condition_2019 = observation_condition) %>%
   left_join(crbirding_observations %>%
               select(observation_reference, observation_condition),

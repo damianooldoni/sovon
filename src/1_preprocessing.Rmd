@@ -459,7 +459,6 @@ if ("megev" %in% acts) {
 }
 ```
 
-
 ## Remove data labelled as `FOUT`
 
 There are observations judged as error. They are marked by`KleurringNummmer` equal to `FOUT`:

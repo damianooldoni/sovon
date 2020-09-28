@@ -2199,7 +2199,7 @@ crbirding_birds <-
   )
 ```
 
-And we remove related observations:
+And we remove related observations as well:
 
 ```{r remove_obs_of_virtual_rings}
 obs_and_acts <-
@@ -2208,7 +2208,7 @@ obs_and_acts <-
     sovon_bird_reference %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_reference)
 ```
 
-The replaced rings left are foreign rings.
+The rings left are foreign rings.
 
 ```{r show_foreign_rings}
 rings_color_still_unknown_foreign <-
