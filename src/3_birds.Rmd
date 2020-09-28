@@ -1963,6 +1963,15 @@ crbirding_birds %>%
   select(-n)
 ```
 
+At Sept, 25 no birds are ringed more than four times:
+
+```{r final_overview_crbiridng_birds_n_higher_than_4}
+crbirding_birds %>%
+  group_by(sovon_bird_reference) %>%
+  add_tally() %>%
+  filter(n >= 5) %>%
+  select(-n)
+```
 ### Map color of rings and inscriptions
 
 The color of the ring should be added, if available, to `bird_shorthand`. It's important to highlight the fact that we have this information only for the most recent color ring of each bird. Following combinations are present, although the color of the inscription `InscriptieKleurCode` will be not mapped:
