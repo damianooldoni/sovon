@@ -778,12 +778,12 @@ obs_and_acts <-
   obs_and_acts %>%
   mutate(
     sovon_observation_notes = if_else(
-      klweg == "klweg" | me == "me",
+      is.na(klweg) & is.na(me),
+      sovon_observation_notes,
       if_else(is.na(sovon_observation_notes),
         "no_color_ring.",
-        paste("no_color_ring.", sovon_observation_notes, sep = " ")
-      ),
-      sovon_observation_notes
+        str_c("no_color_ring.", sovon_observation_notes, sep = " ")
+      )
     )
   )
 ```
