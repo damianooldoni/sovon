@@ -1919,7 +1919,7 @@ crbirding_birds %>%
 
 We show a final overview. 
 
-Birds getting color and metal ring at the same time and never ringed twice:
+Birds getting color and metal ring at the same time and never ringed twice (only the first thousand are shown as this category includes more than 10 thousands rings):
 
 ```{r final_overview_crbiridng_birds_n_1}
 crbirding_birds %>%
@@ -1928,11 +1928,10 @@ crbirding_birds %>%
   ungroup() %>%
   filter(sovon_bird_rings_changed == 2) %>%
   filter(n == 1) %>%
-  select(-n) %>%
-  head(n = 100)
+  select(-n)
 ```
 
-Birds ringed in two different moments:
+Birds ringed in two different moments (only the first thousand are shown as this category includes more than two thousands rings):
 
 ```{r final_overview_crbiridng_birds_n_2}
 crbirding_birds %>%
@@ -1940,8 +1939,7 @@ crbirding_birds %>%
   add_tally() %>%
   ungroup() %>%
   filter(n == 2) %>%
-  select(-n) %>%
-  head(n = 100)
+  select(-n)
 ```
 
 Birds ringed at three different moments:
@@ -1952,8 +1950,7 @@ crbirding_birds %>%
   add_tally() %>%
   ungroup() %>%
   filter(n == 3) %>%
-  select(-n) %>%
-  head(n = 100)
+  select(-n)
 ```
 
 Birds ringed at four different moments:
@@ -1963,8 +1960,7 @@ crbirding_birds %>%
   group_by(sovon_bird_reference) %>%
   add_tally() %>%
   filter(n == 4) %>%
-  select(-n) %>%
-  head(n = 100)
+  select(-n)
 ```
 
 ### Map color of rings and inscriptions
@@ -2359,7 +2355,7 @@ In case of birds with one color ring only, SOVON doesn't save these fields. Howe
 
 For more details, see [issue #61](https://github.com/inbo/cr-birding/issues/61#issuecomment-472862064).
 
-As for colors, this informations are only available for the very last ring of each bird. 
+As for colors, these informations are only available for the very last ring of each bird. 
 
 Overview:
 
@@ -2473,7 +2469,7 @@ crbirding_birds %>%
 
 ### Mapping of `sovon_bird_ring_number`
 
-We can now use `metal_ring_missing` in order to add the metal ring number as `sovon_bird_ring_number`. Still, note that **only the very last metal ring number is saved in our color-oriented database**. We will use it in place of older metal rings. We could improve it in crbirding database later.
+We can now use `metal_ring_missing` in order to add the metal ring number as `sovon_bird_ring_number`. Still, note that **only the very last metal ring number is saved in our color-oriented database**. We will use it in place of older metal rings. Experts could improve it in crbirding database later.
 
 ```{r add_sovon_bird_ring_number_to_crbirding_birds}
 crbirding_birds <-
@@ -2850,9 +2846,11 @@ uvabits_names <-
       track_session_start_latitude = col_double(),
       track_session_start_longitude = col_double()
     )
-  ) %>%
+  )
+uvabits_names <- 
+  uvabits_names %>%
   select(individual_id, ring_number, individual_remarks, everything())
-head(uvabits_names)
+uvabits_names
 ```
 
 We couple the birds to the correspondent names by color ring:
@@ -2878,7 +2876,7 @@ crbirding_birds <-
   left_join(bird_ref_uvabits, by = "sovon_bird_reference")
 ```
 
-Examples:
+The complete mapping of names:
 
 ```{r example_bird_names}
 crbirding_birds %>%
@@ -3020,7 +3018,7 @@ crbirding_birds <-
   ))
 ```
 
-SOVON is interested in color ring versions with a dot if dots are present, even if their purpose is just improving readibility. We can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
+SOVON is interested in color ring versions with a dot if dots are present, even if their purpose is just improving readability. We can overwrite `sovon_bird_shorthand` with control column `sovon_bird_shorthand_pt`:
 
 ```{r remove_col_bird_shorthand_pt}
 crbirding_birds <-
@@ -3080,7 +3078,7 @@ Preview data:
 crbirding_birds %>% head(n = 100)
 ```
 
-Save to text file (comma separated value):
+Save finale birds info as text file (comma separated value):
 
 ```{r write_bird_data_txt}
 write_csv(
