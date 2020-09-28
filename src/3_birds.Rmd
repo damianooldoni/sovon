@@ -2189,88 +2189,23 @@ rings_color_still_unknown_with_B_third_pos <-
 rings_color_still_unknown_with_B_third_pos
 ```
 
-INBO experts explained us that the rings containing a `B` at third position are *virtual* rings (see [issue #81](https://github.com/inbo/cr-birding/issues/81#issuecomment-478954317)). Some of them have no `sovon_bird_date_end`. We assign them `sovon_bird_date_end` by using  the date from observations with action `dood` or  `klgev`:
+INBO experts explained us that the rings containing a `B` at third position are *virtual* rings (see [issue #81#issuecomment-478954317](https://github.com/inbo/cr-birding/issues/81#issuecomment-478954317)). It has been suggested to remove them and not exporting them (see [issues #81#issuecomment-698964036](https://github.com/inbo/cr-birding/issues/81#issuecomment-698964036)). We remove them:
 
-```{r add_bird_date_end_to_virtual_rings}
-rings_color_still_unknown_with_B_third_pos <-
-  rings_color_still_unknown_with_B_third_pos %>%
-  left_join(obs_and_acts %>%
-    filter(dood == "dood" | klgev == "klgev" &
-      (sovon_bird_reference %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_reference)) %>%
-    select(dood, klgev, sovon_bird_reference, Datum),
-  by = "sovon_bird_reference"
-  ) %>%
-  mutate(sovon_bird_date_end = Datum) %>%
-  select(-c(dood, klgev, Datum)) %>%
-  left_join(crbirding_birds,
-    by = c(
-      "sovon_bird_reference", "sovon_bird_shorthand",
-      "sovon_bird_shorthand_pt", "sovon_bird_date_begin",
-      "sovon_bird_date_end", "sovon_bird_notes",
-      "ring_color", "sovon_bird_shorthand_color",
-      "sovon_bird_shorthand_pt_color",
-      "sovon_bird_rings_changed",
-      "metal_ring_missing"
-    )
-  )
-
-crbirding_birds <-
+```{r remove_virtual_rings}
+crbirding_birds <- 
   crbirding_birds %>%
-  anti_join(rings_color_still_unknown_with_B_third_pos,
-    by = c(
-      "sovon_bird_shorthand",
-      "sovon_bird_date_begin",
-      "sovon_bird_date_end"
-    )
-  ) %>%
-  bind_rows(rings_color_still_unknown_with_B_third_pos) %>%
-  arrange(sovon_bird_reference, sovon_bird_date_begin)
-```
-
-We assign them color blue as ring color and add note `virtual_ring.` to `sovon_bird_notes` as decided in [#81](https://github.com/inbo/cr-birding/issues/81#issuecomment-479365880):
-
-```{r solve_virtual_rings}
-crbirding_birds <-
-  crbirding_birds %>%
-  mutate(
-    sovon_bird_notes = case_when(
-      sovon_bird_shorthand %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_shorthand
-      ~ ifelse(is.na(sovon_bird_notes),
-        "virtual_color_ring.",
-        str_c(sovon_bird_notes, "virtual_color_ring.", sep = " ")
-      ),
-      TRUE ~ sovon_bird_notes
-    ),
-    sovon_bird_shorthand_color = if_else(
-      sovon_bird_shorthand %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_shorthand,
-      paste0("B-", sovon_bird_shorthand_color),
-      sovon_bird_shorthand_color
-    ),
-    sovon_bird_shorthand_pt_color = if_else(
-      sovon_bird_shorthand %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_shorthand,
-      paste0("B-", sovon_bird_shorthand_pt_color),
-      sovon_bird_shorthand_pt_color
-    )
+  filter(!
+    sovon_bird_reference %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_reference
   )
 ```
 
-After mapping:
+And we remove related observations:
 
-```{r show_changes_virtual_rings}
-crbirding_birds %>%
-  filter(sovon_bird_reference %in%
-    rings_color_still_unknown_with_B_third_pos$sovon_bird_reference) %>%
-  select(
-    sovon_bird_reference,
-    sovon_bird_shorthand_color,
-    sovon_bird_shorthand_pt_color,
-    sovon_bird_notes,
-    sovon_bird_shorthand,
-    sovon_bird_shorthand_pt,
-    sovon_bird_date_begin,
-    sovon_bird_date_end,
-    everything()
-  )
+```{r remove_obs_of_virtual_rings}
+obs_and_acts <-
+  obs_and_acts %>%
+  filter(!
+    sovon_bird_reference %in% rings_color_still_unknown_with_B_third_pos$sovon_bird_reference)
 ```
 
 The replaced rings left are foreign rings.
