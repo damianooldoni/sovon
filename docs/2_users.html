@@ -6,14 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4 Map user data | Mapping INBO color ring data to SOVON format</title>
   <meta name="description" content="4 Map user data | Mapping INBO color ring data to SOVON format" />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20.6 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4 Map user data | Mapping INBO color ring data to SOVON format" />
   <meta property="og:type" content="book" />
   
   
   
-  <meta name="github-repo" content="inbo/sovon" />
+  <meta name="github-repo" content="inbo/cr-birding" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="4 Map user data | Mapping INBO color ring data to SOVON format" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Damiano Oldoni" />
 
 
-<meta name="date" content="2020-04-30" />
+<meta name="date" content="2020-09-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,14 +50,15 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 pre.sourceCode { margin: 0; }
@@ -66,14 +67,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -82,9 +85,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -157,20 +160,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.6" data-path="1_preprocessing.html"><a href="1_preprocessing.html#merge-observations-and-actions"><i class="fa fa-check"></i><b>3.6</b> Merge observations and actions</a></li>
 <li class="chapter" data-level="3.7" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-spaces-in-obs_and_acts"><i class="fa fa-check"></i><b>3.7</b> Check spaces in <code>obs_and_acts</code></a></li>
 <li class="chapter" data-level="3.8" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-presence-action-code"><i class="fa fa-check"></i><b>3.8</b> Check presence action code</a></li>
-<li class="chapter" data-level="3.9" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-labelled-as-fout"><i class="fa fa-check"></i><b>3.9</b> Remove data labelled as <code>FOUT</code></a></li>
-<li class="chapter" data-level="3.10" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-color-rings-uppercase"><i class="fa fa-check"></i><b>3.10</b> Check color rings: uppercase</a></li>
-<li class="chapter" data-level="3.11" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-keys-kleurringnummer-obs---nummer-birds"><i class="fa fa-check"></i><b>3.11</b> Check keys <code>KleurringNummer</code> (obs) - <code>Nummer</code> (birds)</a></li>
-<li class="chapter" data-level="3.12" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-duplicates-in-date-of-applying-rings"><i class="fa fa-check"></i><b>3.12</b> Check duplicates in date of applying rings</a></li>
-<li class="chapter" data-level="3.13" data-path="1_preprocessing.html"><a href="1_preprocessing.html#add-rngme-if-not-present"><i class="fa fa-check"></i><b>3.13</b> Add <code>rngme</code> if not present</a></li>
-<li class="chapter" data-level="3.14" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-age-while-applying-rings"><i class="fa fa-check"></i><b>3.14</b> Check age while applying rings</a></li>
-<li class="chapter" data-level="3.15" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-bird-sex-inconsistencies"><i class="fa fa-check"></i><b>3.15</b> Check bird sex inconsistencies</a></li>
-<li class="chapter" data-level="3.16" data-path="1_preprocessing.html"><a href="1_preprocessing.html#handle-information-about-metal-ring-number"><i class="fa fa-check"></i><b>3.16</b> Handle information about metal ring number</a></li>
-<li class="chapter" data-level="3.17" data-path="1_preprocessing.html"><a href="1_preprocessing.html#solve-gps-tracker-ids"><i class="fa fa-check"></i><b>3.17</b> Solve GPS tracker IDs</a></li>
-<li class="chapter" data-level="3.18" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-inconsistencies-between-users-and-observers"><i class="fa fa-check"></i><b>3.18</b> Check inconsistencies between users and observers</a></li>
-<li class="chapter" data-level="3.19" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-of-common-shelduck"><i class="fa fa-check"></i><b>3.19</b> Remove data of common shelduck</a></li>
-<li class="chapter" data-level="3.20" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-rings-bgah-brab-and-eau"><i class="fa fa-check"></i><b>3.20</b> Remove rings <code>BGAH</code>, <code>BRAB</code> and <code>EAU</code></a></li>
-<li class="chapter" data-level="3.21" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-date-of-dood"><i class="fa fa-check"></i><b>3.21</b> Check date of <code>dood</code></a></li>
-<li class="chapter" data-level="3.22" data-path="1_preprocessing.html"><a href="1_preprocessing.html#save-preprocessed-data"><i class="fa fa-check"></i><b>3.22</b> Save preprocessed data</a></li>
+<li class="chapter" data-level="3.9" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-combinations-of-actions-with-klgev-or-megev"><i class="fa fa-check"></i><b>3.9</b> Check combinations of actions with <code>klgev</code> or <code>megev</code></a></li>
+<li class="chapter" data-level="3.10" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-labelled-as-fout"><i class="fa fa-check"></i><b>3.10</b> Remove data labelled as <code>FOUT</code></a></li>
+<li class="chapter" data-level="3.11" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-color-rings-uppercase"><i class="fa fa-check"></i><b>3.11</b> Check color rings: uppercase</a></li>
+<li class="chapter" data-level="3.12" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-keys-kleurringnummer-obs---nummer-birds"><i class="fa fa-check"></i><b>3.12</b> Check keys <code>KleurringNummer</code> (obs) - <code>Nummer</code> (birds)</a></li>
+<li class="chapter" data-level="3.13" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-duplicates-in-date-of-applying-rings"><i class="fa fa-check"></i><b>3.13</b> Check duplicates in date of applying rings</a></li>
+<li class="chapter" data-level="3.14" data-path="1_preprocessing.html"><a href="1_preprocessing.html#add-rngme-if-not-present"><i class="fa fa-check"></i><b>3.14</b> Add <code>rngme</code> if not present</a></li>
+<li class="chapter" data-level="3.15" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-age-while-applying-rings"><i class="fa fa-check"></i><b>3.15</b> Check age while applying rings</a></li>
+<li class="chapter" data-level="3.16" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-bird-sex-inconsistencies"><i class="fa fa-check"></i><b>3.16</b> Check bird sex inconsistencies</a></li>
+<li class="chapter" data-level="3.17" data-path="1_preprocessing.html"><a href="1_preprocessing.html#handle-information-about-metal-ring-number"><i class="fa fa-check"></i><b>3.17</b> Handle information about metal ring number</a></li>
+<li class="chapter" data-level="3.18" data-path="1_preprocessing.html"><a href="1_preprocessing.html#solve-gps-tracker-ids"><i class="fa fa-check"></i><b>3.18</b> Solve GPS tracker IDs</a></li>
+<li class="chapter" data-level="3.19" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-inconsistencies-between-users-and-observers"><i class="fa fa-check"></i><b>3.19</b> Check inconsistencies between users and observers</a></li>
+<li class="chapter" data-level="3.20" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-data-of-common-shelduck"><i class="fa fa-check"></i><b>3.20</b> Remove data of common shelduck</a></li>
+<li class="chapter" data-level="3.21" data-path="1_preprocessing.html"><a href="1_preprocessing.html#remove-rings-bgah-brab-and-eau"><i class="fa fa-check"></i><b>3.21</b> Remove rings <code>BGAH</code>, <code>BRAB</code> and <code>EAU</code></a></li>
+<li class="chapter" data-level="3.22" data-path="1_preprocessing.html"><a href="1_preprocessing.html#check-date-of-dood"><i class="fa fa-check"></i><b>3.22</b> Check date of <code>dood</code></a></li>
+<li class="chapter" data-level="3.23" data-path="1_preprocessing.html"><a href="1_preprocessing.html#save-preprocessed-data"><i class="fa fa-check"></i><b>3.23</b> Save preprocessed data</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="2_users.html"><a href="2_users.html"><i class="fa fa-check"></i><b>4</b> Map user data</a><ul>
 <li class="chapter" data-level="4.1" data-path="2_users.html"><a href="2_users.html#read-temporary-user-data"><i class="fa fa-check"></i><b>4.1</b> Read temporary user data</a></li>
@@ -256,7 +260,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.2.14" data-path="4_observations.html"><a href="4_observations.html#reporter---ringer-number"><i class="fa fa-check"></i><b>6.2.14</b> Reporter - ringer number</a></li>
 <li class="chapter" data-level="6.2.15" data-path="4_observations.html"><a href="4_observations.html#ring-number-1"><i class="fa fa-check"></i><b>6.2.15</b> Ring number</a></li>
 <li class="chapter" data-level="6.2.16" data-path="4_observations.html"><a href="4_observations.html#observation-status"><i class="fa fa-check"></i><b>6.2.16</b> Observation status</a></li>
-<li class="chapter" data-level="6.2.17" data-path="4_observations.html"><a href="4_observations.html#condition"><i class="fa fa-check"></i><b>6.2.17</b> Condition</a></li>
+<li class="chapter" data-level="6.2.17" data-path="4_observations.html"><a href="4_observations.html#observation-condition"><i class="fa fa-check"></i><b>6.2.17</b> Observation condition</a></li>
 <li class="chapter" data-level="6.2.18" data-path="4_observations.html"><a href="4_observations.html#mri-metal-ring-information"><i class="fa fa-check"></i><b>6.2.18</b> MRI: metal ring information</a></li>
 <li class="chapter" data-level="6.2.19" data-path="4_observations.html"><a href="4_observations.html#bird-age"><i class="fa fa-check"></i><b>6.2.19</b> Bird age</a></li>
 <li class="chapter" data-level="6.2.20" data-path="4_observations.html"><a href="4_observations.html#bird-sex-1"><i class="fa fa-check"></i><b>6.2.20</b> Bird sex</a></li>
@@ -273,14 +277,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.3" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#map-birds"><i class="fa fa-check"></i><b>7.3</b> Map birds</a><ul>
 <li class="chapter" data-level="7.3.1" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#map-bird_reference"><i class="fa fa-check"></i><b>7.3.1</b> Map <code>bird_reference</code></a></li>
 <li class="chapter" data-level="7.3.2" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#new-bird_reference"><i class="fa fa-check"></i><b>7.3.2</b> New <code>bird_reference</code></a></li>
-<li class="chapter" data-level="7.3.3" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_euring"><i class="fa fa-check"></i><b>7.3.3</b> Changed <code>bird_euring</code></a></li>
-<li class="chapter" data-level="7.3.4" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_shorthand"><i class="fa fa-check"></i><b>7.3.4</b> Changed <code>bird_shorthand</code></a></li>
-<li class="chapter" data-level="7.3.5" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_scheme"><i class="fa fa-check"></i><b>7.3.5</b> Changed <code>bird_scheme</code></a></li>
-<li class="chapter" data-level="7.3.6" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_ring_number"><i class="fa fa-check"></i><b>7.3.6</b> Changed <code>bird_ring_number</code></a></li>
-<li class="chapter" data-level="7.3.7" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_name"><i class="fa fa-check"></i><b>7.3.7</b> Changed <code>bird_name</code></a></li>
-<li class="chapter" data-level="7.3.8" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_sex"><i class="fa fa-check"></i><b>7.3.8</b> Changed <code>bird_sex</code></a></li>
-<li class="chapter" data-level="7.3.9" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_date_begin"><i class="fa fa-check"></i><b>7.3.9</b> Changed <code>bird_date_begin</code></a></li>
-<li class="chapter" data-level="7.3.10" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#save-crbirding_birds-with-added-reference-from-2019-export"><i class="fa fa-check"></i><b>7.3.10</b> Save crbirding_birds with added reference from 2019 export</a></li>
+<li class="chapter" data-level="7.3.3" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#use-bird_reference-from-2019-as-primary-key"><i class="fa fa-check"></i><b>7.3.3</b> Use <code>bird_reference</code> from 2019 as primary key</a></li>
+<li class="chapter" data-level="7.3.4" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_euring"><i class="fa fa-check"></i><b>7.3.4</b> Changed <code>bird_euring</code></a></li>
+<li class="chapter" data-level="7.3.5" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_shorthand"><i class="fa fa-check"></i><b>7.3.5</b> Changed <code>bird_shorthand</code></a></li>
+<li class="chapter" data-level="7.3.6" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_scheme"><i class="fa fa-check"></i><b>7.3.6</b> Changed <code>bird_scheme</code></a></li>
+<li class="chapter" data-level="7.3.7" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_ring_number"><i class="fa fa-check"></i><b>7.3.7</b> Changed <code>bird_ring_number</code></a></li>
+<li class="chapter" data-level="7.3.8" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_name"><i class="fa fa-check"></i><b>7.3.8</b> Changed <code>bird_name</code></a></li>
+<li class="chapter" data-level="7.3.9" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_sex"><i class="fa fa-check"></i><b>7.3.9</b> Changed <code>bird_sex</code></a></li>
+<li class="chapter" data-level="7.3.10" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-bird_date_begin"><i class="fa fa-check"></i><b>7.3.10</b> Changed <code>bird_date_begin</code></a></li>
+<li class="chapter" data-level="7.3.11" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#save-bird-data-with-updated-bird_reference"><i class="fa fa-check"></i><b>7.3.11</b> Save bird data with updated <code>bird_reference</code></a></li>
 </ul></li>
 <li class="chapter" data-level="7.4" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#map-observations"><i class="fa fa-check"></i><b>7.4</b> Map observations</a><ul>
 <li class="chapter" data-level="7.4.1" data-path="5_map_to_previous_output.html"><a href="5_map_to_previous_output.html#changed-geospatial-information"><i class="fa fa-check"></i><b>7.4.1</b> Changed geospatial information</a></li>
@@ -319,132 +324,132 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="read-temporary-user-data" class="section level2">
 <h2><span class="header-section-number">4.1</span> Read temporary user data</h2>
 <p>We start from the user temporary data saved in TSV file <code>users.tsv</code> in folder <code>data\interim</code>:</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">users &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;interim&quot;</span>, <span class="st">&quot;users.tsv&quot;</span>),</a>
-<a class="sourceLine" id="cb98-2" data-line-number="2">  <span class="dt">col_types =</span> <span class="kw">cols</span>(</a>
-<a class="sourceLine" id="cb98-3" data-line-number="3">    <span class="dt">.default =</span> <span class="kw">col_character</span>(),</a>
-<a class="sourceLine" id="cb98-4" data-line-number="4">    <span class="dt">Nummer =</span> <span class="kw">col_double</span>(),</a>
-<a class="sourceLine" id="cb98-5" data-line-number="5">    <span class="dt">Wachtwoord =</span> <span class="kw">col_logical</span>()</a>
-<a class="sourceLine" id="cb98-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb98-7" data-line-number="7">)</a></code></pre></div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="2_users.html#cb101-1"></a>users &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;interim&quot;</span>, <span class="st">&quot;users.tsv&quot;</span>),</span>
+<span id="cb101-2"><a href="2_users.html#cb101-2"></a>  <span class="dt">col_types =</span> <span class="kw">cols</span>(</span>
+<span id="cb101-3"><a href="2_users.html#cb101-3"></a>    <span class="dt">.default =</span> <span class="kw">col_character</span>(),</span>
+<span id="cb101-4"><a href="2_users.html#cb101-4"></a>    <span class="dt">Nummer =</span> <span class="kw">col_double</span>(),</span>
+<span id="cb101-5"><a href="2_users.html#cb101-5"></a>    <span class="dt">Wachtwoord =</span> <span class="kw">col_logical</span>()</span>
+<span id="cb101-6"><a href="2_users.html#cb101-6"></a>  )</span>
+<span id="cb101-7"><a href="2_users.html#cb101-7"></a>)</span></code></pre></div>
 <p>Number of users:</p>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1"><span class="kw">nrow</span>(users)</a></code></pre></div>
-<pre><code>## [1] 1986</code></pre>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="2_users.html#cb102-1"></a><span class="kw">nrow</span>(users)</span></code></pre></div>
+<pre><code>## [1] 2035</code></pre>
 </div>
 <div id="map-user-data-1" class="section level2">
 <h2><span class="header-section-number">4.2</span> Map user data</h2>
 <p>We map the original fields to SOVON fields denoted by prefix <code>sovon_</code>.</p>
 <div id="e-mail" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> E-mail</h3>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb101-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb101-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_email =</span> Email)</a></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="2_users.html#cb104-1"></a>users &lt;-</span>
+<span id="cb104-2"><a href="2_users.html#cb104-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb104-3"><a href="2_users.html#cb104-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_email =</span> Email)</span></code></pre></div>
 </div>
 <div id="first-name" class="section level3">
 <h3><span class="header-section-number">4.2.2</span> First name</h3>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb102-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb102-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_first_name =</span> Voornaam)</a></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="2_users.html#cb105-1"></a>users &lt;-</span>
+<span id="cb105-2"><a href="2_users.html#cb105-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb105-3"><a href="2_users.html#cb105-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_first_name =</span> Voornaam)</span></code></pre></div>
 </div>
 <div id="last-name" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> Last name</h3>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb103-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb103-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_last_name =</span> Familienaam)</a></code></pre></div>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="2_users.html#cb106-1"></a>users &lt;-</span>
+<span id="cb106-2"><a href="2_users.html#cb106-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb106-3"><a href="2_users.html#cb106-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_last_name =</span> Familienaam)</span></code></pre></div>
 </div>
 <div id="address" class="section level3">
 <h3><span class="header-section-number">4.2.4</span> Address</h3>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb104-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb104-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_address =</span> Adres)</a></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="2_users.html#cb107-1"></a>users &lt;-</span>
+<span id="cb107-2"><a href="2_users.html#cb107-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb107-3"><a href="2_users.html#cb107-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_address =</span> Adres)</span></code></pre></div>
 </div>
 <div id="place" class="section level3">
 <h3><span class="header-section-number">4.2.5</span> Place</h3>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb105-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb105-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_place =</span> Gemeente)</a></code></pre></div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="2_users.html#cb108-1"></a>users &lt;-</span>
+<span id="cb108-2"><a href="2_users.html#cb108-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb108-3"><a href="2_users.html#cb108-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_place =</span> Gemeente)</span></code></pre></div>
 </div>
 <div id="postal-code" class="section level3">
 <h3><span class="header-section-number">4.2.6</span> Postal code</h3>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb106-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb106-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_postal_code =</span> Postcode)</a></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="2_users.html#cb109-1"></a>users &lt;-</span>
+<span id="cb109-2"><a href="2_users.html#cb109-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb109-3"><a href="2_users.html#cb109-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_postal_code =</span> Postcode)</span></code></pre></div>
 </div>
 <div id="country" class="section level3">
 <h3><span class="header-section-number">4.2.7</span> Country</h3>
 <p>Countries present:</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1">users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb107-2" data-line-number="2"><span class="st">  </span><span class="kw">distinct</span>(LandCode)</a></code></pre></div>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="2_users.html#cb110-1"></a>users <span class="op">%&gt;%</span></span>
+<span id="cb110-2"><a href="2_users.html#cb110-2"></a><span class="st">  </span><span class="kw">distinct</span>(LandCode)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["LandCode"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"ES"},{"1":"NA"},{"1":"UK"},{"1":"BE"},{"1":"NL"},{"1":"PT"},{"1":"FR"},{"1":"DE"},{"1":"IT"},{"1":"NO"},{"1":"MA"},{"1":"HU"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["LandCode"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"ES"},{"1":"NA"},{"1":"UK"},{"1":"BE"},{"1":"PT"},{"1":"NL"},{"1":"FR"},{"1":"DE"},{"1":"IT"},{"1":"NO"},{"1":"MA"},{"1":"HU"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb108-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb108-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_country =</span> LandCode)</a></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="2_users.html#cb111-1"></a>users &lt;-</span>
+<span id="cb111-2"><a href="2_users.html#cb111-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb111-3"><a href="2_users.html#cb111-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_country =</span> LandCode)</span></code></pre></div>
 </div>
 <div id="user-id" class="section level3">
 <h3><span class="header-section-number">4.2.8</span> User ID</h3>
 <p>User identifiers are provided by SOVON. <code>NA</code> is given.</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb109-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb109-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_id =</span> <span class="ot">NA</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="2_users.html#cb112-1"></a>users &lt;-</span>
+<span id="cb112-2"><a href="2_users.html#cb112-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb112-3"><a href="2_users.html#cb112-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_id =</span> <span class="ot">NA</span>)</span></code></pre></div>
 </div>
 <div id="user-reference" class="section level3">
 <h3><span class="header-section-number">4.2.9</span> User reference</h3>
 <p>We use the unique ID in <code>Nummer</code>:</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb110-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb110-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_reference =</span> Nummer)</a></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="2_users.html#cb113-1"></a>users &lt;-</span>
+<span id="cb113-2"><a href="2_users.html#cb113-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb113-3"><a href="2_users.html#cb113-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_reference =</span> Nummer)</span></code></pre></div>
 </div>
 <div id="user-language" class="section level3">
 <h3><span class="header-section-number">4.2.10</span> User language</h3>
 <p>This field is not present in <code>users</code>. We leave it empty:</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1">users &lt;-</a>
-<a class="sourceLine" id="cb111-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb111-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_language =</span> <span class="ot">NA_character_</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="2_users.html#cb114-1"></a>users &lt;-</span>
+<span id="cb114-2"><a href="2_users.html#cb114-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb114-3"><a href="2_users.html#cb114-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sovon_user_language =</span> <span class="ot">NA_character_</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="save-user-data" class="section level2">
 <h2><span class="header-section-number">4.3</span> Save user data</h2>
 <p>Export the SOVON fields to <code>crbirding_users</code>:</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1">crbirding_users &lt;-</a>
-<a class="sourceLine" id="cb112-2" data-line-number="2"><span class="st">  </span>users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb112-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="kw">starts_with</span>(<span class="st">&quot;sovon_&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="2_users.html#cb115-1"></a>crbirding_users &lt;-</span>
+<span id="cb115-2"><a href="2_users.html#cb115-2"></a><span class="st">  </span>users <span class="op">%&gt;%</span></span>
+<span id="cb115-3"><a href="2_users.html#cb115-3"></a><span class="st">  </span><span class="kw">select</span>(<span class="kw">starts_with</span>(<span class="st">&quot;sovon_&quot;</span>))</span></code></pre></div>
 <p>Remove prefix <code>sovon_</code>:</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="kw">names</span>(crbirding_users) &lt;-<span class="st"> </span><span class="kw">str_remove</span>(</a>
-<a class="sourceLine" id="cb113-2" data-line-number="2">  <span class="kw">names</span>(crbirding_users),</a>
-<a class="sourceLine" id="cb113-3" data-line-number="3">  <span class="dt">pattern =</span> <span class="st">&quot;sovon_&quot;</span></a>
-<a class="sourceLine" id="cb113-4" data-line-number="4">)</a></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="2_users.html#cb116-1"></a><span class="kw">names</span>(crbirding_users) &lt;-<span class="st"> </span><span class="kw">str_remove</span>(</span>
+<span id="cb116-2"><a href="2_users.html#cb116-2"></a>  <span class="kw">names</span>(crbirding_users),</span>
+<span id="cb116-3"><a href="2_users.html#cb116-3"></a>  <span class="dt">pattern =</span> <span class="st">&quot;sovon_&quot;</span></span>
+<span id="cb116-4"><a href="2_users.html#cb116-4"></a>)</span></code></pre></div>
 <p>The desired order of columns in <code>crbirding_users</code>:</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1">cr_users_cols &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb114-2" data-line-number="2">  <span class="st">&quot;user_id&quot;</span>, <span class="st">&quot;user_reference&quot;</span>, <span class="st">&quot;user_email&quot;</span>, <span class="st">&quot;user_first_name&quot;</span>,</a>
-<a class="sourceLine" id="cb114-3" data-line-number="3">  <span class="st">&quot;user_last_name&quot;</span>, <span class="st">&quot;user_address&quot;</span>, <span class="st">&quot;user_postal_code&quot;</span>, <span class="st">&quot;user_place&quot;</span>,</a>
-<a class="sourceLine" id="cb114-4" data-line-number="4">  <span class="st">&quot;user_country&quot;</span>, <span class="st">&quot;user_language&quot;</span>, <span class="st">&quot;user_role&quot;</span></a>
-<a class="sourceLine" id="cb114-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="2_users.html#cb117-1"></a>cr_users_cols &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb117-2"><a href="2_users.html#cb117-2"></a>  <span class="st">&quot;user_id&quot;</span>, <span class="st">&quot;user_reference&quot;</span>, <span class="st">&quot;user_email&quot;</span>, <span class="st">&quot;user_first_name&quot;</span>,</span>
+<span id="cb117-3"><a href="2_users.html#cb117-3"></a>  <span class="st">&quot;user_last_name&quot;</span>, <span class="st">&quot;user_address&quot;</span>, <span class="st">&quot;user_postal_code&quot;</span>, <span class="st">&quot;user_place&quot;</span>,</span>
+<span id="cb117-4"><a href="2_users.html#cb117-4"></a>  <span class="st">&quot;user_country&quot;</span>, <span class="st">&quot;user_language&quot;</span>, <span class="st">&quot;user_role&quot;</span></span>
+<span id="cb117-5"><a href="2_users.html#cb117-5"></a>)</span></code></pre></div>
 <p>Fields still not mapped:</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1">cr_users_cols[<span class="kw">which</span>(<span class="op">!</span>cr_users_cols <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(crbirding_users))]</a></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="2_users.html#cb118-1"></a>cr_users_cols[<span class="kw">which</span>(<span class="op">!</span>cr_users_cols <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(crbirding_users))]</span></code></pre></div>
 <pre><code>## [1] &quot;user_role&quot;</code></pre>
 <p>The field <code>user_role</code> cannot be filled at the moment: it will be mapped at the end of the next chapter.</p>
 <p>Set column order:</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">crbirding_users &lt;-</a>
-<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="st">  </span>crbirding_users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb117-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(cr_users_cols[cr_users_cols <span class="op">!=</span><span class="st"> &quot;user_role&quot;</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="2_users.html#cb120-1"></a>crbirding_users &lt;-</span>
+<span id="cb120-2"><a href="2_users.html#cb120-2"></a><span class="st">  </span>crbirding_users <span class="op">%&gt;%</span></span>
+<span id="cb120-3"><a href="2_users.html#cb120-3"></a><span class="st">  </span><span class="kw">select</span>(cr_users_cols[cr_users_cols <span class="op">!=</span><span class="st"> &quot;user_role&quot;</span>])</span></code></pre></div>
 <p>Preview data (e-mail, first and last names removed for privacy reasons):</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">crbirding_users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb118-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(user_email, user_first_name, user_last_name)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">10</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="2_users.html#cb121-1"></a>crbirding_users <span class="op">%&gt;%</span></span>
+<span id="cb121-2"><a href="2_users.html#cb121-2"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(user_email, user_first_name, user_last_name)) <span class="op">%&gt;%</span></span>
+<span id="cb121-3"><a href="2_users.html#cb121-3"></a><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">10</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["user_id"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["user_reference"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["user_address"],"name":[3],"type":["chr"],"align":["left"]},{"label":["user_postal_code"],"name":[4],"type":["chr"],"align":["left"]},{"label":["user_place"],"name":[5],"type":["chr"],"align":["left"]},{"label":["user_country"],"name":[6],"type":["chr"],"align":["left"]},{"label":["user_language"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"NA","2":"2009","3":"NA","4":"NA","5":"NA","6":"ES","7":"NA"},{"1":"NA","2":"758","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1900","3":"NA","4":"NA","5":"NA","6":"UK","7":"NA"},{"1":"NA","2":"1834","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"421","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1776","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"2057","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1989","3":"NA","4":"NA","5":"NA","6":"NL","7":"NA"},{"1":"NA","2":"1331","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1655","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["user_id"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["user_reference"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["user_address"],"name":[3],"type":["chr"],"align":["left"]},{"label":["user_postal_code"],"name":[4],"type":["chr"],"align":["left"]},{"label":["user_place"],"name":[5],"type":["chr"],"align":["left"]},{"label":["user_country"],"name":[6],"type":["chr"],"align":["left"]},{"label":["user_language"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"NA","2":"2009","3":"NA","4":"NA","5":"NA","6":"ES","7":"NA"},{"1":"NA","2":"758","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"1900","3":"NA","4":"NA","5":"NA","6":"UK","7":"NA"},{"1":"NA","2":"1834","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"},{"1":"NA","2":"421","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"1776","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"2057","3":"NA","4":"NA","5":"NA","6":"BE","7":"NA"},{"1":"NA","2":"2179","3":"NA","4":"NA","5":"NA","6":"PT","7":"NA"},{"1":"NA","2":"1989","3":"NA","4":"NA","5":"NA","6":"NL","7":"NA"},{"1":"NA","2":"1331","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Save to csv file <code>crbirding_users.csv</code> in <code>./data/processed/</code> as asked by SOVON:</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">crbirding_users <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb119-2" data-line-number="2"><span class="st">  </span><span class="kw">write_csv</span>(</a>
-<a class="sourceLine" id="cb119-3" data-line-number="3">    <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;processed&quot;</span>, <span class="st">&quot;crbirding_users.csv&quot;</span>),</a>
-<a class="sourceLine" id="cb119-4" data-line-number="4">    <span class="dt">na =</span> <span class="st">&quot;&quot;</span></a>
-<a class="sourceLine" id="cb119-5" data-line-number="5">  )</a></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="2_users.html#cb122-1"></a>crbirding_users <span class="op">%&gt;%</span></span>
+<span id="cb122-2"><a href="2_users.html#cb122-2"></a><span class="st">  </span><span class="kw">write_csv</span>(</span>
+<span id="cb122-3"><a href="2_users.html#cb122-3"></a>    <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;processed&quot;</span>, <span class="st">&quot;crbirding_users.csv&quot;</span>),</span>
+<span id="cb122-4"><a href="2_users.html#cb122-4"></a>    <span class="dt">na =</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb122-5"><a href="2_users.html#cb122-5"></a>  )</span></code></pre></div>
 
 </div>
 </div>
