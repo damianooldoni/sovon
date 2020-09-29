@@ -229,7 +229,7 @@ crbirding_birds_first_color_ring <-
   group_by(bird_reference) %>%
   filter(!is.na(inscription)) %>%
   mutate(first_color_ring = if_else(
-    bird_date_begin == min(bird_date_begin,na.rm = TRUE),
+    bird_date_begin == min(bird_date_begin, na.rm = TRUE),
     inscription,
     NA_character_)) %>%
   ungroup() %>%
@@ -304,7 +304,7 @@ crbirding_birds %>%
   nrow
 ```
 
-This is not surprising as the bird_reference has always been defined as a progressive number, so it is sufficient the change of one bird reference to modify all the other references coming after.
+This is not surprising as `bird_reference` has been defined as a progressive number, so it is sufficient the change of one bird reference to modify all the other references coming after.
 
 First change appears at:
 
