@@ -323,7 +323,7 @@ Some birds where not present in data transfer of April 2019, so the `bird_refere
 This case includes:
 
 1. New birds: birds ringed for the very first time after the previous data transfer in April 2019.
-2. Birds with modified first color ring: birds whose very first color ring has been corrected. This case is due to the fact that the first color ring is the real unique identifier in INBO ring table `tblKleurring`
+2. Birds with modified first color ring: birds whose very first color ring has been corrected or added. This case is due to the fact that the first color ring is the real unique identifier in INBO ring table `tblKleurring`
 
 ```{r new_birds_or_modified_first_ring}
 crbirding_birds %>%
@@ -372,6 +372,24 @@ crbirding_birds_first_color_ring_2019 %>%
             by = "first_color_ring")
 ```
 
+Based on patch related to [15#issuecomment-700596629](https://github.com/inbo/cr-birding/issues/15#issuecomment-700596629) we have removed all informations about CPAG, so it makes sense we don't fint it in new export.
+The ring `ALOB` is not the first ring in the new data, but it replaces the ring `LPAV`. We match it and assign `bird_reference_2019` to this ring:
+
+```{r assign_bird_ref_2019_to_ALOB}
+bird_reference_ALOB <- 
+  crbirding_birds %>%
+  filter(inscription == "ALOB") %>%
+  pull(bird_reference)
+bird_reference_ALOB_2019 <-
+  crbirding_birds_2019 %>%
+  filter(inscription == "ALOB") %>%
+  pull(bird_reference)
+crbirding_birds <-
+  crbirding_birds %>%
+  mutate(bird_reference_2019 = if_else(bird_reference == bird_reference_ALOB,
+                                       bird_reference_ALOB_2019,
+                                       bird_reference_2019))
+```
 
 Based on metal ring (`bird_ring_number`) information, date of ringing (`bird_date_begin`) and other fields we can see that the ring FMOV is the same as ring FMOU from 2019 export:
 
@@ -390,19 +408,32 @@ all(
 So, we can assign `bird_reference_2019` to this ring:
 
 ```{r assign_bird_ref_2019_to_FMOV}
+bird_reference_FMOV <- 
+  crbirding_birds %>%
+  filter(inscription == "FMOV") %>%
+  pull(bird_reference)
+bird_reference_FMOU_2019 <- 
+  crbirding_birds_2019 %>%
+  filter(inscription == "FMOU") %>%
+  pull(bird_reference)
 crbirding_birds <-
   crbirding_birds %>%
-  mutate(bird_reference_2019 = if_else(!is.na(bird_shorthand) &
-                                         bird_shorthand == "B-FM.OV",
-                                       crbirding_birds_2019 %>%
-                                         filter(bird_shorthand == "B-FM.OU") %>%
-                                         pull(bird_reference),
+  mutate(bird_reference_2019 = if_else(bird_reference == bird_reference_FMOV,
+                                       bird_reference_FMOU_2019,
                                        bird_reference_2019))
+```
+
+Show changes in column `bird_reference_2019`:
+
+```{r changes_FMOV_ALOB}
+crbirding_birds %>%
+  filter(bird_reference %in% c(bird_reference_ALOB, bird_reference_FMOV)) %>%
+  select(bird_reference, bird_reference_2019, bird_shorthand)
 ```
 
 ### Use `bird_reference` from 2019 as primary key
 
-To ease the work of SOVON Iters we reuse the old bird references (`bird_reference_2019`) as primary key in `crbirding_birds` where present, being careful to change the foreign key in `crbirding_observations` as well.
+To ease the work of SOVON It team and as discussed in [issue 128](https://github.com/inbo/cr-birding/issues/128) we reuse the old bird references (`bird_reference_2019`) as primary key in `crbirding_birds` where present, being careful to change the foreign key in `crbirding_observations` as well.
 
 We do it by using a helping column, `new_bird_reference` filled with old bird references where possible and with the new ones plus 20000 to ensure unicity:
 
