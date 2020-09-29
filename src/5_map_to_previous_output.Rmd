@@ -150,11 +150,13 @@ same_ref_ids <-
   crbirding_users %>%
   filter(user_reference %in% crbirding_users_2019$user_reference) %>%
   pull(user_reference)
-crbirding_users_2019 %>%
+ids_users_with_changes <- 
+  crbirding_users_2019 %>%
   filter(user_reference %in% same_ref_ids) %>%
   anti_join(crbirding_users,
             by = names(crbirding_users)) %>%
   pull(user_reference)
+ids_users_with_changes
 ```
 
 ## Map birds
@@ -491,6 +493,7 @@ bird_ref_changed_shorthand <-
   crbirding_birds %>%
   # remove new rings
   filter(bird_reference - 20000 < 0) %>%
+  select(bird_reference, bird_shorthand) %>%
   anti_join(crbirding_birds_2019,
             by = c("bird_reference", "bird_shorthand")) %>%
   distinct(bird_reference)
@@ -505,7 +508,8 @@ crbirding_birds %>%
   select(bird_reference,
          bird_shorthand,
          bird_date_begin,
-         bird_date_end)
+         bird_date_end) %>%
+  arrange(bird_reference)
 ```
 
 Values of `bird_shorthand` in  `crbirding_birds_2019`:
@@ -518,8 +522,11 @@ crbirding_birds_2019 %>%
          bird_date_begin,
          bird_date_end) %>%
   # add "_2019" to make sure we are speaking of 2019's export data
-  rename_all(paste0, "_2019")
+  rename_all(paste0, "_2019") %>%
+  arrange(bird_reference_2019)
 ```
+
+Most of these changes are due to change the color rings.
 
 ### Changed `bird_scheme`
 
@@ -674,7 +681,8 @@ Actual color ring history:
 ```{r actual_history_changed_rings}
 changed_bird_date_begin_end %>%
   left_join(crbirding_birds,
-            by = "bird_reference")
+            by = "bird_reference") %>%
+  select(bird_reference, bird_shorthand, bird_date_begin, bird_date_end)
 ```
 
 Color ring history data from 2019:
@@ -682,7 +690,8 @@ Color ring history data from 2019:
 ```{r history_changed_rings_from_2019}
 changed_bird_date_begin_end %>%
   left_join(crbirding_birds_2019,
-            by = "bird_reference")
+            by = "bird_reference") %>%
+  select(bird_reference, bird_shorthand, bird_date_begin, bird_date_end)
 ```
 
 ### Save bird data with updated `bird_reference`
@@ -690,7 +699,8 @@ changed_bird_date_begin_end %>%
 We save `crbirding_birds` with the updated unique identifiers in `bird_reference`:
 
 ```{r save_birds_with_bird_ref_2019}
-crbirding_birds %>%
+crbirding_birdss <- 
+  crbirding_birds %>%
   mutate(
     bird_date_begin = as.Date(bird_date_begin),
     bird_date_end = as.Date(bird_date_end)) %>%
@@ -756,6 +766,8 @@ crbirding_observations_2019 %>%
          observation_lng)
 ```
 
+Notice how these are observations where the longitude direction was not mapped properly during export of 2019 (see issue [#105](https://github.com/inbo/cr-birding/issues/105)).
+
 Details of observations with changes in location (column `observation_location`):
 
 ```{r obs_with_changes_location}
@@ -806,6 +818,8 @@ crbirding_observations_2019 %>%
               select(observation_reference, user_reference),
             by = "observation_reference")
 ```
+
+Most `user_reference` are the same as in 2019: it means that changes are in the columns hidden for privacy reasons. These user ids are indeed the ones stored above in variable `ids_users_with_changes` in the [Users] section.
 
 ### Changed metal ring information
 
