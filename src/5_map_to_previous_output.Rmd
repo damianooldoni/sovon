@@ -318,7 +318,7 @@ crbirding_birds %>%
 
 ### New `bird_reference`
 
-Some birds where not present in data transfer of April 2019, so the `bird_reference` cannot be mapped to `bird_reference_2019`.
+Some birds were not present in data transfer of April 2019, so the `bird_reference` cannot be mapped to `bird_reference_2019`.
 
 This case includes:
 
@@ -353,7 +353,7 @@ supected_new_birds_before_export_date <-
 supected_new_birds_before_export_date
 ```
 
-To better retrieve potential matches to birds from 2019's export, we check birds from 2019 not anymore included in actual data:
+To better retrieve potential matches to birds from 2019's export, we check birds from 2019 not included in actual data:
 
 ```{r birds_2019_not_in_new_export}
 crbirding_birds_first_color_ring_2019 %>%
