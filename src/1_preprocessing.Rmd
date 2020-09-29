@@ -396,14 +396,12 @@ Remove spaces if present:
 ```{r remove_spaces_from_obs_and_acts}
 obs_and_acts <-
   obs_and_acts %>%
-  mutate_at(
-    vars(-c(
-      starts_with("Plaats"),
-      ends_with("Datum"),
-      one_of("Opmerking", "Nummer", "WaarnemerNummer")
-    )),
-    funs(str_replace(., " ", ""))
-  )
+  mutate(across(
+    !starts_with("Plaats") &
+      !ends_with("Datum") & 
+      !one_of("Opmerking"),
+    ~ str_replace_all(., " ", "")
+  ))
 ```
 
 ## Check presence action code
