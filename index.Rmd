@@ -3,7 +3,7 @@ title: "Mapping INBO color ring data to SOVON format"
 author: Damiano Oldoni
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
-github-repo: inbo/sovon
+github-repo: inbo/cr-birding
 output:
   bookdown::gitbook:
     split_by: rmd
@@ -43,6 +43,6 @@ library(lubridate) # To ease working with dates
 
 The output of the data processing consists of three dataframes saved as comma separated files (`csv`) in folder `data/processed/`:
 
-1. `crbirding_users`: user data
+1. `crbirding_users`: user data (not loaded to GitHub for privacy reasons)
 2. `crbirding_birds`: ring data
 3. `crbirding_observations`: observation data
