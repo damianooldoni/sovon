@@ -507,7 +507,7 @@ crbirding_birds %>%
   filter(!date_is_present)
 ```
 
-Based on spreadsheet and observation data, we found that the dates of applying the rings FAAG, YCAF and FHOV are linked to actions `ziek`, i.e. the ring has been applied while taking care of the birds. 
+Based on spreadsheet and observation data, we found that the dates of applying the rings FAAG, YCAF, FHOV and HSOW are linked to actions `ziek`, i.e. the ring has been applied while taking care of the birds. 
 
 The date of applying FAAG:
 
@@ -567,6 +567,25 @@ info_fhov <-
 info_fhov
 ```
 
+The date of applying HSOW:
+
+```{r get_info_HSOW}
+info_hsow <-
+  crbirding_birds %>%
+  filter(sovon_bird_shorthand == "HSOW") %>%
+  mutate(
+    sovon_bird_date_begin =
+      obs_and_acts %>%
+        filter(
+          first_Nummer == "CPAG",
+          !is.na(ziek)
+        ) %>%
+        ## there is just one "ziek" action (2018-04-26)
+        pull(Datum)
+  )
+info_hsow
+```
+
 Based on notes (column `Opmerking` in `obs_and_acts`) we understand that the color ring BUAH has been placed while applying the metal ring, so it is linked to action `rngme`.
 
 The date of applying BUAH:
@@ -593,10 +612,15 @@ Add this dates to `crbirding_birds`:
 crbirding_birds <-
   bind_rows(
     crbirding_birds %>%
-      filter(!sovon_bird_shorthand %in% c("FAAG", "YCAF", "FHOV", "BUAH")),
+      filter(!sovon_bird_shorthand %in% c("FAAG",
+                                          "YCAF",
+                                          "FHOV",
+                                          "HSOW",
+                                          "BUAH")),
     info_faag,
     info_ycaf,
     info_fhov,
+    info_hsow,
     info_buah
   ) %>%
   arrange(sovon_bird_reference, sovon_bird_date_begin)
