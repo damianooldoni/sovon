@@ -372,7 +372,6 @@ crbirding_birds_first_color_ring_2019 %>%
             by = "first_color_ring")
 ```
 
-Based on patch related to [15#issuecomment-700596629](https://github.com/inbo/cr-birding/issues/15#issuecomment-700596629) we have removed all informations about CPAG, so it makes sense we don't fint it in new export.
 The ring `ALOB` is not the first ring in the new data, but it replaces the ring `LPAV`. We match it and assign `bird_reference_2019` to this ring:
 
 ```{r assign_bird_ref_2019_to_ALOB}

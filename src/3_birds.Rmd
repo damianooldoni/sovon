@@ -634,21 +634,6 @@ crbirding_birds %>%
   nrow() == nrow(crbirding_birds)
 ```
 
-We add a temporary patch in order to solve [issue #15-issuecomment-700596629](https://github.com/inbo/cr-birding/issues/15#issuecomment-700596629). We remove ring history and observations of birds where no date of ringing is present:
-
-```{r add_patch_norngkl}
-no_date_bird_reference <- 
-  crbirding_birds %>%
-  filter(is.na(sovon_bird_date_begin)) %>%
-  distinct(sovon_bird_reference)
-crbirding_birds <- 
-  crbirding_birds %>%
-  filter(!sovon_bird_reference %in% no_date_bird_reference)
-obs_and_acts <-
-  obs_and_acts %>%
-  filter(! sovon_bird_reference %in% no_date_bird_reference)
-```
-
 #### Add intermediate color rings
 
 Based on spreadsheet of experts, we have to add new rings, as some birds have been ringed more than twice, so the information contained in `first_Nummer` and `NummerNieuw` is not complete, as they map the very first and the very last ring. The intermediate rings are the following:
