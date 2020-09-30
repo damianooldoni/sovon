@@ -18,8 +18,8 @@ output:
 
 ```{r index-setup, include = FALSE}
 knitr::opts_chunk$set(
-  warning = FALSE,
-  message = FALSE,
+  warning = TRUE,
+  message = TRUE,
   rownames.print = FALSE # Option for df_print = paged
 )
 ```
