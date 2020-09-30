@@ -2205,6 +2205,9 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,1883,05920,,B-CN.AZ,BLB,H...152988,,U,,2008-07-14,2014-10-19,2,1,,,inscription color: W.
 ,1883,05920,,B-CN.AZ,,,,U,,2014-10-19,,0,,RB,U,inscription color: W.
 ,1884,05920,,B-CPA.C,BLB,H...152986,,U,,2008-07-14,,2,1,RB,U,inscription color: W.
+,1885,05920,,B-CPAG,BLB,H...152993,,U,,2008-07-14,2019-09-09,2,1,,,inscription color: W.
+,1885,05920,,B-H.SOW,BLB,H...152993,,U,,2019-09-09,,1,A,RB,U,inscription color: W.
+,1885,05920,,,BLB,H...152993,,U,,2019-09-09,2019-09-09,1,A,,,
 ,1886,05910,,B-GM.AS,BLB,L...102974,,U,,2008-04-28,2019-05-28,2,A,,,inscription color: W.
 ,1886,05910,,B-GM.AS,,,,U,,2019-05-28,,0,,RB,U,inscription color: W.
 ,1887,05910,,B-GM.AV,BLB,L...102997,,U,,2009-06-08,,2,7,RB,,inscription color: W.
@@ -2537,7 +2540,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,2156,05910,,B-RJA.C,BLB,L...916134,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
 ,2157,05910,,B-RJ.AX,BLB,L...916145,,U,,2014-07-11,,2,1,LB,U,inscription color: W.
 ,2158,05910,,B-R.KAA,BLB,L...916147,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
-,2159,05910,,B-RK.AB,BLB,L...916148,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
+,2159,05910,,B-RK.AB,BLB,L....91614,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
 ,2160,05910,,,BLB,L...914751,,U,,2014-06-13,2014-07-15,0,1,,,
 ,2160,05910,,B-RKA.G,BLB,L...914751,,U,,2014-07-15,,1,1,RB,U,inscription color: W.
 ,2161,05910,,B-RK.AM,BLB,L...914787,,U,,2014-07-18,,2,1,RB,U,inscription color: W.
@@ -4968,7 +4971,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,4497,05920,,B-CT.OJ,BLB,H...925528,,U,,2017-07-10,,2,1,LB,D,inscription color: W.
 ,4498,05910,,B-B.LOD,BLB,L...925669,,U,,2017-07-10,,2,1,LB,D,inscription color: W.
 ,4499,05910,,B-B.FOP,BLB,L...925670,,U,,2017-07-10,,2,1,LB,D,inscription color: W.
-,4500,05910,,B-BR.OJ,BLB,L...925671,,U,,2017-07-10,,2,1,LB,D,inscription color: W.
+,4500,05910,,B-BR.OJ,BLB,L...925671,,U,,2017-07-10,2020-09-01,2,1,LB,D,inscription color: W.
 ,4501,05910,,B-BU.OB,BLB,L...925672,,U,,2017-07-10,,2,1,LB,D,inscription color: W.
 ,4502,05910,,B-BW.OR,BLB,L...925673,,U,,2017-07-10,,2,1,LB,D,inscription color: W.
 ,4503,05920,,B-C.WOH,BLB,H...907030,,U,,2017-07-07,,2,1,LB,U,inscription color: W.
@@ -5215,7 +5218,7 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,4714,05920,,B-ZVA.K,BLB,H...902066,,U,,2014-07-18,,2,1,RB,U,inscription color: W.
 ,4715,05910,,B-RJ.AF,BLB,L...916136,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
 ,4716,05910,,B-RJA.G,BLB,L...914796,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
-,4717,05910,,B-RJ.AJ,BLB,L...916147,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
+,4717,05910,,B-RJ.AJ,BLB,L...916148,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
 ,4718,05910,,B-R.JAL,BLB,L...920803,,U,,2014-07-11,2014-09-01,2,1,RB,U,inscription color: W.
 ,4719,05910,,B-RJ.AM,BLB,L...912684,,U,,2014-07-11,,2,1,RB,U,inscription color: W.
 ,4720,05910,,B-RJA.N,BLB,L...920804,,F,,2014-07-11,,2,1,RB,U,inscription color: W.
@@ -11617,10 +11620,10 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,30509,05910,,B-K.JOZ,,L...930075,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30510,05910,,B-KP.OM,,L...930070,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30511,05910,,B-K.SOW,,L...930084,,U,,2020-06-29,2020-08-19,2,1,,,inscription color: W.
-,30512,05910,,B-KN.OK,,L...930077,,U,,2020-06-29,,2,1,,,inscription color: W.
+,30512,05910,,B-KN.OK,,L...930077,,U,,2020-06-29,2020-09-01,2,1,,,inscription color: W.
 ,30513,05910,,B-KL.OF,,L...930062,,U,,2020-06-29,2020-07-04,2,1,,,inscription color: W.
 ,30514,05910,,B-KZ.OF,,L...930068,,U,,2020-06-29,,2,1,,,inscription color: W.
-,30515,05910,,B-KW.OB,,L...930064,,U,,2020-06-29,,2,1,,,inscription color: W.
+,30515,05910,,B-KW.OB,,L...930064,,U,,2020-06-29,2020-09-01,2,1,,,inscription color: W.
 ,30516,05910,,B-KDO.V,,L...930065,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30517,05910,,B-KWO.C,,L...930059,,U,,2020-06-29,2020-08-19,2,1,,,inscription color: W.
 ,30518,05910,,B-K.NOZ,,L...930061,,U,,2020-06-29,,2,1,,,inscription color: W.
@@ -11656,13 +11659,13 @@ bird_id,bird_reference,bird_euring,bird_bto,bird_shorthand,bird_scheme,bird_ring
 ,30544,05910,,B-KR.OJ,,L...930112,,U,,2020-07-10,,2,1,,,inscription color: W.
 ,30545,05910,,B-KK.OB,,L...930129,,U,,2020-07-10,,2,1,,,inscription color: W.
 ,30546,05910,,B-K.ROP,,L...930135,,U,,2020-07-10,,2,1,,,inscription color: W.
-,30547,05910,,B-KLO.V,,L...930056,,U,,2020-07-10,,2,1,,,inscription color: W.
+,30547,05910,,B-KLO.V,,L...930056,,U,,2020-07-10,2020-07-17,2,1,,,inscription color: W.
 ,30548,05910,,B-K.AOZ,,L...930066,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30549,05910,,B-KN.OR,,L...930054,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30550,05910,,B-K.KOH,,L...930051,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30551,05910,,B-KD.OM,,L...930057,,U,,2020-06-29,,2,1,,,inscription color: W.
 ,30552,05910,,B-KJO.N,,L...930060,,U,,2020-06-29,,2,1,,,inscription color: W.
-,30553,05910,,B-KH.OJ,,L...930155,,U,,2020-06-29,,2,1,,,inscription color: W.
+,30553,05910,,B-KH.OJ,,L...930155,,U,,2020-06-29,2020-07-06,2,1,,,inscription color: W.
 ,30554,05920,,B-LAO.N,,H...908326,,U,,2020-08-28,,2,3,LB,U,inscription color: W.
 ,30555,05920,,B-LA.OF,,H...908409,,U,,2020-08-28,,2,3,RB,U,inscription color: W.
 ,30556,05920,,B-F.UOD,,H...904484,,U,,2018-07-09,,2,1,RB,U,inscription color: W.
