@@ -390,6 +390,8 @@ crbirding_birds <-
                                        bird_reference_2019))
 ```
 
+The ring `EAU` has been removed from the database at the preprocessing stage (see section about the [removal of some rings](#remove-three-rings)).
+
 Based on metal ring (`bird_ring_number`) information, date of ringing (`bird_date_begin`) and other fields we can see that the ring FMOV is the same as ring FMOU from 2019 export:
 
 ```{r check_FMOV-FMOU}
@@ -578,7 +580,11 @@ changed_bird_scheme <-
                      bird_date_begin,
                      bird_date_end),
             by = (c("bird_reference", "bird_date_begin", "bird_date_end"))) %>%
-  filter(!is.na(bird_scheme_2019) | !is.na(bird_scheme))
+  filter(!is.na(bird_scheme_2019) | !is.na(bird_scheme)) %>%
+  select(bird_reference,
+         bird_scheme,
+         bird_scheme_2019,
+         everything())
 changed_bird_scheme
 ```
 

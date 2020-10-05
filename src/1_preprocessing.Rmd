@@ -824,7 +824,7 @@ obs_and_acts <-
   filter(!KleurringNummer %in% common_shellduck_nummer | is.na(KleurringNummer))
 ```
 
-## Remove rings `BGAH`, `BRAB` and `EAU`
+## Remove rings `BGAH`, `BRAB` and `EAU`{#remove-three-rings}
 
 The rings `BGAH`, `BRAB` and `EAU`should be removed, as explained in [# 89-issuesomment-481195862](https://github.com/inbo/cr-birding/issues/89#issuecomment-481195862) and [# 102-issuecomment-604939290](https://github.com/inbo/cr-birding/issues/102#issuecomment-604939290). No information about EURING code can be found:
 
