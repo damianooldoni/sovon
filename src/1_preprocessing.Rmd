@@ -619,8 +619,8 @@ obs_and_acts %>%
 
 ## Check age while applying rings
 
-For each bird, observations with same date should refer to same bird age. The only exceptions allowed are those from  `veld` observations as the age in this case is estimated by observer and can be different froù the real one.  
-Exceptions:
+For each bird, observations with same date should refer to same bird age. The only exceptions allowed are those from  `veld` observations as the age in this case is estimated by observer and can be different from the real one.  
+Exceptions, afer removing field observations:
 
 ```{r check_anomalies_age_ringing}
 exceptions_age <-
@@ -646,16 +646,6 @@ exceptions_age <-
   )
 exceptions_age
 ```
-
-Exceptions: 
-
-```{r exceptions_all_field_obs}
-exceptions_age %>%
-  filter(veld == "veld") %>%
-  nrow() == nrow(exceptions_age)
-```
-
-If yes, then we leave them as they are related to age estimations as given by observers.
 
 ## Check bird sex inconsistencies
 
