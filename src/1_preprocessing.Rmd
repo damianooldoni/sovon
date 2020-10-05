@@ -1,26 +1,8 @@
----
-title: "Import and preprocess INBO color ring data"
-author: 
-- Damiano Oldoni
-date: "`r Sys.Date()`"
-output:
-  html_document:
-    toc: true
-    toc_depth: 3
-    toc_float: true
-    number_sections: true
-    theme: yeti
-    df_print: paged
-knit: (function(input_file, encoding) { rmarkdown::render(input_file, encoding = encoding, output_file = paste0("./docs/",sub(".Rmd", ".html", basename(input_file))))})
----
+# Import and preprocess INBO color ring data
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-```
+## Extract data from INBO kleurring database
 
-# Extract data from INBO kleurring database
-
-## Connection to INBO database
+### Connection to INBO database
 
 Get connection settings from `config.yml` (not included to the reposiory) and connect to database:
 
@@ -34,8 +16,6 @@ conn <- dbConnect(odbc::odbc(),
   trusted_connection = meeuwen$trusted_connection
 )
 ```
-
-## Import data
 
 ### Extract user data
 
