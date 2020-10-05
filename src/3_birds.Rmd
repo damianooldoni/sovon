@@ -1545,7 +1545,7 @@ if ("megev" %in% acts) {
     filter(megev == "megev") %>%
     nrow()
 } else {
-  print("0")
+  message("0")
 }
 ```
 
@@ -1559,7 +1559,7 @@ if ("megev" %in% acts) {
     distinct() %>%
     select_if(~ sum(!is.na(.)) > 0)
 } else {
-  print("'megev' is not present.")
+  message("'megev' is not present.")
 }
 ```
 
@@ -1606,7 +1606,7 @@ if ("megev" %in% acts) {
     filter(n > 1)
   bird_ref_multiple_megev
 } else {
-  print("'megev' is not present.")
+  message("'megev' is not present.")
 }
 ```
 
@@ -1647,7 +1647,7 @@ if ("megev" %in% acts) {
     arrange(sovon_bird_reference)
   rings_to_add_megev
 } else {
-  print("'megev' is not present.")
+  message("'megev' is not present.")
 }
 ```
 
@@ -1674,7 +1674,7 @@ if ("megev" %in% acts) {
     mutate(sovon_bird_date_end = sovon_bird_date_end_updated) %>%
     select(-sovon_bird_date_end_updated)
 } else {
-  print("'megev' is not present.")
+  message("'megev' is not present.")
 }
 ```
 
@@ -1694,7 +1694,7 @@ if ("megev" %in% acts) {
       everything()
     )
 } else {
-  print("'megev' is not present.")
+  message("'megev' is not present.")
 }
 ```
 
@@ -2924,7 +2924,7 @@ ringers_number <-
   filter(!is.na(WaarnemerNummer)) %>%
   distinct(WaarnemerNummer) %>%
   pull(WaarnemerNummer)
-print(paste(
+message(paste(
   "Number of ringers:",
   length(ringers_number)
 ))
