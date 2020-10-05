@@ -836,11 +836,11 @@ obs_and_acts <-
 
 ## Remove rings `BGAH`, `BRAB` and `EAU`
 
-The rings `BGAH` and `BRAB` should be removed, as explained in [this comment on issue 89](https://github.com/inbo/cr-birding/issues/89#issuecomment-481195862). No information about EURING code can be found:
+The rings `BGAH`, `BRAB` and `EAU`should be removed, as explained in [# 89-issuesomment-481195862](https://github.com/inbo/cr-birding/issues/89#issuecomment-481195862) and [# 102-issuecomment-604939290](https://github.com/inbo/cr-birding/issues/102#issuecomment-604939290). No information about EURING code can be found:
 
 ```{r show_BGAH_BRAB}
 birds %>%
-  filter(Nummer %in% c("BGAH", "BRAB"))
+  filter(Nummer %in% c("BGAH", "BRAB", "EAU"))
 ```
 
 We also remove the ring `EAU` as it is not valid and the INBO experts agree on removing it (see [issue #102](https://github.com/inbo/cr-birding/issues/102)).
