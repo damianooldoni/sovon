@@ -1,7 +1,7 @@
 intro
+import-and-preprocess-inbo-color-ring-data
 extract-data-from-inbo-kleurring-database
 connection-to-inbo-database
-import-data
 extract-user-data
 extract-color-ring-data
 extract-observation-data
