@@ -411,7 +411,7 @@ obs_and_acts <-
 acts_with_klgev <-
   obs_and_acts %>%
   filter(klgev == "klgev") %>%
-  select(acts) %>%
+  select(all_of(acts)) %>%
   distinct() %>%
   select_if(~ sum(!is.na(.)) > 0) %>%
   names()
@@ -426,7 +426,7 @@ if ("megev" %in% acts) {
   acts_with_megev <-
     obs_and_acts %>%
     filter(megev == "megev") %>%
-    select(acts) %>%
+    select(all_of(acts)) %>%
     distinct() %>%
     select_if(~ sum(!is.na(.)) > 0) %>%
     names()
