@@ -30,7 +30,7 @@ This document contains and describes all the steps in mapping INBO color ring da
 
 Load libraries:
 
-```{r load_libraries}
+```{r load_libraries, warning=FALSE, message=FALSE}
 library(DBI) # To connect to database
 library(odbc) # To connect to database
 library(tidyverse) # To do datascience
