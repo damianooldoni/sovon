@@ -619,13 +619,16 @@ obs_and_acts %>%
 
 ## Check age while applying rings
 
-For each bird, observations with same date should refer to same bird age. Exceptions:
+For each bird, observations with same date should refer to same bird age. The only exceptions allowed are those from  `veld` observations as the age in this case is estimated by observer and can be different froù the real one.  
+Exceptions:
 
 ```{r check_anomalies_age_ringing}
 exceptions_age <-
   obs_and_acts %>%
+  # age is present
   filter(!is.na(LeeftijdCode)) %>%
-  # filter(!is.na(rngkl) | !is.na(rngme)) %>%
+  # exclude field observations
+  filter(is.na(veld)) %>%
   distinct(KleurringNummer, Datum, LeeftijdCode, WaarnemerNummer) %>%
   group_by(KleurringNummer, Datum, WaarnemerNummer) %>%
   count() %>%
@@ -644,7 +647,7 @@ exceptions_age <-
 exceptions_age
 ```
 
-Are these exceptions field observations (`veld` action)? 
+Exceptions: 
 
 ```{r exceptions_all_field_obs}
 exceptions_age %>%
