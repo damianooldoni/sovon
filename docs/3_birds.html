@@ -24,7 +24,7 @@
 <meta name="author" content="Damiano Oldoni" />
 
 
-<meta name="date" content="2020-10-05" />
+<meta name="date" content="2020-10-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -507,9 +507,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## left_join: added one column (sovon_bird_reference)</code></pre>
 <pre><code>##            &gt; rows only in x         0</code></pre>
 <pre><code>##            &gt; rows only in y  (      0)</code></pre>
-<pre><code>##            &gt; matched rows     150,831</code></pre>
+<pre><code>##            &gt; matched rows     150,843</code></pre>
 <pre><code>##            &gt;                 =========</code></pre>
-<pre><code>##            &gt; rows total       150,831</code></pre>
+<pre><code>##            &gt; rows total       150,843</code></pre>
 <pre><code>## select: columns reordered (sovon_bird_reference, Nummer, Datum, EuringCode, LeeftijdCode, …)</code></pre>
 <p>Check whether there are observations without link to any bird:</p>
 <div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="3_birds.html#cb386-1"></a><span class="kw">filter</span>(obs_and_acts, <span class="kw">is.na</span>(sovon_bird_reference))</span></code></pre></div>
@@ -533,9 +533,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## left_join: added one column (first_Nummer)</code></pre>
 <pre><code>##            &gt; rows only in x         0</code></pre>
 <pre><code>##            &gt; rows only in y  (      0)</code></pre>
-<pre><code>##            &gt; matched rows     150,831</code></pre>
+<pre><code>##            &gt; matched rows     150,843</code></pre>
 <pre><code>##            &gt;                 =========</code></pre>
-<pre><code>##            &gt; rows total       150,831</code></pre>
+<pre><code>##            &gt; rows total       150,843</code></pre>
 <p>The reconstruction of the series of color rings for each bird is made by using columns <code>first_Nummer</code> (very first color ring), <code>NummerNieuw</code> (very last color ring) and the information from spreadsheets of experts. We will collect the needed information in a new dataframe, called <code>crbirding_birds</code> which will grow up to become the end product containing the ring data to deliver to SOVON.</p>
 <p>First step is to <em>gather</em> <code>first_Nummer</code> and <code>NummerNieuw</code> in new column <code>sovon_bird_shorthand</code>:</p>
 <div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="3_birds.html#cb396-1"></a>crbirding_birds &lt;-</span>
@@ -609,7 +609,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb412-5"><a href="3_birds.html#cb412-5"></a>    Datum, rngkl</span>
 <span id="cb412-6"><a href="3_birds.html#cb412-6"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb412-7"><a href="3_birds.html#cb412-7"></a><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## filter: removed 139,607 rows (93%), 11,224 rows remaining</code></pre>
+<pre><code>## filter: removed 139,619 rows (93%), 11,224 rows remaining</code></pre>
 <pre><code>## select: dropped 37 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -633,7 +633,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb415-12"><a href="3_birds.html#cb415-12"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb415-13"><a href="3_birds.html#cb415-13"></a><span class="st">  </span><span class="co"># distinct() %&gt;%</span></span>
 <span id="cb415-14"><a href="3_birds.html#cb415-14"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>n)</span></code></pre></div>
-<pre><code>## filter: removed 139,607 rows (93%), 11,224 rows remaining</code></pre>
+<pre><code>## filter: removed 139,619 rows (93%), 11,224 rows remaining</code></pre>
 <pre><code>## group_by: one grouping variable (sovon_bird_reference)</code></pre>
 <pre><code>## add_tally (grouped): new variable &#39;n&#39; (integer) with one unique value and 0% NA</code></pre>
 <pre><code>## ungroup: no grouping variables</code></pre>
@@ -675,7 +675,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb431-18"><a href="3_birds.html#cb431-18"></a>    sovon_bird_notes</span>
 <span id="cb431-19"><a href="3_birds.html#cb431-19"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb431-20"><a href="3_birds.html#cb431-20"></a><span class="st">  </span><span class="kw">ungroup</span>()</span></code></pre></div>
-<pre><code>## filter: removed 139,607 rows (93%), 11,224 rows remaining</code></pre>
+<pre><code>## filter: removed 139,619 rows (93%), 11,224 rows remaining</code></pre>
 <pre><code>## select: dropped 38 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## group_by: 2 grouping variables (sovon_bird_reference, first_Nummer)</code></pre>
 <pre><code>## summarize: now 11,224 rows and 3 columns, one group variable remaining (sovon_bird_reference)</code></pre>
@@ -778,7 +778,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb467-10"><a href="3_birds.html#cb467-10"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">sovon_bird_date_begin =</span> Datum) <span class="op">%&gt;%</span></span>
 <span id="cb467-11"><a href="3_birds.html#cb467-11"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>n) <span class="op">%&gt;%</span></span>
 <span id="cb467-12"><a href="3_birds.html#cb467-12"></a><span class="st">  </span><span class="kw">arrange</span>(sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 150,470 rows (&gt;99%), 361 rows remaining</code></pre>
+<pre><code>## filter: removed 150,482 rows (&gt;99%), 361 rows remaining</code></pre>
 <pre><code>## group_by: one grouping variable (sovon_bird_reference)</code></pre>
 <pre><code>## add_tally (grouped): new variable &#39;n&#39; (integer) with 2 unique values and 0% NA</code></pre>
 <pre><code>## ungroup: no grouping variables</code></pre>
@@ -852,7 +852,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb499-9"><a href="3_birds.html#cb499-9"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">sovon_bird_date_begin =</span> Datum) <span class="op">%&gt;%</span></span>
 <span id="cb499-10"><a href="3_birds.html#cb499-10"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>n) <span class="op">%&gt;%</span></span>
 <span id="cb499-11"><a href="3_birds.html#cb499-11"></a><span class="st">  </span><span class="kw">arrange</span>(sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 150,470 rows (&gt;99%), 361 rows remaining</code></pre>
+<pre><code>## filter: removed 150,482 rows (&gt;99%), 361 rows remaining</code></pre>
 <pre><code>## group_by: one grouping variable (sovon_bird_reference)</code></pre>
 <pre><code>## add_tally (grouped): new variable &#39;n&#39; (integer) with 2 unique values and 0% NA</code></pre>
 <pre><code>## ungroup: no grouping variables</code></pre>
@@ -995,7 +995,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb553-13"><a href="3_birds.html#cb553-13"></a><span class="st">        </span><span class="kw">pull</span>(Datum)</span>
 <span id="cb553-14"><a href="3_birds.html#cb553-14"></a>  )</span></code></pre></div>
 <pre><code>## filter: removed 11,558 rows (&gt;99%), one row remaining</code></pre>
-<pre><code>## filter: removed 150,829 rows (&gt;99%), 2 rows remaining</code></pre>
+<pre><code>## filter: removed 150,841 rows (&gt;99%), 2 rows remaining</code></pre>
 <pre><code>## filter: removed one row (50%), one row remaining</code></pre>
 <pre><code>## mutate: changed one value (100%) of &#39;sovon_bird_date_begin&#39; (1 fewer NA)</code></pre>
 <div class="sourceCode" id="cb558"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb558-1"><a href="3_birds.html#cb558-1"></a>info_faag</span></code></pre></div>
@@ -1019,7 +1019,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb559-12"><a href="3_birds.html#cb559-12"></a><span class="st">        </span><span class="kw">pull</span>(Datum)</span>
 <span id="cb559-13"><a href="3_birds.html#cb559-13"></a>  )</span></code></pre></div>
 <pre><code>## filter: removed 11,558 rows (&gt;99%), one row remaining</code></pre>
-<pre><code>## filter: removed 150,830 rows (&gt;99%), one row remaining</code></pre>
+<pre><code>## filter: removed 150,842 rows (&gt;99%), one row remaining</code></pre>
 <pre><code>## mutate: changed one value (100%) of &#39;sovon_bird_date_begin&#39; (1 fewer NA)</code></pre>
 <div class="sourceCode" id="cb563"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb563-1"><a href="3_birds.html#cb563-1"></a>info_ycaf</span></code></pre></div>
 <div data-pagedtable="false">
@@ -1042,7 +1042,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb564-12"><a href="3_birds.html#cb564-12"></a><span class="st">        </span><span class="kw">pull</span>(Datum)</span>
 <span id="cb564-13"><a href="3_birds.html#cb564-13"></a>  )</span></code></pre></div>
 <pre><code>## filter: removed 11,558 rows (&gt;99%), one row remaining</code></pre>
-<pre><code>## filter: removed 150,830 rows (&gt;99%), one row remaining</code></pre>
+<pre><code>## filter: removed 150,842 rows (&gt;99%), one row remaining</code></pre>
 <pre><code>## mutate: changed one value (100%) of &#39;sovon_bird_date_begin&#39; (1 fewer NA)</code></pre>
 <div class="sourceCode" id="cb568"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb568-1"><a href="3_birds.html#cb568-1"></a>info_fhov</span></code></pre></div>
 <div data-pagedtable="false">
@@ -1065,7 +1065,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb569-12"><a href="3_birds.html#cb569-12"></a><span class="st">        </span><span class="kw">pull</span>(Datum)</span>
 <span id="cb569-13"><a href="3_birds.html#cb569-13"></a>  )</span></code></pre></div>
 <pre><code>## filter: removed 11,558 rows (&gt;99%), one row remaining</code></pre>
-<pre><code>## filter: removed 150,830 rows (&gt;99%), one row remaining</code></pre>
+<pre><code>## filter: removed 150,842 rows (&gt;99%), one row remaining</code></pre>
 <pre><code>## mutate: changed one value (100%) of &#39;sovon_bird_date_begin&#39; (1 fewer NA)</code></pre>
 <div class="sourceCode" id="cb573"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb573-1"><a href="3_birds.html#cb573-1"></a>info_hsow</span></code></pre></div>
 <div data-pagedtable="false">
@@ -1088,7 +1088,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb574-11"><a href="3_birds.html#cb574-11"></a><span class="st">        </span><span class="kw">pull</span>(Datum)</span>
 <span id="cb574-12"><a href="3_birds.html#cb574-12"></a>  )</span></code></pre></div>
 <pre><code>## filter: removed 11,558 rows (&gt;99%), one row remaining</code></pre>
-<pre><code>## filter: removed 150,830 rows (&gt;99%), one row remaining</code></pre>
+<pre><code>## filter: removed 150,842 rows (&gt;99%), one row remaining</code></pre>
 <pre><code>## mutate: changed one value (100%) of &#39;sovon_bird_date_begin&#39; (1 fewer NA)</code></pre>
 <div class="sourceCode" id="cb578"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb578-1"><a href="3_birds.html#cb578-1"></a>info_buah</span></code></pre></div>
 <div data-pagedtable="false">
@@ -1223,7 +1223,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>## select: dropped 26 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added 12 columns (rngkl, rngme, klgev, br, vang, …)</code></pre>
 <pre><code>##            &gt; rows only in x         0</code></pre>
-<pre><code>##            &gt; rows only in y  (150,817)</code></pre>
+<pre><code>##            &gt; rows only in y  (150,829)</code></pre>
 <pre><code>##            &gt; matched rows          14</code></pre>
 <pre><code>##            &gt;                 =========</code></pre>
 <pre><code>##            &gt; rows total            14</code></pre>
@@ -1341,7 +1341,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb629-14"><a href="3_birds.html#cb629-14"></a>    <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> </span>sovon_bird_date_end</span>
 <span id="cb629-15"><a href="3_birds.html#cb629-15"></a>  )) <span class="op">%&gt;%</span></span>
 <span id="cb629-16"><a href="3_birds.html#cb629-16"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>bird_dood_datum)</span></code></pre></div>
-<pre><code>## filter: removed 150,101 rows (&gt;99%), 730 rows remaining</code></pre>
+<pre><code>## filter: removed 150,113 rows (&gt;99%), 730 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## rename: renamed one variable (bird_dood_datum)</code></pre>
 <pre><code>## right_join: added 5 columns (sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_begin, sovon_bird_date_end, sovon_bird_notes)</code></pre>
@@ -1421,10 +1421,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb657-25"><a href="3_birds.html#cb657-25"></a>    sovon_bird_shorthand_pt,</span>
 <span id="cb657-26"><a href="3_birds.html#cb657-26"></a>    <span class="kw">everything</span>()</span>
 <span id="cb657-27"><a href="3_birds.html#cb657-27"></a>  )</span></code></pre></div>
-<pre><code>## filter: removed 150,063 rows (99%), 768 rows remaining</code></pre>
+<pre><code>## filter: removed 150,075 rows (99%), 768 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## rename: renamed one variable (Datum_rngme)</code></pre>
-<pre><code>## filter: removed 139,607 rows (93%), 11,224 rows remaining</code></pre>
+<pre><code>## filter: removed 139,619 rows (93%), 11,224 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## rename: renamed one variable (Datum_rngkl)</code></pre>
 <pre><code>## left_join: added one column (Datum_rngkl)</code></pre>
@@ -1475,7 +1475,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb680-2"><a href="3_birds.html#cb680-2"></a><span class="st">  </span><span class="kw">filter</span>(<span class="kw">str_detect</span>(Opmerking, <span class="dt">pattern =</span> <span class="st">&quot;[0-9]{6,}&quot;</span>)) <span class="op">%&gt;%</span></span>
 <span id="cb680-3"><a href="3_birds.html#cb680-3"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(vang)) <span class="op">%&gt;%</span></span>
 <span id="cb680-4"><a href="3_birds.html#cb680-4"></a><span class="st">  </span><span class="kw">select</span>(Opmerking)</span></code></pre></div>
-<pre><code>## filter: removed 150,242 rows (&gt;99%), 589 rows remaining</code></pre>
+<pre><code>## filter: removed 150,254 rows (&gt;99%), 589 rows remaining</code></pre>
 <pre><code>## filter: removed 466 rows (79%), 123 rows remaining</code></pre>
 <pre><code>## select: dropped 40 variables (sovon_bird_reference, Nummer, Datum, EuringCode, LeeftijdCode, …)</code></pre>
 <div data-pagedtable="false">
@@ -1637,7 +1637,7 @@ row of numbers.</p>
 <span id="cb719-15"><a href="3_birds.html#cb719-15"></a>  )) <span class="op">%&gt;%</span></span>
 <span id="cb719-16"><a href="3_birds.html#cb719-16"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(n_rings, Datum)) <span class="op">%&gt;%</span></span>
 <span id="cb719-17"><a href="3_birds.html#cb719-17"></a><span class="st">  </span><span class="kw">ungroup</span>()</span></code></pre></div>
-<pre><code>## filter: removed 139,607 rows (93%), 11,224 rows remaining</code></pre>
+<pre><code>## filter: removed 139,619 rows (93%), 11,224 rows remaining</code></pre>
 <pre><code>## mutate: new variable &#39;n_rings&#39; (double) with 2 unique values and 0% NA</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added 2 columns (n_rings, Datum)</code></pre>
@@ -1720,7 +1720,7 @@ row of numbers.</p>
 <span id="cb743-11"><a href="3_birds.html#cb743-11"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">sovon_bird_date_begin =</span> Datum)</span></code></pre></div>
 <pre><code>## filter: removed 12,139 rows (99%), 101 rows remaining</code></pre>
 <pre><code>## select: dropped 7 variables (sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_begin, sovon_bird_date_end, sovon_bird_notes, …)</code></pre>
-<pre><code>## filter: removed 139,607 rows (93%), 11,224 rows remaining</code></pre>
+<pre><code>## filter: removed 139,619 rows (93%), 11,224 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added one column (Datum)</code></pre>
 <pre><code>##            &gt; rows only in x        0</code></pre>
@@ -1885,7 +1885,7 @@ row of numbers.</p>
 <div class="sourceCode" id="cb810"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb810-1"><a href="3_birds.html#cb810-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb810-2"><a href="3_birds.html#cb810-2"></a><span class="st">  </span><span class="kw">filter</span>(klweg <span class="op">==</span><span class="st"> &quot;klweg&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb810-3"><a href="3_birds.html#cb810-3"></a><span class="st">  </span><span class="kw">nrow</span>()</span></code></pre></div>
-<pre><code>## filter: removed 150,762 rows (&gt;99%), 69 rows remaining</code></pre>
+<pre><code>## filter: removed 150,774 rows (&gt;99%), 69 rows remaining</code></pre>
 <pre><code>## [1] 69</code></pre>
 <p>Type of action combinations where <code>klweg</code> occurs:</p>
 <div class="sourceCode" id="cb813"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb813-1"><a href="3_birds.html#cb813-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
@@ -1893,7 +1893,7 @@ row of numbers.</p>
 <span id="cb813-3"><a href="3_birds.html#cb813-3"></a><span class="st">  </span><span class="kw">select</span>(acts) <span class="op">%&gt;%</span></span>
 <span id="cb813-4"><a href="3_birds.html#cb813-4"></a><span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span></span>
 <span id="cb813-5"><a href="3_birds.html#cb813-5"></a><span class="st">  </span><span class="kw">select_if</span>(<span class="op">~</span><span class="st"> </span><span class="kw">sum</span>(<span class="op">!</span><span class="kw">is.na</span>(.)) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span></code></pre></div>
-<pre><code>## filter: removed 150,762 rows (&gt;99%), 69 rows remaining</code></pre>
+<pre><code>## filter: removed 150,774 rows (&gt;99%), 69 rows remaining</code></pre>
 <pre><code>## select: dropped 29 variables (sovon_bird_reference, Nummer, Datum, EuringCode, LeeftijdCode, …)</code></pre>
 <pre><code>## distinct: removed 62 rows (90%), 7 rows remaining</code></pre>
 <pre><code>## select_if: dropped 5 variables (rngkl, rngme, klgev, meweg, vangl)</code></pre>
@@ -1906,7 +1906,7 @@ row of numbers.</p>
 <div class="sourceCode" id="cb818"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb818-1"><a href="3_birds.html#cb818-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb818-2"><a href="3_birds.html#cb818-2"></a><span class="st">  </span><span class="kw">filter</span>(meweg <span class="op">==</span><span class="st"> &quot;meweg&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb818-3"><a href="3_birds.html#cb818-3"></a><span class="st">  </span><span class="kw">nrow</span>()</span></code></pre></div>
-<pre><code>## filter: removed 150,706 rows (&gt;99%), 125 rows remaining</code></pre>
+<pre><code>## filter: removed 150,718 rows (&gt;99%), 125 rows remaining</code></pre>
 <pre><code>## [1] 125</code></pre>
 <p>Type of action combinations where <code>meweg</code> occurs:</p>
 <div class="sourceCode" id="cb821"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb821-1"><a href="3_birds.html#cb821-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
@@ -1914,7 +1914,7 @@ row of numbers.</p>
 <span id="cb821-3"><a href="3_birds.html#cb821-3"></a><span class="st">  </span><span class="kw">select</span>(acts) <span class="op">%&gt;%</span></span>
 <span id="cb821-4"><a href="3_birds.html#cb821-4"></a><span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span></span>
 <span id="cb821-5"><a href="3_birds.html#cb821-5"></a><span class="st">  </span><span class="kw">select_if</span>(<span class="op">~</span><span class="st"> </span><span class="kw">sum</span>(<span class="op">!</span><span class="kw">is.na</span>(.)) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span></code></pre></div>
-<pre><code>## filter: removed 150,706 rows (&gt;99%), 125 rows remaining</code></pre>
+<pre><code>## filter: removed 150,718 rows (&gt;99%), 125 rows remaining</code></pre>
 <pre><code>## select: dropped 29 variables (sovon_bird_reference, Nummer, Datum, EuringCode, LeeftijdCode, …)</code></pre>
 <pre><code>## distinct: removed 119 rows (95%), 6 rows remaining</code></pre>
 <pre><code>## select_if: dropped 6 variables (rngkl, rngme, klgev, klweg, me, …)</code></pre>
@@ -1928,12 +1928,12 @@ row of numbers.</p>
 <span id="cb826-2"><a href="3_birds.html#cb826-2"></a><span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb826-3"><a href="3_birds.html#cb826-3"></a><span class="st">  </span><span class="kw">filter</span>(meweg <span class="op">==</span><span class="st"> &quot;meweg&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb826-4"><a href="3_birds.html#cb826-4"></a><span class="st">  </span><span class="kw">pull</span>(sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 150,706 rows (&gt;99%), 125 rows remaining</code></pre>
+<pre><code>## filter: removed 150,718 rows (&gt;99%), 125 rows remaining</code></pre>
 <div class="sourceCode" id="cb828"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb828-1"><a href="3_birds.html#cb828-1"></a>bird_ref_klweg &lt;-</span>
 <span id="cb828-2"><a href="3_birds.html#cb828-2"></a><span class="st">  </span>(obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb828-3"><a href="3_birds.html#cb828-3"></a><span class="st">    </span><span class="kw">filter</span>(klweg <span class="op">==</span><span class="st"> &quot;klweg&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb828-4"><a href="3_birds.html#cb828-4"></a><span class="st">    </span><span class="kw">pull</span>(sovon_bird_reference))</span></code></pre></div>
-<pre><code>## filter: removed 150,762 rows (&gt;99%), 69 rows remaining</code></pre>
+<pre><code>## filter: removed 150,774 rows (&gt;99%), 69 rows remaining</code></pre>
 <div class="sourceCode" id="cb830"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb830-1"><a href="3_birds.html#cb830-1"></a>bird_ref_meweg[<span class="kw">which</span>(bird_ref_meweg <span class="op">%in%</span><span class="st"> </span>bird_ref_klweg)]</span></code></pre></div>
 <pre><code>## integer(0)</code></pre>
 <p>Are there more than one <code>meweg</code> for bird?</p>
@@ -1944,7 +1944,7 @@ row of numbers.</p>
 <span id="cb832-5"><a href="3_birds.html#cb832-5"></a><span class="st">  </span><span class="kw">add_tally</span>() <span class="op">%&gt;%</span></span>
 <span id="cb832-6"><a href="3_birds.html#cb832-6"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
 <span id="cb832-7"><a href="3_birds.html#cb832-7"></a><span class="st">  </span><span class="kw">filter</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>)</span></code></pre></div>
-<pre><code>## filter: removed 150,706 rows (&gt;99%), 125 rows remaining</code></pre>
+<pre><code>## filter: removed 150,718 rows (&gt;99%), 125 rows remaining</code></pre>
 <pre><code>## group_by: one grouping variable (sovon_bird_reference)</code></pre>
 <pre><code>## add_tally (grouped): new variable &#39;n&#39; (integer) with one unique value and 0% NA</code></pre>
 <pre><code>## ungroup: no grouping variables</code></pre>
@@ -1963,7 +1963,7 @@ row of numbers.</p>
 <span id="cb839-5"><a href="3_birds.html#cb839-5"></a><span class="st">  </span><span class="kw">add_tally</span>() <span class="op">%&gt;%</span></span>
 <span id="cb839-6"><a href="3_birds.html#cb839-6"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
 <span id="cb839-7"><a href="3_birds.html#cb839-7"></a><span class="st">  </span><span class="kw">filter</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>)</span></code></pre></div>
-<pre><code>## filter: removed 150,762 rows (&gt;99%), 69 rows remaining</code></pre>
+<pre><code>## filter: removed 150,774 rows (&gt;99%), 69 rows remaining</code></pre>
 <pre><code>## group_by: one grouping variable (sovon_bird_reference)</code></pre>
 <pre><code>## add_tally (grouped): new variable &#39;n&#39; (integer) with 2 unique values and 0% NA</code></pre>
 <pre><code>## ungroup: no grouping variables</code></pre>
@@ -1992,7 +1992,7 @@ row of numbers.</p>
 <span id="cb846-14"><a href="3_birds.html#cb846-14"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb846-15"><a href="3_birds.html#cb846-15"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
 <span id="cb846-16"><a href="3_birds.html#cb846-16"></a><span class="st">  </span><span class="kw">arrange</span>(sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 150,709 rows (&gt;99%), 122 rows remaining</code></pre>
+<pre><code>## filter: removed 150,721 rows (&gt;99%), 122 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added 7 columns (sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_begin, sovon_bird_date_end, sovon_bird_notes, …)</code></pre>
 <pre><code>##            &gt; rows only in x        0</code></pre>
@@ -2078,7 +2078,7 @@ row of numbers.</p>
 <span id="cb870-37"><a href="3_birds.html#cb870-37"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb870-38"><a href="3_birds.html#cb870-38"></a><span class="st">  </span><span class="kw">select</span>(<span class="kw">names</span>(crbirding_birds))</span></code></pre></div>
 <pre><code>## filter: removed 84 rows (69%), 38 rows remaining</code></pre>
-<pre><code>## filter: removed 150,101 rows (&gt;99%), 730 rows remaining</code></pre>
+<pre><code>## filter: removed 150,113 rows (&gt;99%), 730 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## rename: renamed one variable (bird_dood_datum)</code></pre>
 <pre><code>## left_join: added one column (bird_dood_datum)</code></pre>
@@ -2163,7 +2163,7 @@ row of numbers.</p>
 <span id="cb911-16"><a href="3_birds.html#cb911-16"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb911-17"><a href="3_birds.html#cb911-17"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
 <span id="cb911-18"><a href="3_birds.html#cb911-18"></a><span class="st">  </span><span class="kw">arrange</span>(sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 150,773 rows (&gt;99%), 58 rows remaining</code></pre>
+<pre><code>## filter: removed 150,785 rows (&gt;99%), 58 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added 7 columns (sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_begin, sovon_bird_date_end, sovon_bird_notes, …)</code></pre>
 <pre><code>##            &gt; rows only in x        0</code></pre>
@@ -2238,7 +2238,7 @@ row of numbers.</p>
 <div class="sourceCode" id="cb939"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb939-1"><a href="3_birds.html#cb939-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb939-2"><a href="3_birds.html#cb939-2"></a><span class="st">  </span><span class="kw">filter</span>(klgev <span class="op">==</span><span class="st"> &quot;klgev&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb939-3"><a href="3_birds.html#cb939-3"></a><span class="st">  </span><span class="kw">nrow</span>()</span></code></pre></div>
-<pre><code>## filter: removed 150,793 rows (&gt;99%), 38 rows remaining</code></pre>
+<pre><code>## filter: removed 150,805 rows (&gt;99%), 38 rows remaining</code></pre>
 <pre><code>## [1] 38</code></pre>
 <p>Type of action combinations where <code>klgev</code> occurs:</p>
 <div class="sourceCode" id="cb942"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb942-1"><a href="3_birds.html#cb942-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
@@ -2246,7 +2246,7 @@ row of numbers.</p>
 <span id="cb942-3"><a href="3_birds.html#cb942-3"></a><span class="st">  </span><span class="kw">select</span>(acts) <span class="op">%&gt;%</span></span>
 <span id="cb942-4"><a href="3_birds.html#cb942-4"></a><span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span></span>
 <span id="cb942-5"><a href="3_birds.html#cb942-5"></a><span class="st">  </span><span class="kw">select_if</span>(<span class="op">~</span><span class="st"> </span><span class="kw">sum</span>(<span class="op">!</span><span class="kw">is.na</span>(.)) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span></code></pre></div>
-<pre><code>## filter: removed 150,793 rows (&gt;99%), 38 rows remaining</code></pre>
+<pre><code>## filter: removed 150,805 rows (&gt;99%), 38 rows remaining</code></pre>
 <pre><code>## select: dropped 29 variables (sovon_bird_reference, Nummer, Datum, EuringCode, LeeftijdCode, …)</code></pre>
 <pre><code>## distinct: removed 37 rows (97%), one row remaining</code></pre>
 <pre><code>## select_if: dropped 11 variables (rngkl, rngme, br, vang, dood, …)</code></pre>
@@ -2280,7 +2280,7 @@ row of numbers.</p>
 <span id="cb951-2"><a href="3_birds.html#cb951-2"></a><span class="st">  </span>(obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb951-3"><a href="3_birds.html#cb951-3"></a><span class="st">    </span><span class="kw">filter</span>(klgev <span class="op">==</span><span class="st"> &quot;klgev&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb951-4"><a href="3_birds.html#cb951-4"></a><span class="st">    </span><span class="kw">pull</span>(sovon_bird_reference))</span></code></pre></div>
-<pre><code>## filter: removed 150,793 rows (&gt;99%), 38 rows remaining</code></pre>
+<pre><code>## filter: removed 150,805 rows (&gt;99%), 38 rows remaining</code></pre>
 <div class="sourceCode" id="cb953"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb953-1"><a href="3_birds.html#cb953-1"></a><span class="cf">if</span> (<span class="st">&quot;megev&quot;</span> <span class="op">%in%</span><span class="st"> </span>acts) {</span>
 <span id="cb953-2"><a href="3_birds.html#cb953-2"></a>  bird_ref_megev &lt;-</span>
 <span id="cb953-3"><a href="3_birds.html#cb953-3"></a><span class="st">    </span>obs_and_acts <span class="op">%&gt;%</span></span>
@@ -2319,7 +2319,7 @@ row of numbers.</p>
 <span id="cb961-5"><a href="3_birds.html#cb961-5"></a><span class="st">  </span><span class="kw">add_tally</span>() <span class="op">%&gt;%</span></span>
 <span id="cb961-6"><a href="3_birds.html#cb961-6"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
 <span id="cb961-7"><a href="3_birds.html#cb961-7"></a><span class="st">  </span><span class="kw">filter</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>)</span></code></pre></div>
-<pre><code>## filter: removed 150,793 rows (&gt;99%), 38 rows remaining</code></pre>
+<pre><code>## filter: removed 150,805 rows (&gt;99%), 38 rows remaining</code></pre>
 <pre><code>## group_by: one grouping variable (sovon_bird_reference)</code></pre>
 <pre><code>## add_tally (grouped): new variable &#39;n&#39; (integer) with one unique value and 0% NA</code></pre>
 <pre><code>## ungroup: no grouping variables</code></pre>
@@ -2420,7 +2420,7 @@ row of numbers.</p>
 <span id="cb974-22"><a href="3_birds.html#cb974-22"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb974-23"><a href="3_birds.html#cb974-23"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
 <span id="cb974-24"><a href="3_birds.html#cb974-24"></a><span class="st">  </span><span class="kw">arrange</span>(sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 150,793 rows (&gt;99%), 38 rows remaining</code></pre>
+<pre><code>## filter: removed 150,805 rows (&gt;99%), 38 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added 7 columns (sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_begin, sovon_bird_date_end, sovon_bird_notes, …)</code></pre>
 <pre><code>##            &gt; rows only in x        0</code></pre>
@@ -2516,7 +2516,7 @@ row of numbers.</p>
 <pre><code>## select: dropped 26 variables (EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, MetaalringNummer_obs, …)</code></pre>
 <pre><code>## left_join: added 13 columns (Nummer, rngkl, rngme, klgev, br, …)</code></pre>
 <pre><code>##            &gt; rows only in x         0</code></pre>
-<pre><code>##            &gt; rows only in y  (150,628)</code></pre>
+<pre><code>##            &gt; rows only in y  (150,640)</code></pre>
 <pre><code>##            &gt; matched rows         203    (includes duplicates)</code></pre>
 <pre><code>##            &gt;                 =========</code></pre>
 <pre><code>##            &gt; rows total           203</code></pre>
@@ -2545,7 +2545,7 @@ row of numbers.</p>
 <pre><code>## select: dropped 25 variables (EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, MetaalringNummer_obs, …)</code></pre>
 <pre><code>## left_join: added 14 columns (Nummer, rngkl, rngme, klgev, br, …)</code></pre>
 <pre><code>##            &gt; rows only in x         0</code></pre>
-<pre><code>##            &gt; rows only in y  (150,628)</code></pre>
+<pre><code>##            &gt; rows only in y  (150,640)</code></pre>
 <pre><code>##            &gt; matched rows         203    (includes duplicates)</code></pre>
 <pre><code>##            &gt;                 =========</code></pre>
 <pre><code>##            &gt; rows total           203</code></pre>
@@ -2645,7 +2645,7 @@ row of numbers.</p>
 <pre><code>##            &gt;                 ========</code></pre>
 <pre><code>##            &gt; rows total          193</code></pre>
 <pre><code>## select: columns reordered (sovon_bird_reference, sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_begin, sovon_bird_date_end, …)</code></pre>
-<pre><code>## filter: removed 150,830 rows (&gt;99%), one row remaining</code></pre>
+<pre><code>## filter: removed 150,842 rows (&gt;99%), one row remaining</code></pre>
 <pre><code>## select: dropped 38 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added one column (meweg)</code></pre>
 <pre><code>##            &gt; rows only in x   192</code></pre>
@@ -3124,7 +3124,7 @@ row of numbers.</p>
 <span id="cb1200-2"><a href="3_birds.html#cb1200-2"></a><span class="st">  </span>obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb1200-3"><a href="3_birds.html#cb1200-3"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span></span>
 <span id="cb1200-4"><a href="3_birds.html#cb1200-4"></a><span class="st">    </span>sovon_bird_reference <span class="op">%in%</span><span class="st"> </span>rings_color_still_unknown_with_B_third_pos<span class="op">$</span>sovon_bird_reference)</span></code></pre></div>
-<pre><code>## filter: removed 181 rows (&lt;1%), 150,650 rows remaining</code></pre>
+<pre><code>## filter: removed 181 rows (&lt;1%), 150,662 rows remaining</code></pre>
 <p>The rings left are foreign rings.</p>
 <div class="sourceCode" id="cb1202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1202-1"><a href="3_birds.html#cb1202-1"></a>rings_color_still_unknown_foreign &lt;-</span>
 <span id="cb1202-2"><a href="3_birds.html#cb1202-2"></a><span class="st">  </span>crbirding_birds <span class="op">%&gt;%</span></span>
@@ -3633,7 +3633,7 @@ row of numbers.</p>
 <p>Bird age at the moment of any observation can be found in column <code>LeeftijdCode</code> of <code>obs_and_acts</code>. Values present:</p>
 <div class="sourceCode" id="cb1356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1356-1"><a href="3_birds.html#cb1356-1"></a>obs_and_acts <span class="op">%&gt;%</span></span>
 <span id="cb1356-2"><a href="3_birds.html#cb1356-2"></a><span class="st">  </span><span class="kw">distinct</span>(LeeftijdCode)</span></code></pre></div>
-<pre><code>## distinct: removed 150,642 rows (&gt;99%), 8 rows remaining</code></pre>
+<pre><code>## distinct: removed 150,654 rows (&gt;99%), 8 rows remaining</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["LeeftijdCode"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"NA"},{"1":"AD"},{"1":"PU"},{"1":"I4"},{"1":"I3"},{"1":"J1"},{"1":"I2"},{"1":"I5"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -3669,7 +3669,7 @@ row of numbers.</p>
 <span id="cb1360-13"><a href="3_birds.html#cb1360-13"></a>  )</span>
 <span id="cb1360-14"><a href="3_birds.html#cb1360-14"></a>  ) <span class="op">%&gt;%</span></span>
 <span id="cb1360-15"><a href="3_birds.html#cb1360-15"></a><span class="st">  </span><span class="kw">nrow</span>() <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>(crbirding_birds)</span></code></pre></div>
-<pre><code>## filter: removed 138,324 rows (92%), 12,326 rows remaining</code></pre>
+<pre><code>## filter: removed 138,336 rows (92%), 12,326 rows remaining</code></pre>
 <pre><code>## left_join: added 40 columns (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>##            &gt; rows only in x      152</code></pre>
 <pre><code>##            &gt; rows only in y  (   103)</code></pre>
@@ -3694,7 +3694,7 @@ row of numbers.</p>
 <span id="cb1369-14"><a href="3_birds.html#cb1369-14"></a>    <span class="st">&quot;sovon_bird_date_begin&quot;</span> =<span class="st"> &quot;Datum&quot;</span></span>
 <span id="cb1369-15"><a href="3_birds.html#cb1369-15"></a>  )</span>
 <span id="cb1369-16"><a href="3_birds.html#cb1369-16"></a>  )</span></code></pre></div>
-<pre><code>## filter: removed 138,324 rows (92%), 12,326 rows remaining</code></pre>
+<pre><code>## filter: removed 138,336 rows (92%), 12,326 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added one column (sovon_bird_age_obs)</code></pre>
 <pre><code>##            &gt; rows only in x      152</code></pre>
@@ -3906,7 +3906,7 @@ row of numbers.</p>
 <span id="cb1435-18"><a href="3_birds.html#cb1435-18"></a><span class="st">  </span><span class="kw">distinct</span>(WaarnemerNummer) <span class="op">%&gt;%</span></span>
 <span id="cb1435-19"><a href="3_birds.html#cb1435-19"></a><span class="st">  </span><span class="kw">pull</span>(WaarnemerNummer)</span></code></pre></div>
 <pre><code>## select: dropped 21 variables (sovon_bird_shorthand, sovon_bird_shorthand_pt, sovon_bird_date_end, sovon_bird_notes, sovon_bird_rings_changed, …)</code></pre>
-<pre><code>## filter: removed 138,417 rows (92%), 12,233 rows remaining</code></pre>
+<pre><code>## filter: removed 138,429 rows (92%), 12,233 rows remaining</code></pre>
 <pre><code>## select: dropped 39 variables (Nummer, EuringCode, LeeftijdCode, KleurringNummer, KleurringPlaats, …)</code></pre>
 <pre><code>## left_join: added one column (WaarnemerNummer)</code></pre>
 <pre><code>##            &gt; rows only in x      240</code></pre>
@@ -3936,7 +3936,7 @@ row of numbers.</p>
 <pre><code>## count: now 2 rows and 2 columns, one group variable remaining (user_role)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["user_role"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"O","2":"2002"},{"1":"R","2":"36"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["user_role"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"O","2":"2003"},{"1":"R","2":"36"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
