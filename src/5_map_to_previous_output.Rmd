@@ -284,7 +284,7 @@ crbirding_birds_mapping_bird_reference <-
 head(crbirding_birds_mapping_bird_reference, n = 100)
 ```
 
-We add `bird_reference_2019` to `crbirding_birds`:
+We add `bird_reference_2019` to `crbirding_birds` and `crbirding_observations`:
 
 ```{r add_bird_ref_2019}
 crbirding_birds <- 
@@ -295,6 +295,16 @@ crbirding_birds <-
   select(bird_id, bird_reference, bird_reference_2019, everything())
 ```
 
+and `crbirding_observations`:
+
+```{r add_bird_ref_2019_to_obs}
+crbirding_observations <-
+  crbirding_observations %>%
+  left_join((crbirding_birds_mapping_bird_reference %>%
+              select(bird_reference, bird_reference_2019)),
+            by = "bird_reference")
+```
+ 
 Number of birds present in 2019 but with `bird_reference` not equal to `bird_reference_2019` :
 
 ```{r n_birds_changed_bird_reference}
@@ -388,6 +398,11 @@ crbirding_birds <-
   mutate(bird_reference_2019 = if_else(bird_reference == bird_reference_ALOB,
                                        bird_reference_ALOB_2019,
                                        bird_reference_2019))
+crbirding_observations <-
+  crbirding_observations %>%
+  mutate(bird_reference_2019 = if_else(bird_reference == bird_reference_ALOB,
+                                       bird_reference_ALOB_2019,
+                                       bird_reference_2019))
 ```
 
 The ring `EAU` has been removed from the database at the preprocessing stage (see section about the [removal of some rings](#remove-three-rings)).
@@ -422,6 +437,11 @@ crbirding_birds <-
   mutate(bird_reference_2019 = if_else(bird_reference == bird_reference_FMOV,
                                        bird_reference_FMOU_2019,
                                        bird_reference_2019))
+crbirding_observations <-
+  crbirding_observations %>%
+  mutate(bird_reference_2019 = if_else(bird_reference == bird_reference_FMOV,
+                                       bird_reference_FMOU_2019,
+                                       bird_reference_2019))
 ```
 
 Show changes in column `bird_reference_2019`:
@@ -444,25 +464,25 @@ crbirding_birds <-
   mutate(new_bird_reference = if_else(!is.na(bird_reference_2019),
                                       bird_reference_2019,
                                       bird_reference + 20000))
+crbirding_observations <-
+  crbirding_observations %>%
+  mutate(new_bird_reference = if_else(!is.na(bird_reference_2019),
+                                      bird_reference_2019,
+                                      bird_reference + 20000))
+
 ```
 
-Is `new_bird_reference` unique?
+Is `new_bird_reference` unique for both birds and observations?
 
 ```{r unicity_new_bird_reference}
 nrow(crbirding_birds %>%
   distinct(bird_reference, new_bird_reference)) == 
   nrow(crbirding_birds %>%
          distinct(bird_reference))
-```
-
-We can now add the `new_bird_reference` to observations as well:
-
-```{r add_new_bird_ref_to_obs}
-crbirding_observations <-
-  crbirding_observations %>%
-  left_join(crbirding_birds %>%
-              distinct(bird_reference, new_bird_reference),
-            by = "bird_reference")
+nrow(crbirding_observations %>%
+  distinct(bird_reference, new_bird_reference)) == 
+  nrow(crbirding_observations %>%
+         distinct(bird_reference))
 ```
 
 Again, double checking that `new_bird_reference` is unique:
@@ -474,7 +494,17 @@ nrow(crbirding_observations %>%
          distinct(bird_reference))
 ```
 
-Now we can safely copy the values of `new_bird_reference` to `bird_reference` and remove the help columns `bird_reference_2019` and `inscription`:
+Final check: are all bird reference ids in `new_bird_reference` in `crbirding_observations` in `crbirding_birds` as well?
+
+```{r check_all_bird_ref_id_in_obs}
+crbirding_observations %>%
+  filter(!new_bird_reference %in% crbirding_birds$new_bird_reference) %>%
+  nrow() == 0
+```
+
+If `FALSE`, it means some observations have a broken link to birds and action is needed to solve this bug.
+
+If `TRUE`, we can safely copy the values of `new_bird_reference` to `bird_reference` and remove the help columns `bird_reference_2019` and `inscription`:
 
 ```{r set_bird_ref_again}
 crbirding_birds <- 
@@ -730,12 +760,13 @@ changed_bird_date_begin_end %>%
   select(bird_reference, bird_shorthand, bird_date_begin, bird_date_end)
 ```
 
-### Save bird data with updated `bird_reference`
+### Save bird and observation data with updated `bird_reference`
 
-We save `crbirding_birds` with the updated unique identifiers in `bird_reference`:
+We save `crbirding_birds` and `crbirding_observations` with the updated unique identifiers in `bird_reference`:
 
-```{r save_birds_with_bird_ref_2019}
-crbirding_birdss <- 
+```{r save_birds_and_obs_with_bird_ref_2019}
+# save bird data
+crbirding_birds <- 
   crbirding_birds %>%
   mutate(
     bird_date_begin = as.Date(bird_date_begin),
@@ -743,6 +774,16 @@ crbirding_birdss <-
   write_csv(path = here::here("data",
                               "processed",
                               "crbirding_birds.csv"),
+  na = ""
+)
+# save observation data
+crbirding_observations <- 
+  crbirding_observations %>%
+  mutate(
+    observation_date = as.Date(observation_date)) %>%
+  write_csv(path = here::here("data",
+                              "processed",
+                              "crbirding_observations.csv"),
   na = ""
 )
 ```
