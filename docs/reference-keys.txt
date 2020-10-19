@@ -24,6 +24,7 @@ check-spaces-in-obs_and_acts
 check-presence-action-code
 check-combinations-of-actions-with-klgev-or-megev
 remove-data-labelled-as-fout
+remove-eayt
 check-color-rings-uppercase
 check-keys-kleurringnummer-obs---nummer-birds
 check-duplicates-in-date-of-applying-rings
@@ -154,3 +155,4 @@ changed-bird-ring-position
 changed-notes
 changed-capture-information
 changed-bird-reference
+save-observation-data-with-updated-bird_reference
