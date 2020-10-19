@@ -760,11 +760,11 @@ changed_bird_date_begin_end %>%
   select(bird_reference, bird_shorthand, bird_date_begin, bird_date_end)
 ```
 
-### Save bird and observation data with updated `bird_reference`
+### Save bird data with updated `bird_reference`
 
 We save `crbirding_birds` and `crbirding_observations` with the updated unique identifiers in `bird_reference`:
 
-```{r save_birds_and_obs_with_bird_ref_2019}
+```{r save_birds_with_bird_ref_2019}
 # save bird data
 crbirding_birds <- 
   crbirding_birds %>%
@@ -774,16 +774,6 @@ crbirding_birds <-
   write_csv(path = here::here("data",
                               "processed",
                               "crbirding_birds.csv"),
-  na = ""
-)
-# save observation data
-crbirding_observations <- 
-  crbirding_observations %>%
-  mutate(
-    observation_date = as.Date(observation_date)) %>%
-  write_csv(path = here::here("data",
-                              "processed",
-                              "crbirding_observations.csv"),
   na = ""
 )
 ```
@@ -1085,3 +1075,20 @@ crbirding_observations_2019 %>%
 ```
 
 The huge number of changes of `bird_reference` has been discussed in previous session related to `crbirding_birds`.
+
+### Save observation data with updated `bird_reference`
+
+We save observation data, `crbirding_observations`, with the updated bird unique identifiers, `bird_reference`:
+
+```{r save_obs_and_obs_with_bird_ref_2019}
+crbirding_observations <- 
+  crbirding_observations %>%
+  mutate(
+    observation_date = as.Date(observation_date)) %>%
+  write_csv(path = here::here("data",
+                              "processed",
+                              "crbirding_observations.csv"),
+  na = ""
+)
+```
+
