@@ -470,6 +470,24 @@ birds <-
   birds %>% filter(Nummer != "FOUT")
 ```
 
+## Remove `EAYT`
+
+The bird with color ring `EAYT` has been added after the final data export for SOVON, Oct 8th, and will be removed from birds:
+
+```{r remove_EAYT}
+birds <-
+  birds %>%
+  filter(Nummer != "EAYT")
+```
+
+and observations:
+
+```{r remove_EAYT_from_obs}
+obs_and_acts <-
+  obs_and_acts %>%
+  filter(KleurringNummer != "EAYT")
+```
+
 ## Check color rings: uppercase
 
 Bird color rings codes are uppercase. Exceptions:
