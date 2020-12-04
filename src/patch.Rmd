@@ -266,6 +266,19 @@ Preview:
 head(obs_and_acts, n = 100)
 ```
 
+## Check duplicates `dood`
+
+If multiple observations with action `dood` for same bird occur, we remove those ones occurring after the first one (see https://github.com/inbo/cr-birding/issues/138):
+
+```{r remove_duplicates_dood}
+obs_and_acts <-
+  obs_and_acts %>%
+  filter(dood == "dood") %>%
+  group_by(KleurringNummer) %>%
+  filter(Datum == min(Datum, na.rm = TRUE)) %>%
+  ungroup()
+```
+
 # Import final export data
 
 First, we need to read the data we sent them in Oct, 2020.
