@@ -276,7 +276,10 @@ obs_and_acts <-
   filter(dood == "dood") %>%
   group_by(KleurringNummer) %>%
   filter(Datum == min(Datum, na.rm = TRUE)) %>%
-  ungroup()
+  ungroup() %>%
+  bind_rows(obs_and_acts %>%
+              filter(is.na(dood))) %>%
+  arrange(Nummer)
 ```
 
 # Import final export data
@@ -814,6 +817,13 @@ obs_and_acts <-
       paste(sovon_observation_location)
     )
   )
+```
+
+All `sovon_observation_location` values present in patch data:
+
+```{r all_sovon_observation_location}
+obs_and_acts %>%
+distinct(sovon_observation_location)
 ```
 
 ## Check bird
