@@ -1,0 +1,1225 @@
+---
+title: "Mapping observation - patch"
+author: "Damiano Oldoni"
+date: "12/3/2020"
+output: html_document
+---
+
+In this after-export patch, we are interested in the very last observations, i.e. observations created or modified after 19 Nov 2020. The main goal is to map them based on SOVON standard and assign right bird and user IDs.
+
+# Extract data from INBO kleurring database
+
+## Connection to INBO database
+
+Get connection settings from `config.yml` (not included to the reposiory) and connect to database:
+
+```{r connect_to_db}
+meeuwen <- config::get("meeuwen")
+conn <- dbConnect(odbc::odbc(),
+  driver = meeuwen$driver,
+  server = meeuwen$server,
+  database = meeuwen$database,
+  port = meeuwen$port,
+  trusted_connection = meeuwen$trusted_connection
+)
+```
+
+## Extract user data
+
+First, we extract data about users from INBO *kleurring* database:
+
+```{r get_user_data}
+users <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemer") %>%
+  as_tibble()
+```
+
+## Extract color ring data
+
+```{r get_birds_data}
+birds <- dbGetQuery(conn, "SELECT * FROM dbo.tblKleurring") %>%
+  as_tibble()
+```
+
+We extract the color table in order to know the meaning of the color abbreviations in fields  `RingKleurCode` and `InscriptieKleurCode` in `birds`.
+
+```{r get_color_table}
+color_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeKleur") %>%
+  as_tibble()
+color_table
+```
+
+We also extract the ring position (left or right leg) and the inscription orientation:
+
+```{r  get_ring_position_table}
+ring_position_table <- dbGetQuery(conn, "SELECT * FROM dbo.cdeRingPlaats") %>%
+  as_tibble()
+ring_position_table
+```
+
+## Extract observation data
+
+INBO's observation data contain a text type field: `Opmerking`. Text type is deprecated and an error will be returned if we perform the standard SQL query `"SELECT * FROM dbo.tblWaarneming"`. So, we need an ad-hoc query:
+
+```{r get_obs_data}
+obs <- dbGetQuery(
+  conn,
+  "SELECT Nummer,
+          Datum,
+          EuringCode,
+          LeeftijdCode,
+          KleurringNummer,
+          KleurringPlaats,
+          MetaalringNummer,
+          MetaalringPlaats,
+          PlaatsGemeente,
+          PlaatsToponym,
+          PlaatsToponymDetail,
+          Convert(nvarchar(4000),Opmerking) as Opmerking,
+          WaarnemerNummer,
+          PlaatsLengtegraadGraden,
+          PlaatsLengtegraadMinuten,
+          PlaatsLengtegraadSeconden,
+          PlaatsBreedtegraadGraden,
+          PlaatsBreedtegraadMinuten,
+          PlaatsBreedtegraadSeconden,
+          PlaatsLengtegraadRichtingCode,
+          PlaatsBreedtegraadRichtingCode,
+          PlaatsLandCode,
+          MetaalringLandCode,
+          BevestigingDatum,
+          PlaatsProvincie,
+          AanmaakDatum,
+          WijzigDatum
+  FROM dbo.tblWaarneming"
+) %>% as_tibble()
+```
+
+Table `tblWaarnemingAktie` is also important because contains informations about the actions taken at each observation:
+
+```{r get_waarnemingAktie}
+obs_actions <- dbGetQuery(conn, "SELECT * FROM dbo.tblWaarnemingAktie")
+```
+
+The action codes are described in table `dbo.cdeAktie`:
+
+```{r get_}
+actions_meaning <- dbGetQuery(conn, "SELECT * FROM dbo.cdeAktie")
+actions_meaning
+```
+
+Close connection to server:
+
+```{r close_connection}
+dbDisconnect(conn)
+```
+
+# Pre-processing
+
+## Preview raw data
+
+For privacy reasons users data cannot be shown. Users data refer to the following fields:
+
+```{r prview_users}
+colnames(users)
+```
+
+Preview birds data:
+
+```{r preview_birds}
+birds %>% head()
+```
+
+Preview observations data:
+
+```{r preview_obs}
+obs %>% head()
+```
+
+Preview observation actions data:
+
+```{r preview_obs_actions}
+obs_actions %>% head()
+```
+
+# Filter data for patch
+
+In this after-export patch, we are interested in the very last (field) observations and correspondent rings and observers.
+
+## Observations
+
+Observations created or modified after Nov, 19 2020:
+
+```{r after_export_obs}
+obs <-
+  obs %>%
+  filter(WijzigDatum > as_date("2020-11-19"))
+```
+
+and linked actions:
+
+```{r filter_acts_for_patch}
+obs_actions <-
+  obs_actions %>%
+  filter(WaarnemingNummer %in%
+           obs$Nummer)
+```
+
+## Users
+
+Users the filtered occurrences are pointing to:
+
+```{r filter_users}
+users <- 
+  users %>%
+  filter(Nummer %in% obs$WaarnemerNummer)
+```
+
+## Birds
+
+Users the filtered occurrences are pointing to:
+
+```{r filter_birds}
+birds <- 
+  birds %>%
+  filter(Nummer %in% obs$KleurringNummer)
+```
+
+# Merge observations and actions
+
+In order to ease the mapping of birds and observations, we first remove columns will be never used: 
+
+```{r remove_cols_not_used}
+obs_actions <-
+  obs_actions %>%
+  select(-c(
+    Nummer,
+    AanmaakDatum,
+    WijzigDatum
+  ))
+```
+
+Then we *spread* action codes to columns:
+
+```{r spread_action_codes}
+obs_actions <-
+  obs_actions %>%
+  pivot_wider(names_from = AktieCode, values_from = AktieCode)
+```
+
+The following combinations occur:
+
+```{r distinct_combinations_actions}
+combinations_actions <- 
+  obs_actions %>%
+  select(-WaarnemingNummer) %>%
+  distinct()
+combinations_actions
+```
+
+Actions present in observations:
+
+```{r colnames_actions_present}
+acts <- names(combinations_actions)
+acts
+```
+
+Actions described in `actions_meaning` never used in last observations:
+
+```{r no_used_actions}
+actions_meaning %>%
+  filter(!Code %in% acts)
+```
+
+We add action code columns to observations in order to have a unique dataframe for observations:
+
+```{r merge_obs_with_acts}
+obs_and_acts <-
+  obs %>%
+  left_join(obs_actions, by = c("Nummer" = "WaarnemingNummer"))
+```
+
+Preview: 
+
+```{r merge_obs_with_acts_preview}
+head(obs_and_acts, n = 100)
+```
+
+# Import final export data
+
+First, we need to read the data we sent them in Oct, 2020.
+
+```{r read_2020_data}
+crbirding_users_2020 <- read_csv(here::here("data",
+                                  "processed",
+                                  "crbirding_users_20201007.csv"),
+                                 col_types = cols(
+                                   .default = col_character(),
+                                   user_id = col_logical(),
+                                   user_reference = col_number()),
+                       na = "")
+crbirding_birds_2020 <- read_csv(here::here("data",
+                                  "processed",
+                                  "crbirding_birds_20201007.csv"),
+                       col_types = cols(
+                         .default = col_character(),
+                         bird_id = col_logical(),
+                         bird_reference = col_number(),
+                         bird_bto = col_logical(),
+                         bird_birth_year = col_logical(),
+                         bird_date_begin = col_datetime(
+                           format = ""),
+                         bird_date_end = col_datetime(
+                           format = "")),
+                       na = "")
+crbirding_observations_2020 <- read_csv(here::here(
+  "data",
+  "processed",
+  "crbirding_observations_20201019.csv"),
+  col_types = cols(
+    .default = col_character(),
+    user_id = col_logical(),
+    user_reference = col_number(),
+    bird_id = col_logical(),
+    bird_reference = col_number(),
+    observation_id = col_logical(),
+    observation_reference = col_number(),
+    observation_date = col_datetime(
+      format = ""),
+    observation_time = col_logical(),
+    check_bird = col_logical(),
+    MRI = col_number(),
+    melder_ringersnummer = col_logical(),
+    status_full_grown_bird = col_character()
+  ),
+  na = "")
+```
+
+## Import accessory data
+
+### List workers in bird shelters
+
+```{r import_workers}
+workers_bird_shelters <- read_tsv(
+  here::here("data", "input", "workers_in_bird_shelters.tsv"),
+  col_types = cols(
+    .default = col_character(),
+    user_id = col_logical(),
+    user_reference = col_double()
+  )
+)
+```
+
+# Map user data
+
+We map the original fields to SOVON fields denoted by prefix `sovon_`.
+
+## E-mail
+
+```{r e-mail}
+users <-
+  users %>%
+  mutate(sovon_user_email = Email)
+```
+
+## First name
+
+```{r first_name}
+users <-
+  users %>%
+  mutate(sovon_user_first_name = Voornaam)
+```
+
+## Last name
+
+```{r last_name}
+users <-
+  users %>%
+  mutate(sovon_user_last_name = Familienaam)
+```
+
+## Address
+
+```{r address}
+users <-
+  users %>%
+  mutate(sovon_user_address = Adres)
+```
+
+## Place
+
+```{r place}
+users <-
+  users %>%
+  mutate(sovon_user_place = Gemeente)
+```
+
+## Postal code
+
+```{r postal_code}
+users <-
+  users %>%
+  mutate(sovon_user_postal_code = Postcode)
+```
+
+## Country
+
+Countries present:
+
+```{r countries_in_users}
+users %>%
+  distinct(LandCode)
+```
+
+```{r country}
+users <-
+  users %>%
+  mutate(sovon_user_country = LandCode)
+```
+
+## User ID
+
+User identifiers are provided by SOVON. `NA` is given.
+
+```{r userID}
+users <-
+  users %>%
+  mutate(sovon_user_id = NA)
+```
+
+## User reference
+
+We use the unique ID in `Nummer`:
+
+```{r user_ref}
+users <-
+  users %>%
+  mutate(sovon_user_reference = Nummer)
+```
+
+## User language
+
+This field is not present in `users`. We leave it empty:
+
+```{r user_language}
+users <-
+  users %>%
+  mutate(sovon_user_language = NA_character_)
+```
+
+## User role
+
+The field `user_role` is automatically set to `O`, observer:
+
+```{r user_role}
+users <-
+  users %>%
+  mutate(sovon_user_role = "O")
+```
+
+## Save user data
+
+Export the SOVON fields to `crbirding_users`:
+
+```{r make_crbirding_users}
+crbirding_users <-
+  users %>%
+  select(starts_with("sovon_"))
+```
+
+Remove prefix `sovon_`:
+
+```{r remove prefix_sovon_users}
+names(crbirding_users) <- str_remove(
+  names(crbirding_users),
+  pattern = "sovon_"
+)
+```
+
+The desired order of columns in `crbirding_users`:
+
+```{r cols_order_users}
+cr_users_cols <- c(
+  "user_id", "user_reference", "user_email", "user_first_name",
+  "user_last_name", "user_address", "user_postal_code", "user_place",
+  "user_country", "user_language", "user_role"
+)
+```
+
+Fields still not mapped:
+
+```{r users_fields_not_yet_mapped}
+cr_users_cols[which(!cr_users_cols %in% names(crbirding_users))]
+```
+
+Set column order:
+
+```{r get_right_order_cols_users}
+crbirding_users <-
+  crbirding_users %>%
+  select(all_of(cr_users_cols))
+```
+
+Preview data (e-mail, first and last names removed for privacy reasons):
+
+```{r final_preview_users}
+crbirding_users %>%
+  select(-c(user_email, user_first_name, user_last_name)) %>%
+  head(n = 10)
+```
+
+Save to csv file `crbirding_users_patch.csv` in `./data/processed/` adding suffix `patch` followed by the date, `20201119`:
+
+```{r write_user_data_txt}
+crbirding_users %>%
+  write_csv(
+    file = here::here("data", "processed", "crbirding_users_patch_20201119.csv"),
+    na = ""
+  )
+```
+
+# Map observation data
+
+## Bird reference
+
+Based on `NummerDesc` of `birds` and the inscription in final export  of Oct, 2020, `crbirding_birds_2020`, we can retrieve the `bird_reference` IDs from final export.
+
+Create inscription based on `bird_shorthand`:
+
+```{r retrieve_inscription}
+crbirding_birds_2020 <-
+  crbirding_birds_2020 %>%
+  mutate(inscription = str_sub(str_extract(bird_shorthand, pattern = "-(.*)"), start = 2))
+```
+
+Match inscription with `NummerDesc`:
+
+```{r match_inscriptions_NummerDesc}
+birds <- 
+  birds %>%
+  left_join(crbirding_birds_2020 %>%
+              select(bird_reference, bird_shorthand, inscription),
+            by = c("NummerDesc" = "inscription"))
+birds %>%
+  select(Nummer, NummerNieuw, NummerDesc, bird_shorthand, bird_reference)
+```
+
+Check that all observations have a valid `bird_reference`value:
+
+```{r check_validity_bird_reference}
+birds %>%
+  filter(is.na(bird_reference)) %>%
+  nrow == 0
+```
+
+If everything is right, we remove `bird_shorthand` from `birds`:
+
+```{r remove_inscription}
+birds <-
+  birds %>%
+  select(-bird_shorthand)
+```
+
+and assign `bird_reference` to the observations based on the `KleurringNummer` (obs) -`Nummer` (birds) relation:
+
+```{r assign_bird_reference}
+obs_and_acts <-
+  obs_and_acts %>%
+  left_join(birds %>%
+              select(bird_reference, Nummer),
+            by = c("KleurringNummer" = "Nummer"))  %>%
+  rename(sovon_bird_reference = bird_reference)
+```
+
+Preview:
+
+```{r preview_bird_reference}
+obs_and_acts %>%
+  select(Nummer, sovon_bird_reference) %>%
+  head(100)
+```
+
+## Observation ID
+
+The field `sovon_observation_id` is left to SOVON:
+
+```{r add_obs_id}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_id = NA)
+```
+
+## Observation reference
+
+The observation reference is an unique identifier assigned to each observation. This field exists already: `Nummer`.
+
+```{r add_obs_ref}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_reference = Nummer)
+```
+
+## Observation date
+
+The date is saved in column `Datum`. We copy it in required column `sovon_observation_date`:
+
+```{r obs_date}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_date = Datum)
+```
+
+## Observation time
+
+There is no observation time in `obs_and_acts`. `NA` is given to `sovon_observation_time`:
+
+```{r obs_time}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_time = NA)
+```
+
+## Observation latitude
+
+Observations with missing or partially missing latitude information:
+
+```{r nas_breedte_fields}
+obs_missing_latitude_longitude <-
+  obs_and_acts %>%
+  filter(is.na(PlaatsBreedtegraadGraden) |
+    is.na(PlaatsBreedtegraadMinuten) |
+    is.na(PlaatsBreedtegraadSeconden) |
+    is.na(PlaatsLengtegraadGraden) |
+    is.na(PlaatsLengtegraadMinuten) |
+    is.na(PlaatsLengtegraadSeconden)) %>%
+  select(
+    Nummer,
+    KleurringNummer,
+    Datum,
+    starts_with("PlaatsBreedtegraad"),
+    starts_with("PlaatsLengtegraad"),
+    PlaatsGemeente,
+    PlaatsToponym
+  )
+obs_missing_latitude_longitude
+```
+
+The absolute observation latitude should be converted to decimal degrees:
+
+```{r obs_latitude}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_lat = case_when(
+      !is.na(PlaatsBreedtegraadGraden) &
+        !is.na(PlaatsBreedtegraadMinuten) &
+        !is.na(PlaatsBreedtegraadSeconden) ~ conv_unit(
+        str_c(PlaatsBreedtegraadGraden,
+          PlaatsBreedtegraadMinuten,
+          PlaatsBreedtegraadSeconden,
+          sep = " "
+        ),
+        from = "deg_min_sec",
+        to = "dec_deg"
+      ),
+      !is.na(PlaatsBreedtegraadGraden) &
+        !is.na(PlaatsBreedtegraadMinuten) &
+        is.na(PlaatsBreedtegraadSeconden) ~ conv_unit(
+        str_c(PlaatsBreedtegraadGraden,
+          PlaatsBreedtegraadMinuten,
+          0,
+          sep = " "
+        ),
+        from = "deg_min_sec",
+        to = "dec_deg"
+      ),
+      !is.na(PlaatsBreedtegraadGraden) &
+        is.na(PlaatsBreedtegraadMinuten) &
+        is.na(PlaatsBreedtegraadSeconden) ~ conv_unit(
+        str_c(PlaatsBreedtegraadGraden, 0, 0, sep = " "),
+        from = "deg_min_sec",
+        to = "dec_deg"
+      ),
+      TRUE ~ NA_character_
+    )
+  )
+```
+
+By field `PlaatsBreedtegraadRichtingCode` we can know whether the observation took place in the northern or southern hemisphere. In case of southern hemisphere, the latitude value should be negative.
+
+Values of `PlaatsBreedtegraadRichtingCode` and number of observations:
+
+```{r values_of_PlaatsBreedtegraadRichtingCode}
+obs_and_acts %>%
+  group_by(PlaatsBreedtegraadRichtingCode) %>%
+  count()
+```
+
+If present, the observations with valid `PlaatsBreedtegraadGraden` but without `PlaatsBreedtegraadRichtingCode` should be further evaluated:
+
+```{r obs_without_N_or_Z}
+obs_and_acts %>%
+  filter(is.na(PlaatsBreedtegraadRichtingCode) &
+    !is.na(PlaatsBreedtegraadGraden)) %>%
+  select(Nummer, starts_with("PlaatsBreedte"), PlaatsGemeente, PlaatsToponym)
+```
+
+Assign negative latitude if `PlaatsBreedtegraadRichtingCode` is equal to `S`:
+
+```{r map_N_S}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_lat = case_when(
+      PlaatsBreedtegraadRichtingCode == "N" ~ sovon_observation_lat,
+      PlaatsBreedtegraadRichtingCode == "S" & !is.na(sovon_observation_lat) ~
+      paste0("-", sovon_observation_lat),
+      TRUE ~ sovon_observation_lat
+    )
+  )
+```
+
+## Observation longitude
+
+Absolute value of the observation longitude should be converted to decimal degrees:
+
+```{r obs_longitude}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_lng = case_when(
+      !is.na(PlaatsLengtegraadGraden) &
+        !is.na(PlaatsLengtegraadMinuten) &
+        !is.na(PlaatsLengtegraadSeconden) ~ conv_unit(
+        str_c(PlaatsLengtegraadGraden,
+          PlaatsLengtegraadMinuten,
+          PlaatsLengtegraadSeconden,
+          sep = " "
+        ),
+        from = "deg_min_sec",
+        to = "dec_deg"
+      ),
+      !is.na(PlaatsLengtegraadGraden) &
+        !is.na(PlaatsLengtegraadMinuten) &
+        is.na(PlaatsLengtegraadSeconden) ~ conv_unit(
+        str_c(PlaatsLengtegraadGraden,
+          PlaatsLengtegraadMinuten,
+          0,
+          sep = " "
+        ),
+        from = "deg_min_sec",
+        to = "dec_deg"
+      ),
+      !is.na(PlaatsLengtegraadGraden) &
+        is.na(PlaatsLengtegraadMinuten) &
+        is.na(PlaatsLengtegraadSeconden) ~ conv_unit(
+        str_c(PlaatsLengtegraadGraden, 0, 0, sep = " "),
+        from = "deg_min_sec",
+        to = "dec_deg"
+      ),
+      TRUE ~ NA_character_
+    )
+  )
+```
+
+By field `PlaatsLengtegraadRichtingCode` we can know whether the observation took place in the western or eastern hemisphere. In case of western hemisphere, the longitude value should be negative.
+
+Values of `PlaatsLengtegraadRichtingCode` and number of observations:
+
+```{r values_of_PlaatsLengtegraadRichtingCode}
+obs_and_acts %>%
+  group_by(PlaatsLengtegraadRichtingCode) %>%
+  count()
+```
+
+If present, the observations with valid `PlaatsLengtegraadGraden` but without `PlaatsLengtegraadRichtingCode` should be further evaluated:
+
+```{r obs_without_E_or_W}
+obs_and_acts %>%
+  filter(is.na(PlaatsLengtegraadRichtingCode) &
+    !is.na(PlaatsLengtegraadGraden)) %>%
+  select(Nummer, starts_with("PlaatsLengte"), PlaatsGemeente, PlaatsToponym)
+```
+
+Assign negative longitude if `PlaatsLengtegraadRichtingCode` is equal to `W`:
+
+```{r map_E_W}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_lng = case_when(
+      PlaatsLengtegraadRichtingCode == "E" ~ sovon_observation_lng,
+      PlaatsLengtegraadRichtingCode == "W" & !is.na(sovon_observation_lng) ~ paste0("-", sovon_observation_lng),
+      TRUE ~ sovon_observation_lng
+    )
+  )
+```
+
+## Observation location
+
+Aggregate information about observation location. We follow the following structure: `PlaatsGemeente` [+ `, ` + `PlaatsToponym` [+ `: ` + `PlaatsToponymDetail`]]:
+
+```{r obs_location}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_location = ifelse(!is.na(PlaatsToponym),
+      str_c(PlaatsGemeente,
+        PlaatsToponym,
+        sep = ", "
+      ),
+      paste(PlaatsGemeente)
+    )
+  ) %>%
+  mutate(
+    sovon_observation_location = ifelse(!is.na(PlaatsToponymDetail),
+      str_c(sovon_observation_location,
+        PlaatsToponymDetail,
+        sep = ": "
+      ),
+      paste(sovon_observation_location)
+    )
+  )
+```
+
+## Check bird
+
+The field `sovon_check_bird` is provided by SOVON. `NA` is given:
+
+```{r check_bird}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_check_bird = NA)
+```
+
+## User ID
+
+The field `sovon_user_id` is left to SOVON:
+
+```{r add_user_id}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_user_id = NA)
+```
+
+## User reference
+
+The field `sovon_user_reference` links observations to users and it is equal to field `user_reference` in user data:
+
+```{r add_user_reference}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_user_reference = WaarnemerNummer)
+```
+
+### Observer
+
+The field `sovon_melder` is equal to `user_first_name` and `user_last_name` in `users`:
+
+```{r obs_sovon_melder}
+obs_and_acts <-
+  obs_and_acts %>%
+  left_join(
+    crbirding_users %>%
+      select(user_reference, user_first_name, user_last_name),
+    by = c("WaarnemerNummer" = "user_reference")
+  ) %>%
+  mutate(sovon_melder = case_when(
+    is.na(user_first_name) & !is.na(user_last_name) ~ user_last_name,
+    !is.na(user_first_name) & is.na(user_last_name) ~ user_first_name,
+    !is.na(user_first_name) & !is.na(user_last_name) ~ str_c(user_first_name, user_last_name, sep = " "),
+    is.na(user_first_name) & is.na(user_last_name) ~ NA_character_
+  )) %>%
+  select(-c(user_first_name, user_last_name))
+```
+
+### Observer e-mail
+
+The field `sovon_melder_email` is equal to `user_email` in `users`:
+
+```{r obs_sovon_melder_email}
+obs_and_acts <-
+  obs_and_acts %>%
+  left_join(
+    crbirding_users %>%
+      select(user_reference, user_email),
+    by = c("WaarnemerNummer" = "user_reference")
+  ) %>%
+  rename(sovon_melder_email = user_email)
+```
+
+### Reporter - ringer number
+
+The field `sovon_melder_ringersnummer` is left to SOVON:
+
+```{r sovon_melder_ringersnummer}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_melder_ringersnummer = NA)
+```
+
+### Ring number
+
+The field `sovon_ring_number` contains information about the metal ring number. However, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
+
+```{r add_ring_number}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_ring_number = NA_character_)
+```
+
+## Observation status
+
+Adding the status (based on EURING) information arises by the need of mapping the observations with action code `br` and `vang`:
+
+```{r breed_show}
+actions_meaning %>%
+  filter(Code %in% c("br", "vang"))
+```
+
+The actions `br` and `vang` refer to status `breeding` in EURING system. Based on the scheme at page 16 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document and based on discussion in [this issue](https://github.com/inbo/cr-birding/issues/114), we define the following mapping for field `status_full_grown_bird`:
+
+```{r obs_status}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_status_full_grown_bird = case_when(
+    all(c("br", "vang") %in% acts) && (!is.na(br) | !is.na(vang)) ~ "N",
+    LeeftijdCode == "PU" ~ "-",
+    TRUE ~ "U"
+  ))
+```
+
+### Observation condition
+
+The SOVON field `observation_condition` is NOT mapped following the [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. SOVON experts provided us the following list of conditions (see [#126](https://github.com/inbo/cr-birding/issues/126)):
+
+- `1`: healthy
+- `2`: sick/wounded
+- `3`: dead (less than week)
+- `4`: dead (more than week)
+- `5`: dead (unknown if freshly dead)
+- `6`: released after rehabilitation
+
+So, we do an initial mapping of following actions as follows (in order of priority):
+
+1. `dood`, `klgev`, `megev`: `observation_condition` = `5` 
+2. `ziek` (or observations of bird shelter workers): `observation_condition` = `2`
+3. `rngkl`, `rngme`, `vang`, `vangl`, `veld`, `me`, `meweg`, `klweg`, `br`: `observation_condition` = `1`
+
+```{r obs_condition}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_condition = case_when(
+    "dood" %in% acts && dood == "dood" ~ 5,
+    "ziek" %in% acts && ziek == "ziek" | 
+      sovon_user_reference %in% workers_bird_shelters$user_reference ~ 2,
+    "rngkl" %in% acts && !is.na(rngkl) | 
+      "rngme" %in% acts && !is.na(rngme) | 
+      "vang" %in% acts && !is.na(vang) | 
+      "vangl" %in% acts && !is.na(vangl) |
+      "veld" %in% acts && !is.na(veld) |
+      "me" %in% acts && !is.na(me) | 
+      "meweg" %in% acts && !is.na(meweg) | 
+      "klweg" %in% acts && !is.na(klweg) | 
+      "br" %in% acts && !is.na(br) ~ 1
+  ))
+```
+
+Releasing after rehabilitation can be detected by the notes in field `Opmerking` for the observations of bird shelter workers. This is due to the fact that some of these observations are linked to ringing actions, other are linked to `veld` actions thus making the detection of release by actions troublesome.
+
+Assign condition value `6` to the release after rehabilitation:
+
+```{r assign_6_release_after_rehabilitation}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_condition = if_else(
+    # observation of a bird shelter worker
+    sovon_user_reference %in% workers_bird_shelters$user_reference & 
+      # bird is not dead
+      is.na(dood) & 
+      # no empty note
+      !is.na(Opmerking) & 
+      # note mentions the release in Dutch
+      str_detect(Opmerking, pattern = "gelost|vrijlating") & 
+      # note does not mention the unrelease
+      !str_detect(Opmerking, pattern = "niet gelost"),
+    6, sovon_observation_condition
+  ))
+```
+
+Values of `sovon_observation_condition` present in patch data:
+
+```{r distinct_values_sovon_observation_condition}
+unique(obs_and_acts$sovon_observation_condition)
+```
+
+Overview of notes and actions of observations with `sovon_observation_condition` = 6 (released after rehabilitation):
+
+```{r show_obs_condition_6}
+obs_and_acts %>%
+  filter(sovon_observation_condition == 6) %>%
+  select(
+    Opmerking,
+    acts
+  ) %>%
+  select_if(function(x) any(!is.na(x))) %>%
+  distinct()
+```
+
+## MRI: metal ring information
+
+Metal ring information is an integer between 0 and 9. A table can be found at page 8 of [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document.
+
+However, SOVON uses this field to map the observations referring to the applying of any kind of ring, either color or metal, as their database is purely focussed on color rings and due to a missing field in the EURING Exchange Code 2000+ specific for color rings.
+
+INBO experts explained us that all color rings are applied on tarsus, MRI: 2, while metal ring position is on tarsus or above or unknown, MRI: 1. However, the value 2 is not allowed by SOVON (see [comment in issue 47](https://github.com/inbo/cr-birding/issues/47#issuecomment-478926426)). Values allowed: 1, 4 and 5, where 4 is used for adding a color and/or metal ring, while 5 for changing
+
+Mapping decision rules:
+
+1. Default: MRI 4 
+2. Very first ringing of a bird (no matter if `rngme` only, `rngkl` only or  `rngme` +  `rngkl`): `MRI` 1
+3. Changing a metal and/or color ring: MRI 5
+
+This last condition holds true even if the color ring is changed while adding a metal ring or viceversa.
+
+As we have only field observations (`veld` or `dood` actions) `sovon_MRI` is by default set to 4:
+
+```{r initialize_MRI_obs_and_acts}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_MRI = 4)
+```
+
+## Bird age
+
+The field `sovon_bird_age_obs` should be filled with the age of the bird as mentioned by the observer. We will follow the Euring standard: see [online pdf document](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) at page 14.
+
+```{r map_age_code}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_bird_age_obs = recode(LeeftijdCode,
+    "PU" = "1",
+    "AD" = "A",
+    "J1" = "3",
+    "I4" = "5",
+    "I3" = "7",
+    "I2" = "9",
+    "I5" = "B",
+    .missing = NA_character_
+  ))
+```
+
+Mapping in patch observation data:
+
+```{r mapping_bird_age_ringing}
+obs_and_acts %>%
+  distinct(LeeftijdCode, sovon_bird_age_obs)
+```
+
+## Bird sex
+
+The field `sovon_bird_sex` should be filled with the sex of the bird as mentioned by the observer. This field is not present in `obs_and_acts`, so we assign value `U` (unknown):
+
+```{r add_sovon_bird_sex_obs}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_bird_sex = "U")
+```
+
+## Capture
+
+The field `sovon_observation_is_capture` can be filled by evaluating the link of observations to actions `vang`, `vangl`, `rngkl` or `rngme`:
+
+```{r is_capture}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_is_capture = if_else(
+    "vang" %in% acts && !is.na(vang) | 
+      "vangl" %in% acts && !is.na(vangl) | 
+      "rngkl" %in% acts && !is.na(rngkl) | 
+      "rngme" %in% acts && !is.na(rngme), "Y", "N"
+  ))
+```
+
+## Bird ID
+
+The field `sovon_bird_id` is left to SOVON:
+
+```{r add_bird_id}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_bird_id = NA)
+```
+
+## Bird ring position and inscription direction
+
+We map all values of ring position and inscription reading direction:
+
+```{r map_positions_and_directions}
+ring_position_table <-
+  ring_position_table %>%
+  mutate(
+    sovon_bird_ring_position = case_when(
+      str_sub(Code, start = 1, end = 1) == "L" ~ "LB",
+      str_sub(Code, start = 1, end = 1) == "R" ~ "RB",
+      TRUE ~ NA_character_
+    ),
+    sovon_bird_ring_direction = case_when(
+      str_sub(Code, start = -1, end = -1) == "D" ~ "D",
+      str_sub(Code, start = -1, end = -1) == "U" ~ "U",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  select(
+    Code,
+    sovon_bird_ring_position,
+    sovon_bird_ring_direction,
+    everything()
+  )
+ring_position_table
+```
+
+We map the ring position and inscription reading direction in observations:
+
+```{r map_pos_direction_obs}
+obs_and_acts <-
+  obs_and_acts %>%
+  left_join(ring_position_table %>%
+    select(Code, sovon_bird_ring_position),
+  by = c("KleurringPlaats" = "Code")
+  ) %>%
+  left_join(ring_position_table %>%
+    select(Code, sovon_bird_ring_direction),
+  by = c("KleurringPlaats" = "Code")
+  )
+```
+
+Effects of the mapping:
+
+```{r result_mapping_position_direction_obs}
+obs_and_acts %>%
+  distinct(KleurringPlaats, sovon_bird_ring_position, sovon_bird_ring_direction)
+```
+
+## Observation notes
+
+We copy the notes in `Opmerking` to SOVON field  `sovon_observation_notes`:
+
+```{r obs_notes}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_notes = Opmerking)
+```
+
+We add a dot at the end of the notes if not present already:
+
+```{r add_final_dot}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_notes =
+      if_else(
+        !is.na(sovon_observation_notes) & str_length(sovon_observation_notes) > 0,
+        if_else(str_sub(sovon_observation_notes, -1) != ".",
+          str_c(sovon_observation_notes, ".", sep = ""),
+          sovon_observation_notes
+        ),
+        sovon_observation_notes
+      )
+  )
+```
+
+We also add the prefix `"INBO original notes: "`:
+
+```{r add_prefix}
+obs_and_acts <-
+  obs_and_acts %>%
+  mutate(
+    sovon_observation_notes =
+      if_else(
+        !is.na(sovon_observation_notes) &
+          str_length(sovon_observation_notes) > 0,
+        str_c("INBO original notes: ", sovon_observation_notes, sep = " "),
+        NA_character_
+      )
+  )
+```
+
+No additional mapping as we don't have observations with actions `meweg`, `klweg` or `me`.
+
+Preview of observation notes if any:
+
+```{r preview_sovon_observation_notes}
+obs_and_acts %>%
+  filter(!is.na(sovon_observation_notes)) %>%
+  select(Nummer, sovon_observation_notes)
+```
+
+## Save final observation data
+
+Select the required columns, starting with prefix `sovon_`:
+
+```{r select_sovon_cols}
+crbirding_observations <-
+  obs_and_acts %>%
+  select(starts_with("sovon"))
+```
+
+Remove prefix `sovon_`:
+
+```{r remove prefix_sovon_observations}
+names(crbirding_observations) <- str_remove_all(names(crbirding_observations), pattern = "sovon_")
+```
+
+Remove time and timezone information from `bird_date_begin` and `bird_date_end`:
+
+```{r remove_time_and_tz_obs}
+crbirding_observations <-
+  crbirding_observations %>%
+  mutate(observation_date = as.Date(observation_date))
+```
+
+The desired order of columns in `crbirding_observations`:
+
+```{r cols_order_obs}
+cr_obs_cols <- c(
+  "user_id", "user_reference", "bird_id", "bird_reference", "observation_id",
+  "observation_reference", "observation_date", "observation_time",
+  "observation_lat", "observation_lng", "observation_location",
+  "observation_is_capture", "observation_notes", "check_bird", "MRI", "melder",
+  "melder_email", "melder_ringersnummer", "ring_number", "observation_condition", "status_full_grown_bird",
+  "bird_age_obs", "bird_sex", "bird_ring_position", "bird_ring_direction"
+)
+```
+
+Are all required columns present?
+
+```{r check_presence_required_cols_obs}
+all(cr_obs_cols %in% names(crbirding_observations)) &
+  length(cr_obs_cols) == ncol(crbirding_observations)
+```
+
+Set column order:
+
+```{r get_right_order_cols_obs}
+crbirding_observations <-
+  crbirding_observations %>%
+  select(all_of(cr_obs_cols))
+```
+
+Preview data (without personal observer data for privacy reasons):
+
+```{r final_preview_obs}
+crbirding_observations %>%
+  select(-c(melder, melder_email)) %>%
+  head(n = 10)
+```
+
+Save to text file (comma separated value). We use suffix `patch` followed by date `20201119`:
+
+```{r write_processed_obs_data}
+write_csv(
+  crbirding_observations,
+  file = here::here("data", "processed", "crbirding_observations_patch_20201119.csv"),
+  na = ""
+)
+```
