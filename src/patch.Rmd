@@ -7,6 +7,21 @@ output: html_document
 
 In this after-export patch, we are interested in the very last observations, i.e. observations created or modified after 19 Nov 2020. The main goal is to map them based on SOVON standard and assign right bird and user IDs.
 
+# Setup
+
+Load libraries:
+
+```{r load_libraries, warning=FALSE, message=FALSE}
+library(DBI) # To connect to database
+library(odbc) # To connect to database
+library(tidyverse) # To do datascience
+library(tidylog) # To provide feedback on dplyr functions
+library(tidyselect) # To select columns smartly
+library(measurements) # To convert measurement units
+library(here) # To find files
+library(lubridate) # To ease working with dates
+```
+
 # Extract data from INBO kleurring database
 
 ## Connection to INBO database
