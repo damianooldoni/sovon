@@ -191,7 +191,7 @@ users <-
 
 ## Birds
 
-Users the filtered occurrences are pointing to:
+Birds the filtered occurrences are pointing to:
 
 ```{r filter_birds}
 birds <- 
@@ -826,7 +826,7 @@ obs_and_acts <-
   mutate(sovon_user_reference = WaarnemerNummer)
 ```
 
-### Observer
+## Observer
 
 The field `sovon_melder` is equal to `user_first_name` and `user_last_name` in `users`:
 
@@ -847,7 +847,7 @@ obs_and_acts <-
   select(-c(user_first_name, user_last_name))
 ```
 
-### Observer e-mail
+## Observer e-mail
 
 The field `sovon_melder_email` is equal to `user_email` in `users`:
 
@@ -862,7 +862,7 @@ obs_and_acts <-
   rename(sovon_melder_email = user_email)
 ```
 
-### Reporter - ringer number
+## Reporter - ringer number
 
 The field `sovon_melder_ringersnummer` is left to SOVON:
 
@@ -872,7 +872,7 @@ obs_and_acts <-
   mutate(sovon_melder_ringersnummer = NA)
 ```
 
-### Ring number
+## Ring number
 
 The field `sovon_ring_number` contains information about the metal ring number. However, INBO database is a color ring database. This field is not accurately mapped and we will leave it empty.
 
@@ -903,7 +903,7 @@ obs_and_acts <-
   ))
 ```
 
-### Observation condition
+## Observation condition
 
 The SOVON field `observation_condition` is NOT mapped following the [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. SOVON experts provided us the following list of conditions (see [#126](https://github.com/inbo/cr-birding/issues/126)):
 
@@ -1169,7 +1169,7 @@ obs_and_acts %>%
   select(Nummer, sovon_observation_notes)
 ```
 
-## Save final observation data
+# Save final observation data
 
 Select the required columns, starting with prefix `sovon_`:
 
