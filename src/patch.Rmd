@@ -274,6 +274,13 @@ Preview:
 head(obs_and_acts, n = 100)
 ```
 
+We stored number of observations/actions for checking it is preserved along the mapping :
+
+```{r n_obs_for_control}
+n_obs_raw <- nrow(obs_and_acts)
+```
+
+
 ## Check duplicates `dood`
 
 If multiple observations with action `dood` for same bird occur, we remove those ones occurring after the first one (see https://github.com/inbo/cr-birding/issues/138):
@@ -543,7 +550,8 @@ Match inscription with `NummerDesc`:
 birds <- 
   birds %>%
   left_join(crbirding_birds_2020 %>%
-              select(bird_reference, bird_shorthand, inscription),
+              filter(!is.na(bird_shorthand)) %>%
+              distinct(bird_reference, bird_shorthand, inscription),
             by = c("NummerDesc" = "inscription"))
 birds %>%
   select(Nummer, NummerNieuw, NummerDesc, bird_shorthand, bird_reference)
@@ -571,7 +579,7 @@ and assign `bird_reference` to the observations based on the `KleurringNummer` (
 obs_and_acts <-
   obs_and_acts %>%
   left_join(birds %>%
-              select(bird_reference, Nummer),
+              distinct(bird_reference, Nummer),
             by = c("KleurringNummer" = "Nummer"))  %>%
   rename(sovon_bird_reference = bird_reference)
 ```
@@ -1257,6 +1265,12 @@ Set column order:
 crbirding_observations <-
   crbirding_observations %>%
   select(all_of(cr_obs_cols))
+```
+
+Is the number of observations preserved during mapping?
+
+```{r check_number_observations}
+n_obs_raw == nrow(crbirding_observations)
 ```
 
 Preview data (without personal observer data for privacy reasons):
