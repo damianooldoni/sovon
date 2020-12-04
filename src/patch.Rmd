@@ -5,6 +5,13 @@ date: "12/3/2020"
 output: html_document
 ---
 
+```{r index-setup, include = FALSE}
+knitr::opts_chunk$set(
+  warning = TRUE,
+  message = TRUE,
+  rownames.print = FALSE # Option for df_print = paged
+)
+```
 In this after-export patch, we are interested in the very last observations, i.e. observations created or modified after 19 Nov 2020. The main goal is to map them based on SOVON standard and assign right bird and user IDs.
 
 # Setup
