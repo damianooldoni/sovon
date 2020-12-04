@@ -1,7 +1,7 @@
 ---
-title: "Mapping observation - patch"
+title: "Patch export"
 author: "Damiano Oldoni"
-date: "12/3/2020"
+date: "`r Sys.Date()`"
 output: html_document
 ---
 
