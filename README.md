@@ -8,6 +8,8 @@ This repository contains the functionality to map/transform data from INBO's col
 
 See https://inbo.github.io/cr-birding/
 
+Patch after final export is not included in webpage, but is still rendered as html, download [patch.html](https://github.com/inbo/cr-birding/blob/master/docs/patch.html) from `./docs` folder.
+
 ## Repo structure
 
 The repository structure is based on [Cookiecutter Data Science](http://drivendata.github.io/cookiecutter-data-science/). Files and directories indicated with `GENERATED` should not be edited manually.
@@ -34,6 +36,8 @@ The repository structure is based on [Cookiecutter Data Science](http://drivenda
     ├── 2_users.Rmd   : Script to map user data
     ├── 3_birds.Rmd   : Script to map bird ring data
     └── 4_observations.Rmd : Script to map observations
+    └── 5_map_to_previous_output.Rmd : Script to match bird IDs with previous export
+    └── patch.Rmd     : Script for patch after final export
 ```
 
 ## Installation
