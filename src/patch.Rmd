@@ -177,12 +177,12 @@ In this after-export patch, we are interested in the very last (field) observati
 
 ## Observations
 
-Observations created or modified after Nov, 19 2020:
+Observations created or modified after Dec, 8 2020:
 
 ```{r after_export_obs}
 obs <-
   obs %>%
-  filter(WijzigDatum > as_date("2020-11-19"))
+  filter(WijzigDatum >= as_date("2020-12-08"))
 ```
 
 and linked actions:
@@ -423,10 +423,20 @@ users %>%
   distinct(LandCode)
 ```
 
+Mapping countries:
+
 ```{r country}
 users <-
   users %>%
-  mutate(sovon_user_country = LandCode)
+  mutate(sovon_user_country = recode(LandCode,
+                                     "UK" = "GB")
+)
+```
+
+Overview of the mapping of the countries users come from:
+
+```{r mapping_users_countries}
+users %>% distinct(sovon_user_country)
 ```
 
 ## User ID
@@ -461,12 +471,17 @@ users <-
 
 ## User role
 
-The field `user_role` is automatically set to `O`, observer:
+The field `user_role` is retrieved by joining with final export data first. The users without user role are new users which are always observers, if not otherwise specified by INBO experts:
 
-```{r user_role}
-users <-
+```{r modify_to_ringers_user_role_if_needed}
+users <- 
   users %>%
-  mutate(sovon_user_role = "O")
+  left_join(crbirding_users_2020 %>%
+              select(user_reference, sovon_user_role = user_role),
+            by = c("sovon_user_reference" = "user_reference")) %>%
+  mutate(sovon_user_role = if_else(is.na(sovon_user_role),
+                                   "O",
+                                   sovon_user_role))
 ```
 
 ## Save user data
@@ -520,12 +535,12 @@ crbirding_users %>%
   head(n = 10)
 ```
 
-Save to csv file `crbirding_users_patch.csv` in `./data/processed/` adding suffix `patch` followed by the date, `20201119`:
+Save to csv file `crbirding_users_patch.csv` in `./data/processed/` adding suffix `patch` followed by the date, `20201208`:
 
 ```{r write_user_data_txt}
 crbirding_users %>%
   write_csv(
-    file = here::here("data", "processed", "crbirding_users_patch_20201119.csv"),
+    file = here::here("data", "processed", "crbirding_users_patch_20201208.csv"),
     na = ""
   )
 ```
@@ -557,7 +572,7 @@ birds %>%
   select(Nummer, NummerNieuw, NummerDesc, bird_shorthand, bird_reference)
 ```
 
-Check that all observations have a valid `bird_reference`value:
+Check that all birds have a valid `bird_reference`value:
 
 ```{r check_validity_bird_reference}
 birds %>%
@@ -949,6 +964,13 @@ obs_and_acts <-
   ))
 ```
 
+Distinct values present in our observations:
+
+```{r overview_sovon_status_full_grown_bird}
+obs_and_acts %>%
+  distinct(sovon_status_full_grown_bird)
+```
+
 ## Observation condition
 
 The SOVON field `observation_condition` is NOT mapped following the [EURING Exchange Code 2000+](https://euring.org/files/documents/E2000PLUSExchangeCodev1161.pdf) document. SOVON experts provided us the following list of conditions (see [#126](https://github.com/inbo/cr-birding/issues/126)):
@@ -1020,7 +1042,7 @@ obs_and_acts %>%
   filter(sovon_observation_condition == 6) %>%
   select(
     Opmerking,
-    acts
+    all_of(acts)
   ) %>%
   select_if(function(x) any(!is.na(x))) %>%
   distinct()
@@ -1099,6 +1121,14 @@ obs_and_acts <-
       "rngkl" %in% acts && !is.na(rngkl) | 
       "rngme" %in% acts && !is.na(rngme), "Y", "N"
   ))
+```
+
+In case of patch exports of field observations, the field `sovon_observation_is_capture` should always be `"N"`:
+
+```{r overview_mapping_is_capture}
+obs_and_acts %>%
+  distinct(sovon_observation_is_capture) %>%
+  pull(sovon_observation_is_capture) == "N"
 ```
 
 ## Bird ID
@@ -1281,12 +1311,12 @@ crbirding_observations %>%
   head(n = 10)
 ```
 
-Save to text file (comma separated value). We use suffix `patch` followed by date `20201119`:
+Save to text file (comma separated value). We use suffix `patch` followed by date `20201208`:
 
 ```{r write_processed_obs_data}
 write_csv(
   crbirding_observations,
-  file = here::here("data", "processed", "crbirding_observations_patch_20201119.csv"),
+  file = here::here("data", "processed", "crbirding_observations_patch_20201208.csv"),
   na = ""
 )
 ```
