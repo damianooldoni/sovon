@@ -1320,3 +1320,73 @@ write_csv(
   na = ""
 )
 ```
+
+# Map bird data
+
+As we agreed to not add any additional ring in INBO database we limit the patch export to observations only. This means that the only possible changes in bird data are related to the death of a bird. we do it by adding a value to  `bird_date_end` related to the very last ring.
+
+## Bird date end
+
+Retrieve the bird_reference of the birds found dead:
+
+```{r dead_birds}
+dead_birds <-
+  obs_and_acts %>%
+  filter(dood == "dood") %>%
+  select(sovon_bird_reference, Datum)
+dead_birds
+```
+
+Check that there are no filed observations of a bird after the its death:
+
+```{r set_bird_date_end}
+dead_birds %>%
+  left_join(obs_and_acts %>%
+              filter(veld == "veld") %>%
+              select(sovon_bird_reference,
+                     Datum_veld = Datum,
+                     veld),
+            by = "sovon_bird_reference") %>%
+  filter(Datum_veld >= Datum) %>%
+  nrow == 0
+```
+
+If this check is ok, set `bird_date_end`:
+
+```{r }
+crbirding_birds <-
+  crbirding_birds_2020 %>%
+  filter(bird_reference %in% 
+           dead_birds$sovon_bird_reference) %>%
+  right_join(dead_birds,
+             by = c("bird_reference" = "sovon_bird_reference"))
+crbirding_birds <-
+  crbirding_birds %>% 
+  group_by(bird_reference) %>%
+  mutate(bird_date_end = if_else(
+    bird_date_begin == max(bird_date_begin, na.rm = TRUE) & 
+      is.na(bird_date_end),
+    Datum,
+    bird_date_end))
+crbirding_birds
+```
+
+# Save final bird data
+
+After checking, remove the help column `Datum` as it is not needed anymore:
+
+```{r remove_Datum}
+crbirding_birds <-
+  crbirding_birds %>%
+  select(-Datum)
+```
+
+Save to text file (comma separated value). We use suffix `patch` followed by date `20201208`:
+
+```{r write_processed_bird_data}
+write_csv(
+  crbirding_birds,
+  file = here::here("data", "processed", "crbirding_birds_patch_20201208.csv"),
+  na = ""
+)
+```
