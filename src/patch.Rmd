@@ -869,12 +869,12 @@ obs_and_acts <-
 
 ## User ID
 
-SOVON expert explicitly asked to fill `sovon_user_id` with `user_reference` values in user data:
+The field `sovon_user_id` is left to SOVON::
 
 ```{r add_user_id}
 obs_and_acts <-
   obs_and_acts %>%
-  mutate(sovon_user_id = WaarnemerNummer)
+  mutate(sovon_user_id = NA)
 ```
 
 ## User reference
