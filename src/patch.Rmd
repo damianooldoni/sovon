@@ -182,7 +182,7 @@ Observations created or modified after Dec, 8 2020:
 ```{r after_export_obs}
 obs <-
   obs %>%
-  filter(WijzigDatum >= as_date("2020-12-08"))
+  filter(WijzigDatum >= as_date("2021-01-30"))
 ```
 
 and linked actions:
@@ -192,6 +192,33 @@ obs_actions <-
   obs_actions %>%
   filter(WaarnemingNummer %in%
            obs$Nummer)
+```
+
+Actions present:
+
+```{r acts_present_in_patch}
+unique(obs_actions$AktieCode)
+```
+
+INBO experts agree to remove observations linked to actions `rngkl` and `rngme` from patch export:
+
+```{r remove_rngme_rngkl_from_patch}
+obs_actions_to_remove <- 
+  obs_actions %>%
+  filter(AktieCode %in% c("rngkl", "rngme"))
+obs <- 
+  obs %>%
+  filter(!Nummer %in% obs_actions_to_remove$WaarnemingNummer)
+obs_actions <-
+  obs_actions %>%
+  filter(!AktieCode %in% c("rngkl", "rngme"))
+```
+Check again present actions:
+
+Actions present:
+
+```{r acts_present_in_patch_after_cleaning}
+unique(obs_actions$AktieCode)
 ```
 
 ## Users
@@ -535,12 +562,12 @@ crbirding_users %>%
   head(n = 10)
 ```
 
-Save to csv file `crbirding_users_patch.csv` in `./data/processed/` adding suffix `patch` followed by the date, `20201208`:
+Save to csv file `crbirding_users_patch.csv` in `./data/processed/` adding suffix `patch` followed by the date, `20210511`:
 
 ```{r write_user_data_txt}
 crbirding_users %>%
   write_csv(
-    file = here::here("data", "processed", "crbirding_users_patch_20201208.csv"),
+    file = here::here("data", "processed", "crbirding_users_patch_20210511.csv"),
     na = ""
   )
 ```
@@ -879,7 +906,7 @@ obs_and_acts <-
 
 ## User reference
 
-The field `sovon_user_reference` links observations to users and it is equal to field `user_reference` in user data:
+The field `sovon_user_reference` links observations to users and it is equal to field `user_reference` in user data (equal to `WaarnemerNummer`):
 
 ```{r add_user_reference}
 obs_and_acts <-
@@ -958,17 +985,19 @@ The actions `br` and `vang` refer to status `breeding` in EURING system. Based o
 obs_and_acts <-
   obs_and_acts %>%
   mutate(sovon_status_full_grown_bird = case_when(
-    all(c("br", "vang") %in% acts) && (!is.na(br) | !is.na(vang)) ~ "N",
+    "br" %in% acts && !is.na(br) ~"N",
+    "vang" %in% acts && !is.na(vang) ~"N",
     LeeftijdCode == "PU" ~ "-",
     TRUE ~ "U"
   ))
 ```
 
-Distinct values present in our observations:
+Distinct values present in our observations and rleated number of observations:
 
 ```{r overview_sovon_status_full_grown_bird}
 obs_and_acts %>%
-  distinct(sovon_status_full_grown_bird)
+  group_by(sovon_status_full_grown_bird) %>%
+  count()
 ```
 
 ## Observation condition
@@ -988,23 +1017,70 @@ So, we do an initial mapping of following actions as follows (in order of priori
 2. `ziek` (or observations of bird shelter workers): `observation_condition` = `2`
 3. `rngkl`, `rngme`, `vang`, `vangl`, `veld`, `me`, `meweg`, `klweg`, `br`: `observation_condition` = `1`
 
-```{r obs_condition}
+
+Set `observation_condition` for the first two condtions listed above:
+
+```{r obs_condition_5_and_2}
+if ("dood" %in% acts) {
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_condition = case_when(
+    dood == "dood" ~ 5)
+  )
+}
+if ("klgev" %in% acts) {
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_condition = case_when(
+    klgev == "klgev" ~ 5,
+    TRUE ~ sovon_observation_condition)
+  )
+}
+if ("megev" %in% acts) {
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_condition = case_when(
+    megev == "megev" ~ 5,
+    TRUE ~ sovon_observation_condition)
+  )
+}
+
+if ("ziek" %in% acts) {
+  obs_and_acts <- 
+    obs_and_acts %>%
+  mutate(sovon_observation_condition = case_when(
+    ziek == "ziek" |
+      sovon_user_reference %in% workers_bird_shelters$user_reference ~ 2,
+    TRUE ~ sovon_observation_condition)
+  )
+}
+```
+
+Check that all observations left have one of the actions listed in 3:
+
+```{r check_obs_acts_for_1}
+nrow_obs_with_obs_condition <- 
+  obs_and_acts %>%
+  filter(!is.na(sovon_observation_condition)) %>%
+  nrow()
+
+acts_for_one  <- c("rngkl", "rngme", "vang", "vangl", "veld", "me", "meweg", "klweg", "br")
+obs_and_acts %>%
+  filter(is.na(sovon_observation_condition)) %>%
+  select(one_of(acts_for_one)) %>%
+  filter(if_any(one_of(acts_for_one), ~ !is.na(.))) %>%
+  nrow() == (nrow(obs_and_acts) - nrow_obs_with_obs_condition)
+```
+
+If it's ok, then set `sovon_observation_condition` equal to 1 for all left observations:
+
+```{r set_obs_condition_1}
 obs_and_acts <-
   obs_and_acts %>%
   mutate(sovon_observation_condition = case_when(
-    "dood" %in% acts && dood == "dood" ~ 5,
-    "ziek" %in% acts && ziek == "ziek" | 
-      sovon_user_reference %in% workers_bird_shelters$user_reference ~ 2,
-    "rngkl" %in% acts && !is.na(rngkl) | 
-      "rngme" %in% acts && !is.na(rngme) | 
-      "vang" %in% acts && !is.na(vang) | 
-      "vangl" %in% acts && !is.na(vangl) |
-      "veld" %in% acts && !is.na(veld) |
-      "me" %in% acts && !is.na(me) | 
-      "meweg" %in% acts && !is.na(meweg) | 
-      "klweg" %in% acts && !is.na(klweg) | 
-      "br" %in% acts && !is.na(br) ~ 1
-  ))
+    is.na(sovon_observation_condition) ~ 1,
+    TRUE ~ sovon_observation_condition)
+  )
 ```
 
 Releasing after rehabilitation can be detected by the notes in field `Opmerking` for the observations of bird shelter workers. This is due to the fact that some of these observations are linked to ringing actions, other are linked to `veld` actions thus making the detection of release by actions troublesome.
@@ -1012,7 +1088,8 @@ Releasing after rehabilitation can be detected by the notes in field `Opmerking`
 Assign condition value `6` to the release after rehabilitation:
 
 ```{r assign_6_release_after_rehabilitation}
-obs_and_acts <-
+if ("dood" %in% acts) {
+  obs_and_acts <-
   obs_and_acts %>%
   mutate(sovon_observation_condition = if_else(
     # observation of a bird shelter worker
@@ -1027,12 +1104,15 @@ obs_and_acts <-
       !str_detect(Opmerking, pattern = "niet gelost"),
     6, sovon_observation_condition
   ))
+}
 ```
 
-Values of `sovon_observation_condition` present in patch data:
+Values of `sovon_observation_condition` present in patch data and their distribution:
 
 ```{r distinct_values_sovon_observation_condition}
-unique(obs_and_acts$sovon_observation_condition)
+obs_and_acts %>%
+  group_by(sovon_observation_condition) %>%
+  count()
 ```
 
 Overview of notes and actions of observations with `sovon_observation_condition` = 6 (released after rehabilitation):
@@ -1064,13 +1144,28 @@ Mapping decision rules:
 
 This last condition holds true even if the color ring is changed while adding a metal ring or viceversa.
 
-As we have only field observations (`veld` or `dood` actions) `sovon_MRI` is by default set to 4:
+Set default value, 4:
 
 ```{r initialize_MRI_obs_and_acts}
 obs_and_acts <-
   obs_and_acts %>%
   mutate(sovon_MRI = 4)
 ```
+Very first ringing gets `sovon_MRI` = 1:
+
+```{r assign_1_to_very_first_ringing}
+obs_and_acts <-
+  obs_and_acts %>%
+  group_by(sovon_bird_reference) %>%
+  mutate(sovon_MRI = case_when(
+    Datum == min(Datum) & (rngkl == "rngkl" | rngme == "rngme") ~ 1,
+    TRUE ~ sovon_MRI
+  )) %>%
+  arrange(sovon_bird_reference, Datum) %>%
+  ungroup()
+```
+
+No further mapping needed (see full discussion and all possible mapping in chapter 4: `4_observations.Rmd`)
 
 ## Bird age
 
@@ -1091,11 +1186,12 @@ obs_and_acts <-
   ))
 ```
 
-Mapping in patch observation data:
+Mapping and count in patch observation data:
 
 ```{r mapping_bird_age_ringing}
 obs_and_acts %>%
-  distinct(LeeftijdCode, sovon_bird_age_obs)
+  group_by(LeeftijdCode, sovon_bird_age_obs) %>%
+  count()
 ```
 
 ## Bird sex
@@ -1113,22 +1209,58 @@ obs_and_acts <-
 The field `sovon_observation_is_capture` can be filled by evaluating the link of observations to actions `vang`, `vangl`, `rngkl` or `rngme`:
 
 ```{r is_capture}
+if ("vang" %in% acts){
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_is_capture = case_when(
+    !is.na(vang) ~ "Y")
+  )
+}
+if ("vangl" %in% acts){
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_is_capture = case_when(
+    !is.na(vangl) ~ "Y")
+  )
+}
+if ("rngkl" %in% acts){
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_is_capture = case_when(
+    !is.na(rngkl) ~ "Y")
+  )
+}
+if ("rngme" %in% acts){
+  obs_and_acts <-
+  obs_and_acts %>%
+  mutate(sovon_observation_is_capture = case_when(
+    !is.na(rngme) ~ "Y")
+  )
+}
+
+# assign "N" to all the other observations
 obs_and_acts <-
   obs_and_acts %>%
-  mutate(sovon_observation_is_capture = if_else(
-    "vang" %in% acts && !is.na(vang) | 
-      "vangl" %in% acts && !is.na(vangl) | 
-      "rngkl" %in% acts && !is.na(rngkl) | 
-      "rngme" %in% acts && !is.na(rngme), "Y", "N"
-  ))
+  mutate(sovon_observation_is_capture = case_when(
+    is.na(sovon_observation_is_capture) ~ "N",
+    TRUE ~ sovon_observation_is_capture)
+  )
 ```
 
-In case of patch exports of field observations, the field `sovon_observation_is_capture` should always be `"N"`:
+Distribution of `sovon_observation_is_capture`:
+
+```{r sovon_observation_is_capture_distr}
+obs_and_acts %>%
+  group_by(sovon_observation_is_capture) %>%
+  count()
+```
+
+
+In case of patch exports of field observations, the field `sovon_observation_is_capture` should always be `"N"` unless some ringing observations have been improved and so present in this patch:
 
 ```{r overview_mapping_is_capture}
 obs_and_acts %>%
-  distinct(sovon_observation_is_capture) %>%
-  pull(sovon_observation_is_capture) == "N"
+  filter(sovon_observation_is_capture == "Y")
 ```
 
 ## Bird ID
@@ -1316,7 +1448,7 @@ Save to text file (comma separated value). We use suffix `patch` followed by dat
 ```{r write_processed_obs_data}
 write_csv(
   crbirding_observations,
-  file = here::here("data", "processed", "crbirding_observations_patch_20201208.csv"),
+  file = here::here("data", "processed", "crbirding_observations_patch_20210511.csv"),
   na = ""
 )
 ```
@@ -1330,30 +1462,33 @@ As we agreed to not add any additional ring in INBO database we limit the patch 
 Retrieve the bird_reference of the birds found dead:
 
 ```{r dead_birds}
-dead_birds <-
+if ("dood" %in% acts) {
+  dead_birds <-
   obs_and_acts %>%
   filter(dood == "dood") %>%
   select(sovon_bird_reference, Datum)
 dead_birds
+}
 ```
 
-Check that there are no filed observations of a bird after the its death:
+Check that there are no observations of a bird after its death:
 
 ```{r set_bird_date_end}
-dead_birds %>%
-  left_join(obs_and_acts %>%
-              filter(veld == "veld") %>%
-              select(sovon_bird_reference,
-                     Datum_veld = Datum,
-                     veld),
-            by = "sovon_bird_reference") %>%
-  filter(Datum_veld >= Datum) %>%
-  nrow == 0
+if ("dood" %in% acts) {
+  dead_birds %>%
+    left_join(obs_and_acts %>%
+                select(sovon_bird_reference,
+                       Datum_other_obs = Datum,
+                       all_of(acts)),
+              by = "sovon_bird_reference") %>%
+    filter(Datum_other_obs >= Datum) %>%
+    nrow == nrow(dead_birds)
+}
 ```
 
 If this check is ok, set `bird_date_end`:
 
-```{r }
+```{r set_bird_date_end}
 crbirding_birds <-
   crbirding_birds_2020 %>%
   filter(bird_reference %in% 
