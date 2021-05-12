@@ -554,6 +554,13 @@ crbirding_users <-
   crbirding_users %>%
   select(all_of(cr_users_cols))
 ```
+Order user data by `user_reference`:
+
+```{r arrange_by_user_ref}
+crbirding_users <-
+  crbirding_users %>%
+  arrange(user_reference)
+```
 
 Preview data (e-mail, first and last names removed for privacy reasons):
 
@@ -1621,7 +1628,7 @@ crbirding_birds_klgev
 
 We proceed now to merge `crbirding_birds_dead` and `crbirding_birds_klgev`.
 
-First, remove the help columns `Datum` and `inscription` from as it is not needed anymore:
+First, remove the help columns `Datum` and `inscription` from `crbirding_birds_dead` as it is not needed anymore:
 
 ```{r remove_Datum}
 crbirding_birds_dead <-
@@ -1629,7 +1636,7 @@ crbirding_birds_dead <-
   select(-Datum)
 ```
 
-Check that both `crbirding_birds_dead` and `crbirding_birds_klgev` have some columns:
+Check that both `crbirding_birds_dead` and `crbirding_birds_klgev` have some (number of) columns:
 
 ```{r merge_two_crbirding_birds_dfs}
 ncol(crbirding_birds_dead) == ncol(crbirding_birds_klgev)
@@ -1639,13 +1646,7 @@ ncol(crbirding_birds_dead) == ncol(crbirding_birds_klgev)
 all(names(crbirding_birds_dead) == names(crbirding_birds_klgev))
 ```
 
-And that these columns are the same as in the  final export:
-
-```{r check_cols_with_cols_final_export}
-all(names(crbirding_birds_2020) == names(crbirding_birds_dead))
-```
-
-Merge `crbirding_birds_dead` and `crbirding_birds_klgev`:
+Merge `crbirding_birds_dead` and `crbirding_birds_klgev` and order data by `bird_reference`:
 
 ```{r create_crbirding_birds}
 crbirding_birds <- bind_rows(crbirding_birds_dead,
@@ -1654,7 +1655,34 @@ crbirding_birds <- bind_rows(crbirding_birds_dead,
 crbirding_birds
 ```
 
-# Save final bird data
+## Save final bird data
+
+The desired order of columns in `crbirding_birds`:
+
+```{r cols_order_birds}
+cr_birds_cols <- c(
+  "bird_id", "bird_reference", "bird_euring", "bird_bto",
+  "bird_shorthand", "bird_scheme", "bird_ring_number", "bird_name",
+  "bird_sex", "bird_birth_year", "bird_date_begin", "bird_date_end",
+  "bird_rings_changed", "bird_age_ringing", "bird_ring_position",
+  "bird_ring_direction", "bird_notes"
+)
+```
+
+Are all required columns present?
+
+```{r check_presence_required_cols_birds}
+all(cr_birds_cols %in% names(crbirding_birds)) &
+  length(cr_birds_cols) == ncol(crbirding_birds)
+```
+
+Set column order:
+
+```{r get_right_order_cols_birds}
+crbirding_birds <-
+  crbirding_birds %>%
+  select(all_of(cr_birds_cols))
+```
 
 Save to text file (comma separated value). We use suffix `patch` followed by date `20210511`:
 
